@@ -599,13 +599,13 @@ const Index = () => {
           <main>
           {/* Header with Stats */}
           <div className="text-center mb-12 animate-fade-in">
-            <p className="text-2xl font-bold text-foreground mb-4">
+            <p className="text-2xl font-bold text-black mb-4">
               Nationwide SBA & Commercial Financing
             </p>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-foreground mb-4">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-black mb-4">
               Comprehensive Business Financing Solutions
             </h1>
-            <p className="text-sm text-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
+            <p className="text-sm text-black max-w-3xl mx-auto mb-10 leading-relaxed">
               We provide credit, financing, treasury and payment solutions to help your business succeed. 
               Discover our comprehensive range of SBA-backed and conventional financing options designed to fuel your business growth.
             </p>
