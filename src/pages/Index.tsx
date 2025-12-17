@@ -201,7 +201,7 @@ const DashboardView = () => {
           {firstName && <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3">
               Welcome, {firstName}
             </h2>}
-          <p className="text-sm sm:text-base mb-4 text-black">
+          <p className="text-sm sm:text-base mb-4 text-muted-foreground">
             Manage your loan applications and track your progress here
           </p>
         </div>
@@ -594,7 +594,7 @@ const Index = () => {
 
   // Show auth forms for unauthenticated users
   if (!authenticated && !loading) {
-    return <div className="min-h-screen bg-white py-12">
+    return <div className="min-h-screen bg-background py-12">
         <div className="max-w-7xl mx-auto px-6">
           <main>
           {/* Header with Stats */}
