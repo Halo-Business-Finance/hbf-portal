@@ -3,10 +3,10 @@ import { Facebook, Twitter, Linkedin } from "lucide-react";
 export const Footer = () => {
   return <footer className="bg-[#0a1628] text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 py-14 bg-black">
+      <div className="max-w-7xl mx-auto py-14 bg-black px-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Logo & Description */}
-          <div className="lg:col-span-1">
+          <div className="xlg:col-span-1">
             <div className="mb-6">
               <h2 className="font-bold tracking-wide text-lg">HALO BUSINESS FINANCE</h2>
               
