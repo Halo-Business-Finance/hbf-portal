@@ -3,9 +3,9 @@ import { Facebook, Twitter, Linkedin } from "lucide-react";
 export const Footer = () => {
   return <footer className="bg-[#0a1628] text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto py-14 bg-black px-6">
-        {/* First Row - Logo & First 3 Link Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+      <div className="max-w-7xl mx-auto py-14 bg-black px-6 lg:px-12">
+        {/* First Row - Logo & 3 Link Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10">
           {/* Logo & Description */}
           <div>
             <div className="mb-6">
@@ -63,11 +63,8 @@ export const Footer = () => {
               <li><a href="https://halobusinessfinance.com/partnership-benefits" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Partnership Benefits</a></li>
             </ul>
           </div>
-        </div>
-        
-        {/* Second Row - Resources & Support */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Empty spacer to align with first row */}
+          
+          {/* Empty spacer for second row alignment */}
           <div className="hidden lg:block"></div>
           
           {/* Resources */}
@@ -91,9 +88,6 @@ export const Footer = () => {
               <li><a href="https://halobusinessfinance.com/security-data-protection" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Security & Data Protection</a></li>
             </ul>
           </div>
-          
-          {/* Empty spacer */}
-          <div className="hidden lg:block"></div>
         </div>
       </div>
       
