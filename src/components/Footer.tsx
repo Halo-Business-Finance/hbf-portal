@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
 export const Footer = () => {
-  return <footer className="bg-[#0a1628] text-white">
+  return <footer className="bg-black text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto py-14 bg-black px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto py-14 px-6 lg:px-12">
         {/* First Row - Logo & 4 Link Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr] gap-x-8 gap-y-10">
           {/* Logo & Description */}
@@ -96,7 +96,7 @@ export const Footer = () => {
       
       {/* Middle Bar - Social & Legal Links */}
       <div className="border-t border-gray-700">
-        <div className="max-w-7xl mx-auto px-6 py-5 bg-black">
+        <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* BBB Badge placeholder & Social */}
             <div className="flex items-center gap-6">
@@ -127,7 +127,7 @@ export const Footer = () => {
       </div>
       
       {/* Bottom Disclaimer */}
-      <div className="border-t border-gray-700 bg-[#060d17]">
+      <div className="border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="text-white text-xs space-y-1">
