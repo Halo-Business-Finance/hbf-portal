@@ -814,7 +814,7 @@ const Index = () => {
 
           </main>
         </div>
-        <Footer className="bg-black" />
+        <Footer />
       </div>;
   }
   return <Layout>
