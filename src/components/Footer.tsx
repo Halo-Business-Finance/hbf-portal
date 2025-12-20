@@ -5,7 +5,7 @@ export const Footer = () => {
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto py-14 px-6 lg:px-12">
         {/* First Row - Logo & 4 Link Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr] gap-x-8 gap-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr] gap-x-8 gap-y-6">
           {/* Logo & Description */}
           <div className="min-w-[340px] lg:mr-10">
             <div className="mb-6">
