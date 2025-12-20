@@ -599,13 +599,13 @@ const Index = () => {
           <main>
           {/* Header with Stats */}
           <div className="text-center mb-12 animate-fade-in">
-            <p className="text-2xl font-bold text-black mb-4">
+            <p className="text-2xl font-bold mb-4 text-white">
               Nationwide SBA & Commercial Financing
             </p>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-black mb-4">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight mb-4 text-white">
               Comprehensive Business Financing Solutions
             </h1>
-            <p className="text-sm text-black max-w-3xl mx-auto mb-10 leading-relaxed">
+            <p className="text-sm max-w-3xl mx-auto mb-10 leading-relaxed text-white">
               We provide credit, financing, treasury and payment solutions to help your business succeed. 
               Discover our comprehensive range of SBA-backed and conventional financing options designed to fuel your business growth.
             </p>
@@ -614,15 +614,15 @@ const Index = () => {
           {/* Company Stats - Above Auth Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold text-primary mb-1">$2.5B+</div>
+              <div className="text-2xl font-bold mb-1 text-white">$2.5B+</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Funding Provided</div>
             </Card>
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold text-primary mb-1">95%</div>
+              <div className="text-2xl font-bold mb-1 text-white">95%</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Approval Rate</div>
             </Card>
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold text-primary mb-1">24 Hours</div>
+              <div className="text-2xl font-bold mb-1 text-white">24 Hours</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Avg Loan Processing</div>
             </Card>
           </div>
