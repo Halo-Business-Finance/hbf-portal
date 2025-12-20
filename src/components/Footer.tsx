@@ -1,125 +1,146 @@
 import { Link } from "react-router-dom";
+import { Facebook, Twitter, Linkedin } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#0f1419] text-white">
+    <footer className="bg-[#0a1628] text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Company Info */}
-          <div className="lg:col-span-2">
-            <h3 className="text-2xl font-bold mb-4">Halo Business Finance</h3>
-            <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">
-              Nationwide Commercial & Business Financing. We provide credit, financing, treasury and payment solutions to help your business succeed.
+      <div className="max-w-7xl mx-auto px-6 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+          {/* Logo & Description */}
+          <div className="lg:col-span-1">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold tracking-wide">HALO</h2>
+              <p className="text-xs tracking-widest text-gray-300">BUSINESS FINANCE</p>
+              <div className="w-16 h-0.5 bg-white mt-1 rounded-full"></div>
+            </div>
+            <p className="text-gray-400 text-sm leading-relaxed mb-6">
+              Nationwide commercial loan marketplace offering streamlined loan processes for SBA, commercial real estate, and equipment financing.
             </p>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-              </svg>
-              <span>Bank-Level Security</span>
+            <div className="mb-4">
+              <h4 className="font-semibold text-white mb-2">Stay Informed</h4>
+              <p className="text-gray-400 text-sm mb-3">Get the latest financial insights and market updates.</p>
+              <div className="flex gap-2">
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className="bg-[#1a2a40] border-0 rounded px-3 py-2 text-sm text-white placeholder-gray-500 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                  Subscribe
+                </button>
+              </div>
             </div>
           </div>
           
-          {/* SBA Loans */}
+          {/* Company */}
           <div>
-            <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">SBA Loans</h4>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <a href="https://halobusinessfinance.com/sba-7a-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  SBA 7(a) Loans
-                </a>
-              </li>
-              <li>
-                <a href="https://halobusinessfinance.com/sba-504-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  SBA 504 Loans
-                </a>
-              </li>
-              <li>
-                <a href="https://halobusinessfinance.com/sba-express-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  SBA Express Loans
-                </a>
-              </li>
-              <li>
-                <a href="https://halobusinessfinance.com/usda-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  USDA B&I Loans
-                </a>
-              </li>
+            <h4 className="font-semibold mb-4 text-white">Company</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="https://halobusinessfinance.com/about" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Company Overview</a></li>
+              <li><a href="https://halobusinessfinance.com/how-it-works" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">How It Works</a></li>
+              <li><a href="https://halobusinessfinance.com/benefits" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Marketplace Benefits</a></li>
+              <li><a href="https://halobusinessfinance.com/contact" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+              <li><a href="https://halobusinessfinance.com/careers" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
             </ul>
           </div>
           
-          {/* Commercial Loans */}
+          {/* Loan Programs */}
           <div>
-            <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Commercial</h4>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <a href="https://halobusinessfinance.com/commercial-real-estate" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  Commercial Real Estate
-                </a>
-              </li>
-              <li>
-                <a href="https://halobusinessfinance.com/bridge-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  Bridge Loans
-                </a>
-              </li>
-              <li>
-                <a href="https://halobusinessfinance.com/equipment-financing" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  Equipment Financing
-                </a>
-              </li>
-              <li>
-                <a href="https://halobusinessfinance.com/working-capital" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  Working Capital
-                </a>
-              </li>
+            <h4 className="font-semibold mb-4 text-white">Loan Programs</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="https://halobusinessfinance.com/sba-7a-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">SBA 7a Loans</a></li>
+              <li><a href="https://halobusinessfinance.com/sba-504-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">SBA 504 Loans</a></li>
+              <li><a href="https://halobusinessfinance.com/bridge-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Bridge Loans</a></li>
+              <li><a href="https://halobusinessfinance.com/conventional-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Conventional Loans</a></li>
+              <li><a href="https://halobusinessfinance.com/usda-loans" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">USDA Loans</a></li>
+              <li><a href="https://halobusinessfinance.com/equipment-financing" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Equipment Financing</a></li>
+              <li><a href="https://halobusinessfinance.com/working-capital" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Working Capital</a></li>
+              <li><a href="https://halobusinessfinance.com/business-line-of-credit" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Business Line of Credit</a></li>
             </ul>
           </div>
           
-          {/* Portal Links */}
+          {/* Partner With Us */}
           <div>
-            <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Borrower Portal</h4>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <Link to="/loan-applications" className="text-gray-400 hover:text-white transition-colors">
-                  Apply Now
-                </Link>
-              </li>
-              <li>
-                <Link to="/calculator" className="text-gray-400 hover:text-white transition-colors">
-                  Loan Calculator
-                </Link>
-              </li>
-              <li>
-                <Link to="/my-documents" className="text-gray-400 hover:text-white transition-colors">
-                  My Documents
-                </Link>
-              </li>
-              <li>
-                <Link to="/support" className="text-gray-400 hover:text-white transition-colors">
-                  Support
-                </Link>
-              </li>
+            <h4 className="font-semibold mb-4 text-white">Partner With Us</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="https://halobusinessfinance.com/become-a-broker" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Become a Broker</a></li>
+              <li><a href="https://halobusinessfinance.com/broker-resources" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Broker Resources</a></li>
+              <li><a href="https://halobusinessfinance.com/become-a-lender" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Become a Lender</a></li>
+              <li><a href="https://halobusinessfinance.com/partnership-benefits" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Partnership Benefits</a></li>
+            </ul>
+          </div>
+          
+          {/* Resources */}
+          <div>
+            <h4 className="font-semibold mb-4 text-white">Resources</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/calculator" className="text-gray-400 hover:text-white transition-colors">Loan Calculator</Link></li>
+              <li><a href="https://halobusinessfinance.com/industry-solutions" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Industry Solutions</a></li>
+              <li><a href="https://halobusinessfinance.com/sba-resources" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">SBA Resources</a></li>
+              <li><a href="https://halobusinessfinance.com/market-insights" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Market Insights</a></li>
+            </ul>
+          </div>
+          
+          {/* Support */}
+          <div>
+            <h4 className="font-semibold mb-4 text-white">Support</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/support" className="text-gray-400 hover:text-white transition-colors">Customer Service</Link></li>
+              <li><a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Technical Support</a></li>
+              <li><a href="https://halobusinessfinance.com/schedule-consultation" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Schedule Consultation</a></li>
+              <li><a href="https://halobusinessfinance.com/security" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Security & Data Protection</a></li>
             </ul>
           </div>
         </div>
       </div>
       
-      {/* Bottom Bar */}
+      {/* Middle Bar - Social & Legal Links */}
       <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} Halo Business Finance. All rights reserved.
-            </p>
+            {/* BBB Badge placeholder & Social */}
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4">
+                <span className="text-gray-400 text-sm">Follow Us:</span>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                  <Twitter className="w-5 h-5" />
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
+            
+            {/* Legal Links */}
             <div className="flex items-center gap-6 text-sm">
-              <Link to="/terms" className="text-gray-500 hover:text-white transition-colors">
-                Terms of Service
-              </Link>
-              <Link to="/privacy" className="text-gray-500 hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
-              <a href="https://halobusinessfinance.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
-                Main Website
-              </a>
+              <a href="https://halobusinessfinance.com/licenses" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">Company Licenses</a>
+              <a href="https://halobusinessfinance.com/nmls" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">NMLS Compliance</a>
+              <a href="https://halobusinessfinance.com/cfipa" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">CFIPA</a>
+              <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="text-gray-400 hover:text-white transition-colors">Terms of Use</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Bottom Disclaimer */}
+      <div className="border-t border-gray-800 bg-[#060d17]">
+        <div className="max-w-7xl mx-auto px-6 py-5">
+          <div className="flex flex-col md:flex-row justify-between gap-4">
+            <div className="text-gray-500 text-xs space-y-1">
+              <p>&copy; {new Date().getFullYear()} Halo Business Finance. All rights reserved.</p>
+              <p>DFPI CFL License No. 60DBO-178064. California Commercial Financing Law disclosures available upon request.</p>
+              <p>NMLS ID: 2272778. Commercial Loan Marketplace. Loan programs subject to credit approval and terms may vary by lender.</p>
+              <p>Halo Business Finance is a direct CRE & equipment lender providing commercial financing solutions to businesses nationwide.</p>
+            </div>
+            <div className="flex items-end gap-4 text-xs">
+              <a href="https://halobusinessfinance.com/accessibility" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">Accessibility</a>
+              <span className="text-gray-600">|</span>
+              <a href="https://halobusinessfinance.com/sitemap" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">Site Map</a>
             </div>
           </div>
         </div>
