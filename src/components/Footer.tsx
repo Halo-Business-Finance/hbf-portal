@@ -5,9 +5,9 @@ export const Footer = () => {
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto py-14 bg-black px-6 lg:px-12">
         {/* First Row - Logo & 3 Link Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-x-8 gap-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr] gap-x-8 gap-y-10">
           {/* Logo & Description */}
-          <div className="min-w-[280px] lg:mr-8">
+          <div className="min-w-[320px] lg:mr-10">
             <div className="mb-6">
               <h2 className="font-bold tracking-wide text-lg whitespace-nowrap">HALO BUSINESS FINANCE</h2>
             </div>
