@@ -82,22 +82,6 @@ export const Footer = () => {
             </ul>
           </div>
         </div>
-        
-        {/* Newsletter Section */}
-        <div className="mt-10 pt-8 border-t border-gray-700">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h4 className="font-semibold text-white mb-1">Stay Informed</h4>
-              <p className="text-white text-xs">Get the latest financial insights and market updates.</p>
-            </div>
-            <div className="flex gap-2 max-w-md">
-              <input type="email" placeholder="Enter your email" className="bg-[#1a2a40] border-0 rounded px-3 py-2 text-sm text-white placeholder-gray-400 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
       
       {/* Middle Bar - Social & Legal Links */}
