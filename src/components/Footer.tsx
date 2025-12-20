@@ -4,10 +4,10 @@ export const Footer = () => {
   return <footer className="bg-black text-white">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto py-14 px-6 lg:px-12">
-        {/* First Row - Logo & 4 Link Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr] gap-x-8 gap-y-2">
+        {/* Single Row - Logo & 5 Link Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr_1fr] gap-x-6 gap-y-8">
           {/* Logo & Description */}
-          <div className="min-w-[340px] lg:mr-10">
+          <div className="min-w-[300px] lg:mr-6">
             <div className="mb-6">
               <h2 className="font-bold tracking-wide text-lg whitespace-nowrap">HALO BUSINESS FINANCE</h2>
             </div>
@@ -65,13 +65,7 @@ export const Footer = () => {
             </ul>
           </div>
           
-          {/* Empty spacers for second row - position Resources under Support (5th column) */}
-          <div className="hidden lg:block"></div>
-          <div className="hidden lg:block"></div>
-          <div className="hidden lg:block"></div>
-          <div className="hidden lg:block"></div>
-          
-          {/* Resources - positioned under Support */}
+          {/* Resources */}
           <div>
             <h4 className="font-semibold mb-4 text-white">Resources</h4>
             <ul className="space-y-2 text-sm">
