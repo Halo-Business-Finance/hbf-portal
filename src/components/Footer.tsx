@@ -4,8 +4,8 @@ export const Footer = () => {
   return <footer className="bg-[#0a1628] text-white">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto py-14 bg-black px-6 lg:px-12">
-        {/* First Row - Logo & 3 Link Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr] gap-x-8 gap-y-10">
+        {/* First Row - Logo & 4 Link Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr] gap-x-8 gap-y-10">
           {/* Logo & Description */}
           <div className="min-w-[340px] lg:mr-10">
             <div className="mb-6">
@@ -64,6 +64,17 @@ export const Footer = () => {
             </ul>
           </div>
           
+          {/* Support */}
+          <div>
+            <h4 className="font-semibold mb-4 text-white">Support</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="https://halobusinessfinance.com/customer-service" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Customer Service</a></li>
+              <li><a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Technical Support</a></li>
+              <li><a href="https://halobusinessfinance.com/schedule-consultation" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Schedule Consultation</a></li>
+              <li><a href="https://halobusinessfinance.com/security-data-protection" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Security & Data Protection</a></li>
+            </ul>
+          </div>
+          
           {/* Empty spacer for second row alignment */}
           <div className="hidden lg:block text-white"></div>
           
@@ -75,17 +86,6 @@ export const Footer = () => {
               <li><a href="https://halobusinessfinance.com/industry-solutions" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Industry Solutions</a></li>
               <li><a href="https://halobusinessfinance.com/sba-resources" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">SBA Resources</a></li>
               <li><a href="https://halobusinessfinance.com/market-insights" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Market Insights</a></li>
-            </ul>
-          </div>
-          
-          {/* Support */}
-          <div>
-            <h4 className="font-semibold mb-4 text-white">Support</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="https://halobusinessfinance.com/customer-service" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Customer Service</a></li>
-              <li><a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Technical Support</a></li>
-              <li><a href="https://halobusinessfinance.com/schedule-consultation" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Schedule Consultation</a></li>
-              <li><a href="https://halobusinessfinance.com/security-data-protection" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Security & Data Protection</a></li>
             </ul>
           </div>
         </div>
