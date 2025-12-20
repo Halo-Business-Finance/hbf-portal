@@ -198,7 +198,7 @@ const DashboardView = () => {
       {/* Header with bottom separator */}
       <div className="border-none rounded-none">
         <div className="flex-1">
-          {firstName && <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3">
+          {firstName && <h2 className="text-lg sm:text-xl font-bold mb-3 text-black">
               Welcome, {firstName}
             </h2>}
           <p className="text-sm sm:text-base mb-4 text-black">

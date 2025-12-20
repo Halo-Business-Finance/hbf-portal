@@ -1,17 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  FileText, 
-  Upload, 
-  Calculator, 
-  MessageSquare, 
-  CreditCard,
-  Building2,
-  Zap
-} from "lucide-react";
+import { FileText, Upload, Calculator, MessageSquare, CreditCard, Building2, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface QuickAction {
   id: string;
   label: string;
@@ -20,99 +11,81 @@ interface QuickAction {
   action: () => void;
   variant?: 'default' | 'primary';
 }
-
 interface QuickActionsProps {
   onNewApplication?: () => void;
   className?: string;
 }
-
-export const QuickActions = ({ onNewApplication, className }: QuickActionsProps) => {
+export const QuickActions = ({
+  onNewApplication,
+  className
+}: QuickActionsProps) => {
   const navigate = useNavigate();
-
-  const actions: QuickAction[] = [
-    {
-      id: 'new-application',
-      label: 'New Application',
-      description: 'Start a new loan application',
-      icon: FileText,
-      action: () => {
-        if (onNewApplication) {
-          onNewApplication();
-        } else {
-          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-      },
-      variant: 'primary'
+  const actions: QuickAction[] = [{
+    id: 'new-application',
+    label: 'New Application',
+    description: 'Start a new loan application',
+    icon: FileText,
+    action: () => {
+      if (onNewApplication) {
+        onNewApplication();
+      } else {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
     },
-    {
-      id: 'upload-docs',
-      label: 'Upload Documents',
-      description: 'Submit required documents',
-      icon: Upload,
-      action: () => navigate('/my-documents')
-    },
-    {
-      id: 'calculator',
-      label: 'Loan Calculator',
-      description: 'Estimate your payments',
-      icon: Calculator,
-      action: () => navigate('/loan-calculator')
-    },
-    {
-      id: 'credit-report',
-      label: 'View Credit Report',
-      description: 'Check your credit score',
-      icon: CreditCard,
-      action: () => navigate('/credit-reports')
-    },
-    {
-      id: 'bank-accounts',
-      label: 'Bank Accounts',
-      description: 'Manage linked accounts',
-      icon: Building2,
-      action: () => navigate('/bank-accounts')
-    },
-    {
-      id: 'support',
-      label: 'Get Support',
-      description: 'Contact our team',
-      icon: MessageSquare,
-      action: () => navigate('/support')
-    }
-  ];
-
-  return (
-    <Card className={cn("", className)}>
+    variant: 'primary'
+  }, {
+    id: 'upload-docs',
+    label: 'Upload Documents',
+    description: 'Submit required documents',
+    icon: Upload,
+    action: () => navigate('/my-documents')
+  }, {
+    id: 'calculator',
+    label: 'Loan Calculator',
+    description: 'Estimate your payments',
+    icon: Calculator,
+    action: () => navigate('/loan-calculator')
+  }, {
+    id: 'credit-report',
+    label: 'View Credit Report',
+    description: 'Check your credit score',
+    icon: CreditCard,
+    action: () => navigate('/credit-reports')
+  }, {
+    id: 'bank-accounts',
+    label: 'Bank Accounts',
+    description: 'Manage linked accounts',
+    icon: Building2,
+    action: () => navigate('/bank-accounts')
+  }, {
+    id: 'support',
+    label: 'Get Support',
+    description: 'Contact our team',
+    icon: MessageSquare,
+    action: () => navigate('/support')
+  }];
+  return <Card className={cn("", className)}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Zap className="h-5 w-5 text-primary" />
+          <Zap className="h-5 w-5 text-white" />
           Quick Actions
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {actions.map((action) => {
-            const Icon = action.icon;
-            return (
-              <Button
-                key={action.id}
-                variant={action.variant === 'primary' ? 'default' : 'outline'}
-                className={cn(
-                  "h-auto flex-col items-center justify-center p-4 gap-2 transition-all duration-200",
-                  "hover:scale-[1.02] hover:shadow-md",
-                  action.variant === 'primary' && "bg-primary hover:bg-primary/90"
-                )}
-                onClick={action.action}
-              >
+          {actions.map(action => {
+          const Icon = action.icon;
+          return <Button key={action.id} variant={action.variant === 'primary' ? 'default' : 'outline'} className={cn("h-auto flex-col items-center justify-center p-4 gap-2 transition-all duration-200", "hover:scale-[1.02] hover:shadow-md", action.variant === 'primary' && "bg-primary hover:bg-primary/90")} onClick={action.action}>
                 <Icon className="h-5 w-5" />
                 <span className="text-xs font-medium text-center leading-tight">
                   {action.label}
                 </span>
-              </Button>
-            );
-          })}
+              </Button>;
+        })}
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
