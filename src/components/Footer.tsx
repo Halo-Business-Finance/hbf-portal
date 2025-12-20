@@ -5,11 +5,11 @@ export const Footer = () => {
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto py-14 bg-black px-6 lg:px-12">
         {/* First Row - Logo & 3 Link Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-x-12 gap-y-10">
           {/* Logo & Description */}
-          <div>
+          <div className="min-w-[280px]">
             <div className="mb-6">
-              <h2 className="font-bold tracking-wide text-lg">HALO BUSINESS FINANCE</h2>
+              <h2 className="font-bold tracking-wide text-lg whitespace-nowrap">HALO BUSINESS FINANCE</h2>
             </div>
             <p className="text-white text-sm leading-relaxed mb-6">
               Nationwide commercial loan marketplace offering streamlined loan processes for SBA, commercial real estate, and equipment financing.
