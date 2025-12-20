@@ -75,10 +75,13 @@ export const Footer = () => {
             </ul>
           </div>
           
-          {/* Empty spacer for second row alignment */}
-          <div className="hidden lg:block text-white"></div>
+          {/* Empty spacers for second row - position Resources under Support (5th column) */}
+          <div className="hidden lg:block"></div>
+          <div className="hidden lg:block"></div>
+          <div className="hidden lg:block"></div>
+          <div className="hidden lg:block"></div>
           
-          {/* Resources */}
+          {/* Resources - positioned under Support */}
           <div>
             <h4 className="font-semibold mb-4 text-white">Resources</h4>
             <ul className="space-y-2 text-sm">
