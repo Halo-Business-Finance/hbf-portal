@@ -1,18 +1,16 @@
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
-
 export const Footer = () => {
-  return (
-    <footer className="bg-[#0a1628] text-white">
+  return <footer className="bg-[#0a1628] text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 py-14">
+      <div className="max-w-7xl mx-auto px-6 py-14 bg-black">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Logo & Description */}
           <div className="lg:col-span-1">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold tracking-wide">HALO</h2>
-              <p className="text-xs tracking-widest text-white">BUSINESS FINANCE</p>
-              <div className="w-16 h-0.5 bg-white mt-1 rounded-full"></div>
+              <h2 className="font-bold tracking-wide text-lg">HALO BUSINESS FINANCE</h2>
+              
+              
             </div>
             <p className="text-white text-sm leading-relaxed mb-6">
               Nationwide commercial loan marketplace offering streamlined loan processes for SBA, commercial real estate, and equipment financing.
@@ -21,11 +19,7 @@ export const Footer = () => {
               <h4 className="font-semibold text-white mb-2">Stay Informed</h4>
               <p className="text-white text-sm mb-3">Get the latest financial insights and market updates.</p>
               <div className="flex gap-2">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email" 
-                  className="bg-[#1a2a40] border-0 rounded px-3 py-2 text-sm text-white placeholder-gray-400 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+                <input type="email" placeholder="Enter your email" className="bg-[#1a2a40] border-0 rounded px-3 py-2 text-sm text-white placeholder-gray-400 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
                   Subscribe
                 </button>
@@ -145,6 +139,5 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
