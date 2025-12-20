@@ -3,14 +3,13 @@ import { Facebook, Twitter, Linkedin } from "lucide-react";
 export const Footer = () => {
   return <footer className="bg-[#0a1628] text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto py-14 bg-black px-0">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+      <div className="max-w-7xl mx-auto py-14 bg-black px-6">
+        {/* First Row - Logo & First 3 Link Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           {/* Logo & Description */}
-          <div className="xlg:col-span-1">
+          <div>
             <div className="mb-6">
-              <h2 className="font-bold tracking-wide text-lg">HALO BUSINESS FINANCE</h2>
-              
-              
+              <h2 className="font-bold tracking-wide text-lg">HALO BUSINESS FINANCE</h2>
             </div>
             <p className="text-white text-sm leading-relaxed mb-6">
               Nationwide commercial loan marketplace offering streamlined loan processes for SBA, commercial real estate, and equipment financing.
@@ -64,6 +63,12 @@ export const Footer = () => {
               <li><a href="https://halobusinessfinance.com/partnership-benefits" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Partnership Benefits</a></li>
             </ul>
           </div>
+        </div>
+        
+        {/* Second Row - Resources & Support */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Empty spacer to align with first row */}
+          <div className="hidden lg:block"></div>
           
           {/* Resources */}
           <div>
@@ -86,6 +91,9 @@ export const Footer = () => {
               <li><a href="https://halobusinessfinance.com/security-data-protection" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Security & Data Protection</a></li>
             </ul>
           </div>
+          
+          {/* Empty spacer */}
+          <div className="hidden lg:block"></div>
         </div>
       </div>
       
