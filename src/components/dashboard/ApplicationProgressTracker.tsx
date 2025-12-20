@@ -62,7 +62,7 @@ export const ApplicationProgressTracker = ({
   return <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Clock className="h-5 w-5 text-primary" />
+          <Clock className="h-5 w-5 text-white" />
           Application Progress
         </CardTitle>
       </CardHeader>

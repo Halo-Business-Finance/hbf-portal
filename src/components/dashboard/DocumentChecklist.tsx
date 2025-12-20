@@ -122,7 +122,7 @@ export const DocumentChecklist = ({
           <CollapsibleTrigger asChild>
             <button className="flex items-center justify-between w-full text-left">
               <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
+                <FileText className="h-5 w-5 text-white" />
                 Document Checklist
               </CardTitle>
               {isOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}

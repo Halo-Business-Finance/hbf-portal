@@ -108,7 +108,7 @@ export const DashboardCharts = ({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <PieChartIcon className="h-4 w-4 text-primary" />
+            <PieChartIcon className="h-4 w-4 text-white" />
             Application Status
           </CardTitle>
         </CardHeader>
@@ -129,7 +129,7 @@ export const DashboardCharts = ({
                       <div className="w-3 h-3 rounded-full" style={{
                   backgroundColor: item.color
                 }} />
-                      <span className="text-black">{item.name}</span>
+                      <span className="text-white">{item.name}</span>
                     </div>
                     <span className="font-medium">{item.value}</span>
                   </div>)}
@@ -144,14 +144,14 @@ export const DashboardCharts = ({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-primary" />
+            <TrendingUp className="h-4 w-4 text-white" />
             Monthly Applications
           </CardTitle>
         </CardHeader>
         <CardContent>
           {monthlyData.some(d => d.applications > 0) ? <div className="h-32">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData} className="text-black">
+                <BarChart data={monthlyData} className="text-white">
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{
                 fontSize: 12,
                 fill: 'hsl(var(--muted-foreground))'

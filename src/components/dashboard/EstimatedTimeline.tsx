@@ -68,7 +68,7 @@ export const EstimatedTimeline = ({
   return <Card className={className}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
+          <Calendar className="h-5 w-5 text-white" />
           Estimated Timeline
         </CardTitle>
       </CardHeader>
