@@ -11,19 +11,9 @@ export const Footer = () => {
             <div className="mb-6">
               <h2 className="font-bold tracking-wide text-lg whitespace-nowrap">HALO BUSINESS FINANCE</h2>
             </div>
-            <p className="text-white text-sm leading-relaxed mb-6">
+            <p className="text-white text-sm leading-relaxed">
               Nationwide commercial loan marketplace offering streamlined loan processes for SBA, commercial real estate, and equipment financing.
             </p>
-            <div className="mb-4">
-              <h4 className="font-semibold text-white mb-2">Stay Informed</h4>
-              <p className="text-white mb-3 text-xs">Get the latest financial insights and market updates.</p>
-              <div className="flex gap-2">
-                <input type="email" placeholder="Enter your email" className="bg-[#1a2a40] border-0 rounded px-3 py-2 text-sm text-white placeholder-gray-400 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
-                  Subscribe
-                </button>
-              </div>
-            </div>
           </div>
           
           {/* Company */}
@@ -90,6 +80,22 @@ export const Footer = () => {
               <li><a href="https://halobusinessfinance.com/sba-resources" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">SBA Resources</a></li>
               <li><a href="https://halobusinessfinance.com/market-insights" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Market Insights</a></li>
             </ul>
+          </div>
+        </div>
+        
+        {/* Newsletter Section */}
+        <div className="mt-10 pt-8 border-t border-gray-700">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h4 className="font-semibold text-white mb-1">Stay Informed</h4>
+              <p className="text-white text-xs">Get the latest financial insights and market updates.</p>
+            </div>
+            <div className="flex gap-2 max-w-md">
+              <input type="email" placeholder="Enter your email" className="bg-[#1a2a40] border-0 rounded px-3 py-2 text-sm text-white placeholder-gray-400 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                Subscribe
+              </button>
+            </div>
           </div>
         </div>
       </div>
