@@ -802,11 +802,11 @@ const Index = () => {
           {/* Terms text below card */}
           <p className="text-center text-sm text-foreground mt-6 max-w-xl mx-auto">
             By signing up, you agree to our{" "}
-            <a href="/terms" className="text-primary hover:underline">
+            <a href="/terms" className="hover:underline text-white">
               terms of service
             </a>{" "}
             and{" "}
-            <a href="/privacy" className="text-primary hover:underline">
+            <a href="/privacy" className="hover:underline text-white">
               privacy policy
             </a>
             .
