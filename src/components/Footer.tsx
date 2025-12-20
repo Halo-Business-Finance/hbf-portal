@@ -37,10 +37,10 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-white">Company</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="https://halobusinessfinance.com/about" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Company Overview</a></li>
+              <li><a href="https://halobusinessfinance.com/about-us" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Company Overview</a></li>
               <li><a href="https://halobusinessfinance.com/how-it-works" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">How It Works</a></li>
-              <li><a href="https://halobusinessfinance.com/benefits" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Marketplace Benefits</a></li>
-              <li><a href="https://halobusinessfinance.com/contact" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Contact Us</a></li>
+              <li><a href="https://halobusinessfinance.com/marketplace-benefits" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Marketplace Benefits</a></li>
+              <li><a href="https://halobusinessfinance.com/contact-us" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Contact Us</a></li>
               <li><a href="https://halobusinessfinance.com/careers" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Careers</a></li>
             </ul>
           </div>
@@ -51,9 +51,9 @@ export const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li><a href="https://halobusinessfinance.com/sba-7a-loans" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">SBA 7a Loans</a></li>
               <li><a href="https://halobusinessfinance.com/sba-504-loans" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">SBA 504 Loans</a></li>
-              <li><a href="https://halobusinessfinance.com/bridge-loans" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Bridge Loans</a></li>
+              <li><a href="https://halobusinessfinance.com/bridge-financing" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Bridge Loans</a></li>
               <li><a href="https://halobusinessfinance.com/conventional-loans" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Conventional Loans</a></li>
-              <li><a href="https://halobusinessfinance.com/usda-loans" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">USDA Loans</a></li>
+              <li><a href="https://halobusinessfinance.com/usda-bi-loans" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">USDA Loans</a></li>
               <li><a href="https://halobusinessfinance.com/equipment-financing" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Equipment Financing</a></li>
               <li><a href="https://halobusinessfinance.com/working-capital" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Working Capital</a></li>
               <li><a href="https://halobusinessfinance.com/business-line-of-credit" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Business Line of Credit</a></li>
@@ -75,7 +75,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-white">Resources</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/calculator" className="text-white hover:underline transition-colors">Loan Calculator</Link></li>
+              <li><a href="https://halobusinessfinance.com/loan-calculator" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Loan Calculator</a></li>
               <li><a href="https://halobusinessfinance.com/industry-solutions" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Industry Solutions</a></li>
               <li><a href="https://halobusinessfinance.com/sba-resources" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">SBA Resources</a></li>
               <li><a href="https://halobusinessfinance.com/market-insights" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Market Insights</a></li>
@@ -86,10 +86,10 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-white">Support</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/support" className="text-white hover:underline transition-colors">Customer Service</Link></li>
+              <li><a href="https://halobusinessfinance.com/customer-service" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Customer Service</a></li>
               <li><a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Technical Support</a></li>
               <li><a href="https://halobusinessfinance.com/schedule-consultation" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Schedule Consultation</a></li>
-              <li><a href="https://halobusinessfinance.com/security" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Security & Data Protection</a></li>
+              <li><a href="https://halobusinessfinance.com/security-data-protection" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Security & Data Protection</a></li>
             </ul>
           </div>
         </div>
