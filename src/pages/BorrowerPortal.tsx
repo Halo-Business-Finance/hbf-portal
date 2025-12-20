@@ -200,48 +200,49 @@ const BorrowerPortal = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <div className="space-y-4 sm:space-y-6">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight mb-2">My Account</h2>
-            <p className="text-sm sm:text-base text-foreground">Manage your account information and preferences</p>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-1 sm:mb-2">My Account</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">Manage your account information and preferences</p>
           </div>
 
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+            <Card className="overflow-hidden">
+              <CardHeader className="px-4 py-4 sm:px-6 sm:py-5">
+                <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                   <div className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    Personal Information
+                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span>Personal Information</span>
                   </div>
                   {!isEditing && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setIsEditing(true)}
+                      className="h-8 px-2 sm:px-3"
                     >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
+                      <Edit className="w-4 h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">Edit</span>
                     </Button>
                   )}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <FormField
                         control={form.control}
                         name="first_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>First Name</FormLabel>
+                            <FormLabel className="text-sm">First Name</FormLabel>
                             <FormControl>
                               <Input 
                                 {...field} 
                                 disabled={!isEditing}
-                                className={!isEditing ? "bg-muted/50" : ""}
+                                className={`h-10 sm:h-9 ${!isEditing ? "bg-muted/50" : ""}`}
                               />
                             </FormControl>
                             <FormMessage />
@@ -253,12 +254,12 @@ const BorrowerPortal = () => {
                         name="last_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Last Name</FormLabel>
+                            <FormLabel className="text-sm">Last Name</FormLabel>
                             <FormControl>
                               <Input 
                                 {...field}
                                 disabled={!isEditing}
-                                className={!isEditing ? "bg-muted/50" : ""}
+                                className={`h-10 sm:h-9 ${!isEditing ? "bg-muted/50" : ""}`}
                               />
                             </FormControl>
                             <FormMessage />
@@ -267,23 +268,23 @@ const BorrowerPortal = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
+                      <Label className="flex items-center gap-2 text-sm">
                         <Mail className="w-4 h-4" />
                         Email
                       </Label>
                       <Input 
                         value={userProfile?.email || user?.email || ''} 
                         readOnly 
-                        className="bg-muted/50"
+                        className="bg-muted/50 h-10 sm:h-9"
                       />
-                      <p className="text-xs text-foreground">Email cannot be changed here</p>
+                      <p className="text-xs text-muted-foreground">Email cannot be changed here</p>
                     </div>
                     <FormField
                       control={form.control}
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2">
+                          <FormLabel className="flex items-center gap-2 text-sm">
                             <Phone className="w-4 h-4" />
                             Phone
                           </FormLabel>
@@ -291,7 +292,7 @@ const BorrowerPortal = () => {
                             <Input 
                               {...field}
                               disabled={!isEditing}
-                              className={!isEditing ? "bg-muted/50" : ""}
+                              className={`h-10 sm:h-9 ${!isEditing ? "bg-muted/50" : ""}`}
                               placeholder="Not provided"
                             />
                           </FormControl>
@@ -300,10 +301,10 @@ const BorrowerPortal = () => {
                       )}
                     />
                     {isEditing && (
-                      <div className="flex flex-col sm:flex-row gap-2 pt-4">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4">
                         <Button 
                           type="submit" 
-                          className="flex-1"
+                          className="flex-1 h-11 sm:h-10"
                           disabled={isSaving}
                         >
                           <Save className="w-4 h-4 mr-2" />
@@ -314,6 +315,7 @@ const BorrowerPortal = () => {
                           variant="outline"
                           onClick={handleCancelEdit}
                           disabled={isSaving}
+                          className="h-11 sm:h-10"
                         >
                           <X className="w-4 h-4 mr-2" />
                           Cancel
@@ -325,53 +327,53 @@ const BorrowerPortal = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Settings</CardTitle>
-                <CardDescription>Manage your account preferences</CardDescription>
+            <Card className="overflow-hidden">
+              <CardHeader className="px-4 py-4 sm:px-6 sm:py-5">
+                <CardTitle className="text-base sm:text-lg">Account Settings</CardTitle>
+                <CardDescription className="text-sm">Manage your account preferences</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6 space-y-2 sm:space-y-3">
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start"
+                  className="w-full justify-start h-11 sm:h-10 text-sm"
                   onClick={() => navigate('/change-email')}
                 >
-                  <Mail className="w-4 h-4 mr-2" />
+                  <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
                   Change Email
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start"
+                  className="w-full justify-start h-11 sm:h-10 text-sm"
                   onClick={() => navigate('/change-password')}
                 >
-                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
                   Change Password
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start"
+                  className="w-full justify-start h-11 sm:h-10 text-sm"
                   onClick={() => navigate('/two-factor-auth')}
                 >
-                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
                   Two-Factor Authentication
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start"
+                  className="w-full justify-start h-11 sm:h-10 text-sm"
                   onClick={() => toast({
                     title: "Coming Soon",
                     description: "Notification preferences will be available soon."
                   })}
                 >
-                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
                   Notification Preferences
                 </Button>
                 <Button 
                   variant="destructive" 
-                  className="w-full justify-start"
+                  className="w-full justify-start h-11 sm:h-10 text-sm mt-4"
                   onClick={handleLogout}
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
+                  <LogOut className="w-4 h-4 mr-2 flex-shrink-0" />
                   Log Out
                 </Button>
               </CardContent>
