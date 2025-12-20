@@ -7,7 +7,7 @@ export const Footer = () => {
         {/* First Row - Logo & 3 Link Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr] gap-x-8 gap-y-10">
           {/* Logo & Description */}
-          <div className="min-w-[320px] lg:mr-10">
+          <div className="min-w-[340px] lg:mr-10">
             <div className="mb-6">
               <h2 className="font-bold tracking-wide text-lg whitespace-nowrap">HALO BUSINESS FINANCE</h2>
             </div>
@@ -16,7 +16,7 @@ export const Footer = () => {
             </p>
             <div className="mb-4">
               <h4 className="font-semibold text-white mb-2">Stay Informed</h4>
-              <p className="text-white text-sm mb-3">Get the latest financial insights and market updates.</p>
+              <p className="text-white mb-3 text-xs">Get the latest financial insights and market updates.</p>
               <div className="flex gap-2">
                 <input type="email" placeholder="Enter your email" className="bg-[#1a2a40] border-0 rounded px-3 py-2 text-sm text-white placeholder-gray-400 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
@@ -65,7 +65,7 @@ export const Footer = () => {
           </div>
           
           {/* Empty spacer for second row alignment */}
-          <div className="hidden lg:block"></div>
+          <div className="hidden lg:block text-white"></div>
           
           {/* Resources */}
           <div>
