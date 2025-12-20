@@ -161,8 +161,8 @@ const Navbar = () => {
           <Popover open={searchOpen} onOpenChange={setSearchOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-full justify-start text-muted-foreground font-normal", "bg-muted/50 border-transparent hover:bg-muted hover:border-border", "transition-all duration-200")} onClick={() => setSearchOpen(true)}>
-                <Search className="mr-2 h-4 w-4 text-black" />
-                <span className="text-black">Search applications, documents...</span>
+                <Search className="mr-2 h-4 w-4 text-white" />
+                <span className="text-white">Search applications, documents...</span>
                 <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                   <span className="text-xs">⌘</span>K
                 </kbd>
@@ -264,22 +264,22 @@ const Navbar = () => {
             </DropdownMenu>
 
             {/* Calculator */}
-            <Button variant="ghost" size="icon" onClick={() => setCalculatorOpen(true)} className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted" title="Loan Calculator">
-              <Calculator className="text-black h-[20px] w-[19px]" />
+            <Button variant="ghost" size="icon" onClick={() => setCalculatorOpen(true)} title="Loan Calculator" className="h-9 w-9 hover:bg-muted text-white">
+              <Calculator className="h-[20px] w-[19px] text-white" />
             </Button>
 
             <LoanCalculatorDialog open={calculatorOpen} onOpenChange={setCalculatorOpen} />
 
             {/* Help */}
             <Button variant="ghost" size="icon" onClick={() => navigate('/support')} className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted hidden sm:flex">
-              <HelpCircle className="h-5 w-5 text-black" />
+              <HelpCircle className="h-5 w-5 text-white" />
             </Button>
             
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted">
-                  <UserCircle className="h-5 w-5 text-black" />
+                  <UserCircle className="h-5 w-5 text-white" />
                 </Button>
               </DropdownMenuTrigger>
               
