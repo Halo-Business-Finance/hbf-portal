@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,15 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+
+// Rate limiting configuration for MFA
+const MFA_RATE_LIMIT = { maxAttempts: 5, windowMs: 60000, lockoutMs: 900000 }; // 15 min lockout
+
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+  lockedUntil?: number;
+}
 
 const MFAVerification = () => {
   const navigate = useNavigate();
@@ -18,8 +27,63 @@ const MFAVerification = () => {
   const [factorId, setFactorId] = useState<string | null>(null);
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [remainingAttempts, setRemainingAttempts] = useState(MFA_RATE_LIMIT.maxAttempts);
+  
+  // Rate limiting
+  const rateLimitRef = useRef<RateLimitEntry | null>(null);
 
   const returnTo = (location.state as any)?.returnTo || '/my-account';
+
+  const formatTimeRemaining = (ms: number): string => {
+    const seconds = Math.ceil(ms / 1000);
+    if (seconds < 60) return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    const minutes = Math.ceil(seconds / 60);
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  };
+
+  const checkRateLimit = useCallback((): { allowed: boolean; message?: string } => {
+    const now = Date.now();
+    const current = rateLimitRef.current;
+
+    // Check if currently locked out
+    if (current?.lockedUntil && now < current.lockedUntil) {
+      const remainingTime = current.lockedUntil - now;
+      return {
+        allowed: false,
+        message: `Too many verification attempts. Please wait ${formatTimeRemaining(remainingTime)} before trying again.`
+      };
+    }
+
+    // Clean up expired entries
+    if (current && now > current.resetTime) {
+      rateLimitRef.current = null;
+    }
+
+    const entry = rateLimitRef.current;
+
+    if (!entry) {
+      rateLimitRef.current = { count: 1, resetTime: now + MFA_RATE_LIMIT.windowMs };
+      setRemainingAttempts(MFA_RATE_LIMIT.maxAttempts - 1);
+      return { allowed: true };
+    }
+
+    if (entry.count >= MFA_RATE_LIMIT.maxAttempts) {
+      rateLimitRef.current = {
+        ...entry,
+        lockedUntil: now + MFA_RATE_LIMIT.lockoutMs,
+        resetTime: now + MFA_RATE_LIMIT.lockoutMs
+      };
+      setRemainingAttempts(0);
+      return {
+        allowed: false,
+        message: `Too many verification attempts. Account temporarily locked for ${formatTimeRemaining(MFA_RATE_LIMIT.lockoutMs)}.`
+      };
+    }
+
+    rateLimitRef.current = { ...entry, count: entry.count + 1 };
+    setRemainingAttempts(MFA_RATE_LIMIT.maxAttempts - entry.count - 1);
+    return { allowed: true };
+  }, []);
 
   useEffect(() => {
     initiateMFAChallenge();
@@ -78,6 +142,17 @@ const MFAVerification = () => {
       return;
     }
 
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit();
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Too Many Attempts",
+        description: rateLimitCheck.message,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setVerifying(true);
     try {
       const { data, error } = await supabase.auth.mfa.verify({
@@ -87,6 +162,10 @@ const MFAVerification = () => {
       });
 
       if (error) throw error;
+
+      // Reset rate limit on success
+      rateLimitRef.current = null;
+      setRemainingAttempts(MFA_RATE_LIMIT.maxAttempts);
 
       toast({
         title: "Success",
@@ -99,7 +178,9 @@ const MFAVerification = () => {
       console.error('Error verifying MFA:', error);
       toast({
         title: "Invalid Code",
-        description: "The verification code is incorrect. Please try again.",
+        description: remainingAttempts > 0 
+          ? `The verification code is incorrect. ${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining.`
+          : "The verification code is incorrect.",
         variant: "destructive"
       });
       setVerificationCode('');
@@ -156,6 +237,11 @@ const MFAVerification = () => {
           <Alert>
             <AlertDescription>
               Admin access requires MFA verification for enhanced security.
+              {remainingAttempts < MFA_RATE_LIMIT.maxAttempts && remainingAttempts > 0 && (
+                <span className="block mt-1 text-amber-600 font-medium">
+                  {remainingAttempts} attempt{remainingAttempts !== 1 ? 's' : ''} remaining
+                </span>
+              )}
             </AlertDescription>
           </Alert>
 
