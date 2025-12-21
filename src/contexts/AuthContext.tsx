@@ -76,14 +76,33 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Get safe redirect URL - only allow known production/preview domains
+    const getSafeRedirectUrl = (): string => {
+      const origin = window.location.origin;
+      const allowedPatterns = [
+        /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
+        /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
+        /^http:\/\/localhost:\d+$/,
+        /^http:\/\/127\.0\.0\.1:\d+$/,
+      ];
+      
+      if (allowedPatterns.some(pattern => pattern.test(origin))) {
+        return `${origin}/`;
+      }
+      if (origin.startsWith('https://')) {
+        return `${origin}/`;
+      }
+      return '';
+    };
+    
+    const redirectUrl = getSafeRedirectUrl();
     
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
+      options: redirectUrl ? {
         emailRedirectTo: redirectUrl
-      }
+      } : undefined
     });
     return { error };
   };
