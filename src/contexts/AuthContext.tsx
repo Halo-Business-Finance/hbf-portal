@@ -1,6 +1,19 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+// Rate limiting configuration
+const RATE_LIMIT_CONFIG = {
+  login: { maxAttempts: 5, windowMs: 60000, lockoutMs: 300000 },
+  signup: { maxAttempts: 3, windowMs: 60000, lockoutMs: 600000 },
+};
+
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+  lockedUntil?: number;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -13,9 +26,10 @@ interface AuthContextType {
   setUsername: (username: string | null) => void;
   phone: string | null;
   setPhone: (phone: string | null) => void;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any; rateLimited?: boolean }>;
+  signUp: (email: string, password: string) => Promise<{ error: any; rateLimited?: boolean }>;
   signOut: () => Promise<void>;
+  resetAuthRateLimit: (action: 'login' | 'signup') => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,6 +49,64 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [formState, setFormState] = useState(0);
   const [username, setUsername] = useState<string | null>(null);
   const [phone, setPhone] = useState<string | null>(null);
+  const { toast } = useToast();
+  
+  // Rate limiting state
+  const rateLimitsRef = useRef<Record<string, RateLimitEntry>>({});
+
+  const formatTimeRemaining = (ms: number): string => {
+    const seconds = Math.ceil(ms / 1000);
+    if (seconds < 60) return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    const minutes = Math.ceil(seconds / 60);
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  };
+
+  const checkRateLimit = useCallback((action: 'login' | 'signup'): { allowed: boolean; message?: string } => {
+    const now = Date.now();
+    const config = RATE_LIMIT_CONFIG[action];
+    const key = action;
+    const current = rateLimitsRef.current[key];
+
+    // Check if currently locked out
+    if (current?.lockedUntil && now < current.lockedUntil) {
+      const remainingTime = current.lockedUntil - now;
+      return {
+        allowed: false,
+        message: `Too many ${action} attempts. Please wait ${formatTimeRemaining(remainingTime)} before trying again.`
+      };
+    }
+
+    // Clean up expired entries
+    if (current && now > current.resetTime) {
+      delete rateLimitsRef.current[key];
+    }
+
+    const entry = rateLimitsRef.current[key];
+
+    if (!entry) {
+      rateLimitsRef.current[key] = { count: 1, resetTime: now + config.windowMs };
+      return { allowed: true };
+    }
+
+    if (entry.count >= config.maxAttempts) {
+      rateLimitsRef.current[key] = {
+        ...entry,
+        lockedUntil: now + config.lockoutMs,
+        resetTime: now + config.lockoutMs
+      };
+      return {
+        allowed: false,
+        message: `Too many ${action} attempts. Please wait ${formatTimeRemaining(config.lockoutMs)} before trying again.`
+      };
+    }
+
+    rateLimitsRef.current[key] = { ...entry, count: entry.count + 1 };
+    return { allowed: true };
+  }, []);
+
+  const resetAuthRateLimit = useCallback((action: 'login' | 'signup') => {
+    delete rateLimitsRef.current[action];
+  }, []);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -68,14 +140,42 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    // Check rate limit before attempting sign in
+    const rateLimitCheck = checkRateLimit('login');
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Too Many Attempts",
+        description: rateLimitCheck.message,
+        variant: "destructive"
+      });
+      return { error: { message: rateLimitCheck.message }, rateLimited: true };
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    // Reset rate limit on successful login
+    if (!error) {
+      resetAuthRateLimit('login');
+    }
+    
     return { error };
   };
 
   const signUp = async (email: string, password: string) => {
+    // Check rate limit before attempting sign up
+    const rateLimitCheck = checkRateLimit('signup');
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Too Many Attempts",
+        description: rateLimitCheck.message,
+        variant: "destructive"
+      });
+      return { error: { message: rateLimitCheck.message }, rateLimited: true };
+    }
+
     // Get safe redirect URL - only allow known production/preview domains
     const getSafeRedirectUrl = (): string => {
       const origin = window.location.origin;
@@ -104,6 +204,12 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         emailRedirectTo: redirectUrl
       } : undefined
     });
+    
+    // Reset rate limit on successful signup
+    if (!error) {
+      resetAuthRateLimit('signup');
+    }
+    
     return { error };
   };
 
@@ -131,6 +237,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         signIn,
         signUp,
         signOut,
+        resetAuthRateLimit,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,15 @@ import * as z from 'zod';
 import { Mail, ArrowLeft, AlertCircle } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+// Rate limiting configuration
+const RATE_LIMIT = { maxAttempts: 3, windowMs: 300000, lockoutMs: 600000 }; // 10 min lockout
+
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+  lockedUntil?: number;
+}
 
 const emailSchema = z.object({
   currentEmail: z.string().email("Invalid email address"),
@@ -33,6 +42,55 @@ const ChangeEmail = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Rate limiting
+  const rateLimitRef = useRef<RateLimitEntry | null>(null);
+
+  const formatTimeRemaining = (ms: number): string => {
+    const seconds = Math.ceil(ms / 1000);
+    if (seconds < 60) return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    const minutes = Math.ceil(seconds / 60);
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  };
+
+  const checkRateLimit = useCallback((): { allowed: boolean; message?: string } => {
+    const now = Date.now();
+    const current = rateLimitRef.current;
+
+    if (current?.lockedUntil && now < current.lockedUntil) {
+      const remainingTime = current.lockedUntil - now;
+      return {
+        allowed: false,
+        message: `Too many email change attempts. Please wait ${formatTimeRemaining(remainingTime)} before trying again.`
+      };
+    }
+
+    if (current && now > current.resetTime) {
+      rateLimitRef.current = null;
+    }
+
+    const entry = rateLimitRef.current;
+
+    if (!entry) {
+      rateLimitRef.current = { count: 1, resetTime: now + RATE_LIMIT.windowMs };
+      return { allowed: true };
+    }
+
+    if (entry.count >= RATE_LIMIT.maxAttempts) {
+      rateLimitRef.current = {
+        ...entry,
+        lockedUntil: now + RATE_LIMIT.lockoutMs,
+        resetTime: now + RATE_LIMIT.lockoutMs
+      };
+      return {
+        allowed: false,
+        message: `Too many email change attempts. Please wait ${formatTimeRemaining(RATE_LIMIT.lockoutMs)} before trying again.`
+      };
+    }
+
+    rateLimitRef.current = { ...entry, count: entry.count + 1 };
+    return { allowed: true };
+  }, []);
 
   const form = useForm<z.infer<typeof emailSchema>>({
     resolver: zodResolver(emailSchema),
@@ -44,6 +102,17 @@ const ChangeEmail = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof emailSchema>) => {
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit();
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Too Many Attempts",
+        description: rateLimitCheck.message,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Verify current email matches
@@ -56,6 +125,9 @@ const ChangeEmail = () => {
       });
 
       if (error) throw error;
+
+      // Reset rate limit on success
+      rateLimitRef.current = null;
 
       toast({
         title: "Verification Email Sent",

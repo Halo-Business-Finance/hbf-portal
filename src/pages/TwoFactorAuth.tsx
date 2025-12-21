@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,15 @@ import { ArrowLeft, Shield, Smartphone, AlertCircle, CheckCircle, Copy } from 'l
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { useUserRole } from '@/hooks/useUserRole';
+
+// Rate limiting configuration for MFA enrollment
+const MFA_RATE_LIMIT = { maxAttempts: 5, windowMs: 60000, lockoutMs: 600000 }; // 10 min lockout
+
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+  lockedUntil?: number;
+}
 
 const TwoFactorAuth = () => {
   const navigate = useNavigate();
@@ -25,9 +34,62 @@ const TwoFactorAuth = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [enrolledFactors, setEnrolledFactors] = useState<any[]>([]);
   const [hasEnrolledFactor, setHasEnrolledFactor] = useState(false);
+  const [remainingAttempts, setRemainingAttempts] = useState(MFA_RATE_LIMIT.maxAttempts);
+
+  // Rate limiting
+  const rateLimitRef = useRef<RateLimitEntry | null>(null);
 
   const returnTo = (location.state as any)?.returnTo;
   const requireSetup = (location.state as any)?.requireSetup;
+
+  const formatTimeRemaining = (ms: number): string => {
+    const seconds = Math.ceil(ms / 1000);
+    if (seconds < 60) return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    const minutes = Math.ceil(seconds / 60);
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  };
+
+  const checkRateLimit = useCallback((): { allowed: boolean; message?: string } => {
+    const now = Date.now();
+    const current = rateLimitRef.current;
+
+    if (current?.lockedUntil && now < current.lockedUntil) {
+      const remainingTime = current.lockedUntil - now;
+      return {
+        allowed: false,
+        message: `Too many verification attempts. Please wait ${formatTimeRemaining(remainingTime)} before trying again.`
+      };
+    }
+
+    if (current && now > current.resetTime) {
+      rateLimitRef.current = null;
+    }
+
+    const entry = rateLimitRef.current;
+
+    if (!entry) {
+      rateLimitRef.current = { count: 1, resetTime: now + MFA_RATE_LIMIT.windowMs };
+      setRemainingAttempts(MFA_RATE_LIMIT.maxAttempts - 1);
+      return { allowed: true };
+    }
+
+    if (entry.count >= MFA_RATE_LIMIT.maxAttempts) {
+      rateLimitRef.current = {
+        ...entry,
+        lockedUntil: now + MFA_RATE_LIMIT.lockoutMs,
+        resetTime: now + MFA_RATE_LIMIT.lockoutMs
+      };
+      setRemainingAttempts(0);
+      return {
+        allowed: false,
+        message: `Too many verification attempts. Please wait ${formatTimeRemaining(MFA_RATE_LIMIT.lockoutMs)} before trying again.`
+      };
+    }
+
+    rateLimitRef.current = { ...entry, count: entry.count + 1 };
+    setRemainingAttempts(MFA_RATE_LIMIT.maxAttempts - entry.count - 1);
+    return { allowed: true };
+  }, []);
 
   useEffect(() => {
     checkEnrollmentStatus();
@@ -93,6 +155,17 @@ const TwoFactorAuth = () => {
       return;
     }
 
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit();
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Too Many Attempts",
+        description: rateLimitCheck.message,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setVerifying(true);
     try {
       const { data, error } = await supabase.auth.mfa.challengeAndVerify({
@@ -101,6 +174,10 @@ const TwoFactorAuth = () => {
       });
 
       if (error) throw error;
+
+      // Reset rate limit on success
+      rateLimitRef.current = null;
+      setRemainingAttempts(MFA_RATE_LIMIT.maxAttempts);
 
       toast({
         title: "Success",
@@ -126,7 +203,9 @@ const TwoFactorAuth = () => {
       console.error('Error verifying MFA:', error);
       toast({
         title: "Error",
-        description: error?.message || "Invalid verification code. Please try again.",
+        description: remainingAttempts > 0 
+          ? `Invalid verification code. ${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining.`
+          : "Invalid verification code. Please try again.",
         variant: "destructive"
       });
     } finally {
