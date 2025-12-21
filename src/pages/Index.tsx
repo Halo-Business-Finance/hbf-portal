@@ -516,17 +516,38 @@ const Index = () => {
       setAuthLoading(false);
     }
   };
+  // Get safe redirect URL - only allow known production/preview domains
+  const getSafeRedirectUrl = (): string => {
+    const origin = window.location.origin;
+    // Allow Lovable preview domains, localhost for dev, and common production patterns
+    const allowedPatterns = [
+      /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
+      /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
+      /^http:\/\/localhost:\d+$/,
+      /^http:\/\/127\.0\.0\.1:\d+$/,
+    ];
+    
+    if (allowedPatterns.some(pattern => pattern.test(origin))) {
+      return `${origin}/`;
+    }
+    // Fallback to a safe default - the current origin if it's HTTPS
+    if (origin.startsWith('https://')) {
+      return `${origin}/`;
+    }
+    // Last resort - return empty to let Supabase use configured default
+    return '';
+  };
+
   const handleMicrosoftSignIn = async () => {
     setAuthLoading(true);
     setAuthError("");
     try {
+      const redirectTo = getSafeRedirectUrl();
       const {
         error
       } = await supabase.auth.signInWithOAuth({
         provider: 'azure',
-        options: {
-          redirectTo: `${window.location.origin}/`
-        }
+        options: redirectTo ? { redirectTo } : undefined
       });
       if (error) {
         setAuthError(error.message || "Failed to sign in with Microsoft");
@@ -541,13 +562,12 @@ const Index = () => {
     setAuthLoading(true);
     setAuthError("");
     try {
+      const redirectTo = getSafeRedirectUrl();
       const {
         error
       } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`
-        }
+        options: redirectTo ? { redirectTo } : undefined
       });
       if (error) {
         setAuthError(error.message || "Failed to sign in with Google");
@@ -562,13 +582,12 @@ const Index = () => {
     setAuthLoading(true);
     setAuthError("");
     try {
+      const redirectTo = getSafeRedirectUrl();
       const {
         error
       } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
-        options: {
-          redirectTo: `${window.location.origin}/`
-        }
+        options: redirectTo ? { redirectTo } : undefined
       });
       if (error) {
         setAuthError(error.message || "Failed to sign in with Apple");

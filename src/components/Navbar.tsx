@@ -56,14 +56,32 @@ const Navbar = () => {
     }, 300);
     return () => clearTimeout(searchTimeout);
   }, [searchQuery, authenticated]);
+  // Sanitize search input to prevent SQL injection via PostgREST operators
+  const sanitizeSearchQuery = (query: string): string => {
+    // Limit length to prevent abuse
+    const limited = query.slice(0, 100);
+    // Escape LIKE wildcards
+    const escaped = limited.replace(/[%_]/g, '\\$&');
+    // Remove PostgREST special characters that could be used for injection
+    return escaped.replace(/[(),.'"\[\]{}|\\^$*+?]/g, '');
+  };
+
   const performSearch = async (query: string) => {
     if (!query.trim()) return;
     setSearching(true);
     try {
       const results: SearchResult[] = [];
+      const sanitizedQuery = sanitizeSearchQuery(query);
+      
+      if (!sanitizedQuery) {
+        setSearchResults([]);
+        setSearching(false);
+        return;
+      }
+      
       const {
         data: applications
-      } = await supabase.from('loan_applications').select('id, application_number, business_name, first_name, last_name, loan_type, status').or(`business_name.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,application_number.ilike.%${query}%`).limit(5);
+      } = await supabase.from('loan_applications').select('id, application_number, business_name, first_name, last_name, loan_type, status').or(`business_name.ilike.%${sanitizedQuery}%,first_name.ilike.%${sanitizedQuery}%,last_name.ilike.%${sanitizedQuery}%,application_number.ilike.%${sanitizedQuery}%`).limit(5);
       if (applications) {
         applications.forEach(app => {
           results.push({
@@ -77,7 +95,7 @@ const Navbar = () => {
       }
       const {
         data: documents
-      } = await supabase.from('borrower_documents').select('id, file_name, document_category, uploaded_at').ilike('file_name', `%${query}%`).eq('is_latest_version', true).limit(5);
+      } = await supabase.from('borrower_documents').select('id, file_name, document_category, uploaded_at').ilike('file_name', `%${sanitizedQuery}%`).eq('is_latest_version', true).limit(5);
       if (documents) {
         documents.forEach(doc => {
           results.push({
