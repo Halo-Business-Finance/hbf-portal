@@ -325,12 +325,31 @@ async function updateApplicationStatus(
   notes?: string
 ): Promise<Response> {
   try {
+    // First, fetch the current loan_details to merge safely
+    const { data: currentApp, error: fetchError } = await supabase
+      .from('loan_applications')
+      .select('loan_details')
+      .eq('id', applicationId)
+      .single();
+
+    if (fetchError) {
+      throw fetchError;
+    }
+
+    // Safely merge status_notes into loan_details without using raw SQL
+    // This prevents SQL injection by using parameterized updates
+    const sanitizedNotes = notes ? notes.replace(/[<>'"\\;]/g, '') : '';
+    const updatedLoanDetails = {
+      ...(currentApp?.loan_details || {}),
+      status_notes: sanitizedNotes
+    };
+
     const { data, error } = await supabase
       .from('loan_applications')
       .update({
         status: newStatus,
         updated_at: new Date().toISOString(),
-        loan_details: supabase.raw(`loan_details || '{"status_notes": "${notes || ''}"}'::jsonb`)
+        loan_details: updatedLoanDetails
       })
       .eq('id', applicationId)
       .select()
