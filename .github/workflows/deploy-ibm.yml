@@ -52,4 +52,5 @@ jobs:
           ibmcloud ce project select --name ${{ env.CODE_ENGINE_PROJECT }}
           ibmcloud ce application update \
             --name ${{ env.IMAGE_NAME }} \
-            --image ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            --image ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}"
