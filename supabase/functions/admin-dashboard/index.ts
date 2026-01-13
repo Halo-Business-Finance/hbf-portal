@@ -256,9 +256,9 @@ async function getFilteredApplications(supabase: any, filters: ApplicationFilter
       // - Limit length to prevent abuse
       const sanitizedSearch = String(filters.searchTerm)
         .slice(0, 100) // Limit length
-        .replace(/[%_]/g, '\\$&') // Escape LIKE wildcards
-        .replace(/[(),.'"\[\]{}|\\^$*+?]/g, '') // Remove special chars that could break query
-        .trim();
+        .replace(/[\\(),.'"\[\]{}|^$*+?]/g, '') // Remove backslashes and special chars that could break query
+        .trim()
+        .replace(/[%_]/g, '\\$&'); // Escape LIKE wildcards for safe ilike usage
       
       if (sanitizedSearch.length > 0) {
         query = query.or(`business_name.ilike.%${sanitizedSearch}%,first_name.ilike.%${sanitizedSearch}%,last_name.ilike.%${sanitizedSearch}%,application_number.ilike.%${sanitizedSearch}%`);
