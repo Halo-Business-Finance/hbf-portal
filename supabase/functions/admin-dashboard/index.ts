@@ -44,9 +44,10 @@ serve(async (req) => {
       );
     }
 
-    // Get service role key from environment
+    // Get Supabase URL and service role key from environment
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    if (!serviceRoleKey) {
+    if (!supabaseUrl || !serviceRoleKey) {
       return new Response(
         JSON.stringify({ error: 'Service configuration error' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -54,7 +55,7 @@ serve(async (req) => {
     }
 
     const supabase = createClient(
-      "https://zosgzkpfgaaadadezpxo.supabase.co",
+      supabaseUrl,
       serviceRoleKey,
       {
         global: {
