@@ -33,6 +33,12 @@ jobs:
           ibmcloud cr region-set ${{ env.IBM_CLOUD_REGION }}
           ibmcloud cr login
 
+      - name: Debug - Show Dockerfile content
+        run: |
+          echo "=== Commit SHA: ${{ github.sha }} ==="
+          echo "=== First 30 lines of Dockerfile ==="
+          head -n 30 Dockerfile
+
       - name: Build Docker image
         run: |
           docker build \
