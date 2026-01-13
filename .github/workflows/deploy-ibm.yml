@@ -50,8 +50,26 @@ jobs:
 
       - name: Push to IBM Container Registry
         run: |
-          docker push ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest
+          push_with_retry() {
+            local image=$1
+            local max_attempts=3
+            local attempt=1
+            while [ $attempt -le $max_attempts ]; do
+              echo "Push attempt $attempt of $max_attempts for $image"
+              if docker push "$image"; then
+                echo "Successfully pushed $image"
+                return 0
+              fi
+              echo "Push failed, waiting 30 seconds before retry..."
+              sleep 30
+              attempt=$((attempt + 1))
+            done
+            echo "Failed to push $image after $max_attempts attempts"
+            return 1
+          }
+          
+          push_with_retry "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          push_with_retry "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
 
       - name: Deploy to Code Engine
         run: |
