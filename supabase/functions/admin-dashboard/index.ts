@@ -113,8 +113,13 @@ serve(async (req) => {
           status: z.string().max(50),
           notes: z.string().max(1000).optional()
         });
-        const updateBody = await req.json();
-        const updateValidation = updateSchema.safeParse(updateBody);
+        if (!body || typeof body !== 'object') {
+          return new Response(
+            JSON.stringify({ error: 'Missing or invalid request body' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        const updateValidation = updateSchema.safeParse(body);
         if (!updateValidation.success) {
           return new Response(
             JSON.stringify({ error: 'Invalid update data', details: updateValidation.error.format() }),
