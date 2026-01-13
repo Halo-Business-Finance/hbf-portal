@@ -102,9 +102,21 @@ serve(async (req) => {
 
     switch (action) {
       case 'validate':
+        if (!applicationData) {
+          return new Response(
+            JSON.stringify({ error: 'Application data is required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
         return await validateApplication(applicationData);
       
       case 'process':
+        if (!applicationData) {
+          return new Response(
+            JSON.stringify({ error: 'Application data is required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
         return await processApplication(supabase, applicationData, userId);
       
       case 'updateStatus':
@@ -127,9 +139,22 @@ serve(async (req) => {
           );
         }
         
+        if (!applicationId || !applicationData?.status) {
+          return new Response(
+            JSON.stringify({ error: 'Application ID and status are required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
         return await updateApplicationStatus(supabase, applicationId, applicationData.status, applicationData.notes);
       
       case 'calculate-eligibility':
+        if (!applicationData) {
+          return new Response(
+            JSON.stringify({ error: 'Application data is required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
         return await calculateEligibility(applicationData);
 
       default:
@@ -141,8 +166,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in loan-application-processor:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -307,11 +333,12 @@ async function processApplication(supabase: any, applicationData: LoanApplicatio
 
   } catch (error) {
     console.error('Error processing application:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         success: false, 
         message: 'Failed to process application',
-        error: error.message 
+        error: errorMessage 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -372,11 +399,12 @@ async function updateApplicationStatus(
 
   } catch (error) {
     console.error('Error updating application status:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         success: false, 
         message: 'Failed to update application status',
-        error: error.message 
+        error: errorMessage 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
