@@ -397,9 +397,49 @@ async function updateApplicationStatus(
 
 async function exportApplications(supabase: any, filters: ApplicationFilter): Promise<Response> {
   try {
-    // Get applications with the same filtering logic
-    const applicationsResponse = await getFilteredApplications(supabase, filters);
-    const { applications } = await applicationsResponse.json();
+    // Query applications directly for export to avoid extra processing done in getFilteredApplications
+    let query = supabase
+      .from('applications')
+      .select(`
+        application_number,
+        status,
+        loan_type,
+        amount_requested,
+        first_name,
+        last_name,
+        business_name,
+        phone,
+        years_in_business,
+        application_started_date,
+        application_submitted_date
+      `);
+
+    // Apply basic filters consistent with ApplicationFilter where possible
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+    if (filters.loanType) {
+      query = query.eq('loan_type', filters.loanType);
+    }
+    if (filters.startDate) {
+      query = query.gte('application_submitted_date', filters.startDate);
+    }
+    if (filters.endDate) {
+      query = query.lte('application_submitted_date', filters.endDate);
+    }
+
+    const { data: applications, error: queryError } = await query;
+
+    if (queryError) {
+      console.error('Error querying applications for export:', queryError);
+      return new Response(
+        JSON.stringify({
+          error: 'Failed to export applications',
+          message: queryError.message ?? 'Unknown query error',
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
 
     // Convert to CSV format
     const csvHeader = [
@@ -415,7 +455,7 @@ async function exportApplications(supabase: any, filters: ApplicationFilter): Pr
       'Submitted Date'
     ].join(',');
 
-    const csvRows = applications.map((app: any) => [
+    const csvRows = (applications ?? []).map((app: any) => [
       app.application_number || '',
       app.status || '',
       app.loan_type || '',
