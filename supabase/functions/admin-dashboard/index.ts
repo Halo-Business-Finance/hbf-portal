@@ -139,8 +139,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in admin-dashboard:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -200,10 +201,11 @@ async function getApplicationStats(supabase: any): Promise<Response> {
 
   } catch (error) {
     console.error('Error getting application stats:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         error: 'Failed to get application stats',
-        message: error.message 
+        message: errorMessage 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -305,10 +307,11 @@ async function getFilteredApplications(supabase: any, filters: ApplicationFilter
 
   } catch (error) {
     console.error('Error getting filtered applications:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         error: 'Failed to get applications',
-        message: error.message 
+        message: errorMessage 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -381,10 +384,11 @@ async function updateApplicationStatus(
 
   } catch (error) {
     console.error('Error updating application status:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         error: 'Failed to update application status',
-        message: error.message 
+        message: errorMessage 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -436,10 +440,11 @@ async function exportApplications(supabase: any, filters: ApplicationFilter): Pr
 
   } catch (error) {
     console.error('Error exporting applications:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         error: 'Failed to export applications',
-        message: error.message 
+        message: errorMessage 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -489,10 +494,11 @@ async function getAnalytics(supabase: any): Promise<Response> {
 
   } catch (error) {
     console.error('Error getting analytics:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         error: 'Failed to get analytics',
-        message: error.message 
+        message: errorMessage 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
