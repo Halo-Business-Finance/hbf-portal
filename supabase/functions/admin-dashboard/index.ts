@@ -360,7 +360,7 @@ async function updateApplicationStatus(
           notificationData: {
             applicationId,
             newStatus: status,
-            applicantEmail: `${application.first_name}@example.com`, // In real app, get from user profile
+            applicantEmail: application.email || null, // Use actual applicant email if available
             applicantName: `${application.first_name} ${application.last_name}`,
             applicationNumber: application.application_number
           }
