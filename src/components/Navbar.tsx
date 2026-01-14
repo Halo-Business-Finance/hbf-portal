@@ -319,25 +319,26 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50">
       {/* Top Bar - Dark Navy */}
-      <div className="h-12 bg-[#1a1f2e] flex items-center justify-between px-4 lg:px-6">
+      <div className="min-h-[48px] md:min-h-[52px] bg-[#1a1f2e] flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2">
         {/* Logo */}
-        <div className="cursor-pointer flex items-center" onClick={handleLogoClick}>
-          <span className="text-white font-bold text-lg tracking-wide uppercase">
-            HALO BUSINESS FINANCE
+        <div className="cursor-pointer flex items-center flex-shrink-0" onClick={handleLogoClick}>
+          <span className="text-white font-bold text-sm sm:text-base lg:text-lg tracking-wide uppercase leading-tight">
+            <span className="hidden sm:inline">HALO BUSINESS FINANCE</span>
+            <span className="sm:hidden">HALO BUSINESS<br/>FINANCE</span>
           </span>
         </div>
 
         {/* Right Side - Top Bar */}
-        <div className="flex items-center gap-2 lg:gap-4">
+        <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
           {/* Search Icon */}
           {authenticated && (
             <Popover open={searchOpen} onOpenChange={setSearchOpen}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10">
+                <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10">
                   <Search className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0 bg-white border shadow-xl" align="end">
+              <PopoverContent className="w-[calc(100vw-24px)] sm:w-[400px] p-0 bg-white border shadow-xl" align="end">
                 <Command shouldFilter={false}>
                   <CommandInput
                     placeholder="Search applications and documents..."
@@ -397,32 +398,32 @@ const Navbar = () => {
             </Popover>
           )}
 
-          {/* Customer Support Dropdown */}
+          {/* Customer Support Dropdown - Icon only on mobile */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="hidden sm:flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors">
-                <Phone className="h-3.5 w-3.5" />
-                <span>Customer Support</span>
-                <ChevronDown className="h-3 w-3" />
+              <button className="flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors p-2 sm:p-0 min-h-[36px] sm:min-h-0">
+                <Phone className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">Customer Support</span>
+                <ChevronDown className="h-3 w-3 hidden sm:inline" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white border shadow-lg min-w-[200px] z-50">
               <DropdownMenuItem asChild className="cursor-pointer text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
-                <a href="tel:1-800-555-0123" className="flex items-center gap-2 px-3 py-2 text-slate-700">
+                <a href="tel:1-800-555-0123" className="flex items-center gap-2 px-3 py-3 sm:py-2 text-slate-700">
                   <Phone className="h-4 w-4 text-slate-500" />
                   <span>1-800-555-0123</span>
                 </a>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/support')} className="cursor-pointer px-3 py-2 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+              <DropdownMenuItem onClick={() => navigate('/support')} className="cursor-pointer px-3 py-3 sm:py-2 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
                 <span>Support Center</span>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="cursor-pointer text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
-                <a href="https://halobusinessfinance.com/contact-us/" target="_blank" rel="noopener noreferrer" className="px-3 py-2 text-slate-700">
+                <a href="https://halobusinessfinance.com/contact-us/" target="_blank" rel="noopener noreferrer" className="px-3 py-3 sm:py-2 text-slate-700">
                   <span>Contact Us</span>
                 </a>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <div className="px-3 py-2 text-[10px] text-slate-400 flex items-center gap-2">
+              <DropdownMenuSeparator className="hidden sm:block" />
+              <div className="hidden sm:flex px-3 py-2 text-[10px] text-slate-400 items-center gap-2">
                 <span className="flex items-center gap-1">
                   <kbd className="px-1 py-0.5 bg-slate-100 rounded text-[9px] font-mono">↑↓</kbd>
                   <span>navigate</span>
@@ -441,11 +442,11 @@ const Navbar = () => {
 
           {/* Sign In Button or User Menu */}
           {authenticated ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               {/* Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10 relative">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10 relative">
                     <Bell className="h-4 w-4" />
                     {notificationCount > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center text-[10px] font-bold bg-red-500 text-white rounded-full">
@@ -454,7 +455,7 @@ const Navbar = () => {
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80 bg-white border shadow-xl">
+                <DropdownMenuContent align="end" className="w-[calc(100vw-24px)] sm:w-80 bg-white border shadow-xl">
                   <div className="px-4 py-3 border-b">
                     <h3 className="font-semibold text-slate-900">Notifications</h3>
                     <p className="text-xs text-slate-500">
@@ -492,7 +493,7 @@ const Navbar = () => {
                     )}
                   </div>
                   <div className="p-2 border-t">
-                    <Button variant="ghost" className="w-full text-sm h-9" onClick={() => navigate('/notifications')}>
+                    <Button variant="ghost" className="w-full text-sm h-10 sm:h-9" onClick={() => navigate('/notifications')}>
                       View All Notifications
                     </Button>
                   </div>
@@ -505,7 +506,7 @@ const Navbar = () => {
                 size="icon"
                 onClick={() => setCalculatorOpen(true)}
                 title="Loan Calculator"
-                className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10"
+                className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10"
               >
                 <Calculator className="h-4 w-4" />
               </Button>
@@ -514,36 +515,36 @@ const Navbar = () => {
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10">
                     <UserCircle className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white border shadow-xl z-50">
-                  <DropdownMenuItem onClick={() => navigate('/my-account?tab=account')} className="cursor-pointer py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+                <DropdownMenuContent align="end" className="w-[calc(100vw-24px)] sm:w-56 bg-white border shadow-xl z-50">
+                  <DropdownMenuItem onClick={() => navigate('/my-account?tab=account')} className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
                     <FileText className="w-4 h-4 mr-3 text-slate-500" />
                     <span>My Account</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/notification-preferences')} className="cursor-pointer py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+                  <DropdownMenuItem onClick={() => navigate('/notification-preferences')} className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
                     <BellRing className="w-4 h-4 mr-3 text-slate-500" />
                     <span>Notification Preferences</span>
                   </DropdownMenuItem>
                   {isAdmin() && (
-                    <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+                    <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
                       <Shield className="w-4 h-4 mr-3 text-slate-500" />
                       <span>Admin Dashboard</span>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/change-password')} className="cursor-pointer py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+                  <DropdownMenuItem onClick={() => navigate('/change-password')} className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
                     <KeyRound className="w-4 h-4 mr-3 text-slate-500" />
                     <span>Change Password</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer py-2.5 text-red-600 hover:bg-red-50 focus:bg-red-50 focus:text-red-600 transition-colors">
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer py-3 sm:py-2.5 text-red-600 hover:bg-red-50 focus:bg-red-50 focus:text-red-600 transition-colors">
                     <LogOut className="w-4 h-4 mr-3" />
                     <span>Sign Out</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <div className="px-3 py-2 text-[10px] text-slate-400 flex items-center gap-2">
+                  <DropdownMenuSeparator className="hidden sm:block" />
+                  <div className="hidden sm:flex px-3 py-2 text-[10px] text-slate-400 items-center gap-2">
                     <span className="flex items-center gap-1">
                       <kbd className="px-1 py-0.5 bg-slate-100 rounded text-[9px] font-mono">↑↓</kbd>
                       <span>navigate</span>
@@ -563,10 +564,11 @@ const Navbar = () => {
           ) : (
             <Button
               onClick={() => navigate('/borrower-portal')}
-              className="h-8 px-4 bg-transparent border border-primary text-primary hover:bg-primary hover:text-white rounded-full text-sm font-medium"
+              className="h-9 sm:h-8 px-3 sm:px-4 bg-transparent border border-primary text-primary hover:bg-primary hover:text-white rounded-full text-sm font-medium"
             >
               <Lock className="h-3.5 w-3.5 mr-1.5" />
-              Sign In
+              <span className="hidden xs:inline">Sign In</span>
+              <span className="xs:hidden">Login</span>
             </Button>
           )}
         </div>
@@ -574,34 +576,53 @@ const Navbar = () => {
 
       {/* Bottom Bar - Light Gray Navigation (only show when not authenticated) */}
       {!authenticated && (
-        <div className="h-12 bg-[#f0f2f5] border-b border-slate-200 flex items-center justify-between px-4 lg:px-6">
+        <div className="min-h-[48px] md:min-h-[52px] bg-[#f0f2f5] border-b border-slate-200 flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2">
           {/* Main Navigation Links */}
           <nav className="hidden lg:flex items-center">
             {mainNavItems.map((item) => renderNavLink(item))}
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile/Tablet Menu Button */}
           <div className="lg:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 px-3 text-slate-700">
+                <Button variant="ghost" className="h-10 sm:h-9 px-4 sm:px-3 text-slate-700 text-base sm:text-sm">
                   Menu
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-white border shadow-lg">
+              <DropdownMenuContent align="start" className="w-[calc(100vw-24px)] sm:w-64 bg-white border shadow-lg max-h-[70vh] overflow-y-auto">
                 {mainNavItems.map((item) => (
-                  <DropdownMenuItem key={item.label} asChild className="cursor-pointer">
-                    {item.external ? (
-                      <a href={item.href} target="_blank" rel="noopener noreferrer" className="w-full">
-                        {item.label}
-                      </a>
-                    ) : (
-                      <Link to={item.href} className="w-full">
-                        {item.label}
-                      </Link>
+                  <div key={item.label}>
+                    <DropdownMenuItem asChild className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+                      {item.external ? (
+                        <a href={item.href} target="_blank" rel="noopener noreferrer" className="w-full font-medium">
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link to={item.href} className="w-full font-medium">
+                          {item.label}
+                        </Link>
+                      )}
+                    </DropdownMenuItem>
+                    {item.children && item.children.length > 0 && (
+                      <div className="pl-4 border-l-2 border-slate-200 ml-3 mb-2">
+                        {item.children.map((child) => (
+                          <DropdownMenuItem key={child.label} asChild className="cursor-pointer py-2.5 sm:py-2 text-slate-600 text-sm hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+                            {child.external ? (
+                              <a href={child.href} target="_blank" rel="noopener noreferrer" className="w-full">
+                                {child.label}
+                              </a>
+                            ) : (
+                              <Link to={child.href} className="w-full">
+                                {child.label}
+                              </Link>
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </div>
                     )}
-                  </DropdownMenuItem>
+                  </div>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -610,7 +631,7 @@ const Navbar = () => {
           {/* Get Started Button */}
           <Button
             onClick={() => navigate('/borrower-portal')}
-            className="h-8 px-5 bg-primary hover:bg-primary/90 text-white rounded-full text-sm font-medium"
+            className="h-10 sm:h-9 px-5 sm:px-5 bg-primary hover:bg-primary/90 text-white rounded-full text-sm font-medium"
           >
             <Lock className="h-3.5 w-3.5 mr-1.5" />
             Get Started
