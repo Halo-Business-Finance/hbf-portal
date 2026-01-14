@@ -39,7 +39,7 @@ import { CreditScoreWidget } from '@/components/CreditScoreWidget';
 import { BankBalanceWidget } from '@/components/BankBalanceWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { Footer } from '@/components/Footer';
-import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts } from '@/components/dashboard';
+import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts, SwipeableDashboard } from '@/components/dashboard';
 const FundedLoansView = ({
   userId
 }: {
@@ -192,6 +192,76 @@ const DashboardView = () => {
     setStatusFilter(filter);
     setActiveTab('applications');
   };
+  // Define dashboard sections for swipeable navigation on mobile
+  const dashboardSections = [
+    {
+      id: 'overview',
+      label: 'Overview',
+      content: (
+        <div className="space-y-4">
+          <QuickActions />
+          <DashboardOverview />
+          <DashboardCharts userId={user?.id} />
+        </div>
+      ),
+    },
+    {
+      id: 'progress',
+      label: 'Progress',
+      content: (
+        <div className="space-y-4">
+          <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <DocumentChecklist userId={user?.id} />
+        </div>
+      ),
+    },
+    {
+      id: 'financial',
+      label: 'Financial',
+      content: (
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-foreground">Bank Accounts</h2>
+            <BankBalanceWidget />
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-foreground">Credit Scores</h2>
+            <CreditScoreWidget />
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'applications',
+      label: 'Applications',
+      content: (
+        <div className="space-y-4">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
+              <p className="stat-label">Total<br />Applications</p>
+              <p className="stat-value">{stats.totalApplications}</p>
+            </div>
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+              <p className="stat-label">Approved<br />Amount</p>
+              <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
+            </div>
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
+              <p className="stat-label">Pending<br />Review</p>
+              <p className="stat-value">{stats.pendingReview}</p>
+            </div>
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+              <p className="stat-label">Success Rate</p>
+              <p className="stat-value">{stats.successRate}%</p>
+            </div>
+          </div>
+          <ApplicationsList statusFilter={statusFilter} />
+        </div>
+      ),
+    },
+  ];
+
   return <div className="space-y-4 sm:space-y-5 mb-12">
       {/* Onboarding Guide for new users */}
       <OnboardingGuide userId={user?.id} />
@@ -208,90 +278,96 @@ const DashboardView = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <QuickActions />
+      {/* Mobile Swipeable Dashboard */}
+      <SwipeableDashboard sections={dashboardSections} />
 
-      {/* Overview Card */}
-      <DashboardOverview />
+      {/* Desktop Layout - Hidden on mobile */}
+      <div className="hidden md:block space-y-4 sm:space-y-5">
+        {/* Quick Actions */}
+        <QuickActions />
 
-      {/* Dashboard Charts */}
-      <DashboardCharts userId={user?.id} />
+        {/* Overview Card */}
+        <DashboardOverview />
 
-      {/* Progress & Timeline Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-        <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-        <DocumentChecklist userId={user?.id} />
+        {/* Dashboard Charts */}
+        <DashboardCharts userId={user?.id} />
+
+        {/* Progress & Timeline Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <DocumentChecklist userId={user?.id} />
+        </div>
+
+        {/* Bank Accounts & Credit Scores Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground">Bank Accounts</h2>
+            <BankBalanceWidget />
+          </div>
+          
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground">Credit Scores</h2>
+            <CreditScoreWidget />
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
+            <p className="stat-label">Total<br />Applications</p>
+            <p className="stat-value">{stats.totalApplications}</p>
+          </div>
+
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+            <p className="stat-label">Approved<br />Amount</p>
+            <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
+          </div>
+
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
+            <p className="stat-label">Pending<br />Review</p>
+            <p className="stat-value">{stats.pendingReview}</p>
+          </div>
+
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+            <p className="stat-label">Success Rate</p>
+            <p className="stat-value">{stats.successRate}%</p>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          
+
+          <TabsContent value="applications" className="mt-6">
+            {statusFilter && <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-blue-900 text-white">
+                    Filter: {statusFilter === 'all' ? 'All Applications' : statusFilter === 'pending' ? 'Pending Review' : statusFilter === 'approved' ? 'Approved/Funded' : statusFilter}
+                  </Badge>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setStatusFilter(null)} className="text-blue-900 hover:text-blue-700">
+                  Clear Filter
+                </Button>
+              </div>}
+            <ApplicationsList statusFilter={statusFilter} />
+          </TabsContent>
+
+          <TabsContent value="activity" className="mt-6">
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Clock className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Recent Activity</h3>
+                <p className="text-muted-foreground">Your recent application activity will appear here</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="loans" className="mt-6">
+            <FundedLoansView userId={user?.id} />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      {/* Bank Accounts & Credit Scores Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Bank Accounts</h2>
-          <BankBalanceWidget />
-        </div>
-        
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Credit Scores</h2>
-          <CreditScoreWidget />
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
-          <p className="stat-label">Total<br />Applications</p>
-          <p className="stat-value">{stats.totalApplications}</p>
-        </div>
-
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-          <p className="stat-label">Approved<br />Amount</p>
-          <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
-        </div>
-
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
-          <p className="stat-label">Pending<br />Review</p>
-          <p className="stat-value">{stats.pendingReview}</p>
-        </div>
-
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-          <p className="stat-label">Success Rate</p>
-          <p className="stat-value">{stats.successRate}%</p>
-        </div>
-      </div>
-
-      {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        
-
-        <TabsContent value="applications" className="mt-6">
-          {statusFilter && <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-blue-900 text-white">
-                  Filter: {statusFilter === 'all' ? 'All Applications' : statusFilter === 'pending' ? 'Pending Review' : statusFilter === 'approved' ? 'Approved/Funded' : statusFilter}
-                </Badge>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => setStatusFilter(null)} className="text-blue-900 hover:text-blue-700">
-                Clear Filter
-              </Button>
-            </div>}
-          <ApplicationsList statusFilter={statusFilter} />
-        </TabsContent>
-
-        <TabsContent value="activity" className="mt-6">
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Clock className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Recent Activity</h3>
-              <p className="text-muted-foreground">Your recent application activity will appear here</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="loans" className="mt-6">
-          <FundedLoansView userId={user?.id} />
-        </TabsContent>
-      </Tabs>
 
       {/* Floating Support Button */}
       <FloatingSupportButton />
@@ -619,49 +695,48 @@ const Index = () => {
           <div className="max-w-7xl mx-auto px-6 bg-white">
             <main>
           {/* Header with Stats */}
-          <div className="text-center mb-12 animate-fade-in">
-            <p className="sm:text-2xl font-bold text-black mb-0 mt-px my-0 py-0 pt-[10px] pb-0 font-serif text-2xl px-[10px]">
+          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+            <p className="text-xl sm:text-2xl font-bold text-black mb-0 mt-px my-0 py-0 pt-[10px] pb-0 px-[10px] font-sans">
                SBA & Commercial 
 Loan Marketplace                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
             </p>
-            <h1 className="sm:text-xl font-bold tracking-tight mb-4 text-black font-serif px-[10px] text-lg">
+            <h1 className="text-base sm:text-xl font-bold tracking-tight mb-3 sm:mb-4 text-black px-[10px] font-sans">
               Comprehensive Business Financing Solutions
             </h1>
-            <p className="max-w-3xl mx-auto mb-10 leading-relaxed text-black text-xs font-serif">
-              We provide credit, financing, treasury and payment solutions to help your business succeed. 
-              Discover our comprehensive range of SBA-backed and conventional financing options designed to fuel your business growth.
+            <p className="max-w-3xl mx-auto leading-relaxed text-black text-sm sm:text-base font-sans px-2">
+              Our Marketplace provides Conventional, SBA, USDA, and Bridge loan financing nationwide to meet any business need. Discover our comprehensive range of SBA, USDA and conventional financing options.      
             </p>
           </div>
 
           {/* Company Stats - Above Auth Card */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
-            <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white underline underline-offset-4 decoration-white">$1 Billion+</div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Loan Funding Provided</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-6 max-w-3xl mx-auto mb-6 sm:mb-8">
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 text-black underline underline-offset-2 sm:underline-offset-4 decoration-black">$1 Billion+</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Funding Provided</div>
             </Card>
-            <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white underline underline-offset-4 decoration-white">95%</div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Loan Approval Rate</div>
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">95%</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Approval Rate</div>
             </Card>
-            <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white underline underline-offset-4 decoration-white">24 Hours</div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Avg Loan Processing</div>
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">24 Hours</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Avg Loan Processing</div>
             </Card>
           </div>
 
           {/* Auth Card */}
-          <div className="px-6 w-full flex justify-center">
-          <Card className="max-w-md w-full shadow-lg">
-            <CardHeader className="text-center pb-3 pt-6">
-              <h2 className="text-2xl font-bold text-foreground mb-1">
+          <div className="px-2 sm:px-6 w-full flex justify-center">
+          <Card className="max-w-3xl w-full shadow-lg border-2 border-blue-500">
+            <CardHeader className="text-center pb-3 pt-4 sm:pt-6 px-4 sm:px-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
                 Welcome to Halo Business Finance
               </h2>
               <p className="text-sm text-foreground">
                 Sign in to your account
               </p>
             </CardHeader>
-            <CardContent className="px-6 pb-6">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
               <Tabs value={isLogin ? "login" : "signup"} onValueChange={switchMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 h-9 gap-2">
                   <TabsTrigger value="login" className="text-sm py-1">Sign In</TabsTrigger>
@@ -670,18 +745,20 @@ Loan Marketplace
                 
                 <TabsContent value="login" className="space-y-4 mt-0">
                   <form onSubmit={handleAuthSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-foreground font-normal text-sm">Email</Label>
-                      <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="password" className="text-foreground font-normal text-sm">Password</Label>
-                      <div className="relative">
-                        <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
-                        <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
-                          {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                        </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-foreground font-normal text-sm">Email</Label>
+                        <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="password" className="text-foreground font-normal text-sm">Password</Label>
+                        <div className="relative">
+                          <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
+                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          </Button>
+                        </div>
                       </div>
                     </div>
 
@@ -689,9 +766,17 @@ Loan Marketplace
                         <AlertDescription>{authError}</AlertDescription>
                       </Alert>}
 
-                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={authLoading}>
-                      {authLoading ? "Signing in..." : "Sign In"}
-                    </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                      <Button type="submit" className="w-full h-11 text-base font-medium" disabled={authLoading}>
+                        {authLoading ? "Signing in..." : "Sign In"}
+                      </Button>
+                      
+                      <div className="text-center md:text-left">
+                        <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
+                          Forgot your password?
+                        </Button>
+                      </div>
+                    </div>
                     
                     <div className="relative py-2">
                       <div className="absolute inset-0 flex items-center">
@@ -704,7 +789,7 @@ Loan Marketplace
                       </div>
                     </div>
 
-                    <div className="text-sm">
+                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
                       <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with Google">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
@@ -726,18 +811,12 @@ Loan Marketplace
                         </svg>
                       </Button>
                     </div>
-
-                    <div className="text-center">
-                      <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
-                        Forgot your password?
-                      </Button>
-                    </div>
                   </form>
                 </TabsContent>
                 
                 <TabsContent value="signup" className="space-y-4 mt-0">
                   <form onSubmit={handleAuthSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName" className="text-foreground font-normal text-sm">First Name</Label>
                         <Input id="firstName" placeholder="John" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading} className="h-10" />
@@ -748,22 +827,30 @@ Loan Marketplace
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="business" className="text-foreground font-normal text-sm">Business Name</Label>
-                      <Input id="business" placeholder="Your Business LLC" value={businessName} onChange={e => setBusinessName(e.target.value)} required disabled={authLoading} className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email" className="text-foreground font-normal text-sm">Email</Label>
-                      <Input id="signup-email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="business" className="text-foreground font-normal text-sm">Business Name</Label>
+                        <Input id="business" placeholder="Your Business LLC" value={businessName} onChange={e => setBusinessName(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email" className="text-foreground font-normal text-sm">Email</Label>
+                        <Input id="signup-email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password" className="text-foreground font-normal text-sm">Password</Label>
-                      <div className="relative">
-                        <Input id="signup-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
-                        <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
-                          {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password" className="text-foreground font-normal text-sm">Password</Label>
+                        <div className="relative">
+                          <Input id="signup-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
+                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-end">
+                        <Button type="submit" className="w-full h-10 text-base font-medium border-2 border-blue-500" disabled={authLoading}>
+                          {authLoading ? "Creating..." : "Create Account"}
                         </Button>
                       </div>
                     </div>
@@ -771,10 +858,6 @@ Loan Marketplace
                     {authError && <Alert variant="destructive">
                         <AlertDescription>{authError}</AlertDescription>
                       </Alert>}
-
-                    <Button type="submit" className="w-full h-11 text-base font-medium border-2 border-blue-500" disabled={authLoading}>
-                      {authLoading ? "Creating Account..." : "Create Account"}
-                    </Button>
 
                     <div className="relative py-2">
                       <div className="absolute inset-0 flex items-center">
@@ -787,7 +870,7 @@ Loan Marketplace
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
                       <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with Google">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
@@ -823,13 +906,13 @@ Loan Marketplace
           </div>
           
           {/* Terms text below card */}
-          <p className="text-center text-sm text-foreground mt-6 max-w-xl mx-auto">
+          <p className="text-center text-black mt-6 max-w-xl mx-auto my-[20px] text-base">
             By signing up, you agree to our{" "}
-            <a href="/terms" className="hover:underline text-white">
+            <a href="/terms" className="hover:underline text-black">
               terms of service
             </a>{" "}
             and{" "}
-            <a href="/privacy" className="hover:underline text-white">
+            <a href="/privacy" className="hover:underline text-black">
               privacy policy
             </a>
             .
