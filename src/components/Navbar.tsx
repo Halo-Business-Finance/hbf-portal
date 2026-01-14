@@ -232,20 +232,7 @@ const Navbar = () => {
                 </a>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="hidden sm:block" />
-              <div className="hidden sm:flex px-3 py-2 text-[10px] text-slate-400 items-center gap-2">
-                <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 bg-slate-100 rounded text-[9px] font-mono">↑↓</kbd>
-                  <span>navigate</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 bg-slate-100 rounded text-[9px] font-mono">↵</kbd>
-                  <span>select</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 bg-slate-100 rounded text-[9px] font-mono">esc</kbd>
-                  <span>close</span>
-                </span>
-              </div>
+              
             </DropdownMenuContent>
           </DropdownMenu>
 
