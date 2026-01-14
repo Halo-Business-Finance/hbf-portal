@@ -12,6 +12,7 @@ env:
   ICR_REGISTRY: us.icr.io
   IMAGE_NAME: hbf-portal
   CODE_ENGINE_PROJECT: hbf-portal
+  CODE_ENGINE_PROJECT: hbf-portal
 
 jobs:
   build-and-deploy:
