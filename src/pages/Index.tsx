@@ -710,18 +710,18 @@ Loan Marketplace
           </div>
 
           {/* Company Stats - Above Auth Card */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto mb-6 sm:mb-8">
-            <Card className="p-4 sm:p-6 border-2 border-blue-500">
-              <div className="text-lg sm:text-2xl font-bold mb-1 text-black underline underline-offset-4 decoration-black">$1 Billion+</div>
-              <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-foreground">Loan Funding Provided</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-6 max-w-3xl mx-auto mb-6 sm:mb-8">
+            <Card className="p-2 sm:p-6 border-2 border-blue-500">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 text-black underline underline-offset-2 sm:underline-offset-4 decoration-black">$1 Billion+</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Funding Provided</div>
             </Card>
-            <Card className="p-4 sm:p-6 border-2 border-blue-500">
-              <div className="text-lg sm:text-2xl font-bold mb-1 underline underline-offset-4 decoration-black text-black">95%</div>
-              <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-foreground">Loan Approval Rate</div>
+            <Card className="p-2 sm:p-6 border-2 border-blue-500">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">95%</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Approval Rate</div>
             </Card>
-            <Card className="p-4 sm:p-6 border-2 border-blue-500">
-              <div className="text-lg sm:text-2xl font-bold mb-1 underline underline-offset-4 decoration-black text-black">24 Hours</div>
-              <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-foreground">Avg Loan Processing</div>
+            <Card className="p-2 sm:p-6 border-2 border-blue-500">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">24 Hours</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Avg Loan Processing</div>
             </Card>
           </div>
 
