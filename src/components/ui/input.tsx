@@ -23,13 +23,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           className={cn(
             // Base styles
-            "flex h-11 w-full rounded-lg border bg-background text-sm text-foreground",
+            "flex h-11 w-full rounded-lg border-2 border-blue-500 bg-background text-sm text-foreground",
             "ring-offset-background transition-all duration-200",
             "placeholder:text-muted-foreground",
             // Focus styles
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-0 focus-visible:border-primary",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/30 focus-visible:ring-offset-0 focus-visible:border-blue-400",
             // Shadow and hover
-            "shadow-sm hover:shadow-md hover:border-muted-foreground/30",
+            "shadow-sm hover:shadow-md hover:border-blue-400",
             // Disabled styles
             "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-sm",
             // File input styles
@@ -41,7 +41,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             // Error state
             error && "border-destructive focus-visible:ring-destructive/30 focus-visible:border-destructive",
             // Default border
-            !error && "border-border",
+            !error && "border-blue-500",
             className
           )}
           ref={ref}
