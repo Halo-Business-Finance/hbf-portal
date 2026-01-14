@@ -39,7 +39,7 @@ import { CreditScoreWidget } from '@/components/CreditScoreWidget';
 import { BankBalanceWidget } from '@/components/BankBalanceWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { Footer } from '@/components/Footer';
-import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts } from '@/components/dashboard';
+import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts, SwipeableDashboard } from '@/components/dashboard';
 const FundedLoansView = ({
   userId
 }: {
@@ -192,6 +192,76 @@ const DashboardView = () => {
     setStatusFilter(filter);
     setActiveTab('applications');
   };
+  // Define dashboard sections for swipeable navigation on mobile
+  const dashboardSections = [
+    {
+      id: 'overview',
+      label: 'Overview',
+      content: (
+        <div className="space-y-4">
+          <QuickActions />
+          <DashboardOverview />
+          <DashboardCharts userId={user?.id} />
+        </div>
+      ),
+    },
+    {
+      id: 'progress',
+      label: 'Progress',
+      content: (
+        <div className="space-y-4">
+          <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <DocumentChecklist userId={user?.id} />
+        </div>
+      ),
+    },
+    {
+      id: 'financial',
+      label: 'Financial',
+      content: (
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-foreground">Bank Accounts</h2>
+            <BankBalanceWidget />
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-foreground">Credit Scores</h2>
+            <CreditScoreWidget />
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'applications',
+      label: 'Applications',
+      content: (
+        <div className="space-y-4">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
+              <p className="stat-label">Total<br />Applications</p>
+              <p className="stat-value">{stats.totalApplications}</p>
+            </div>
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+              <p className="stat-label">Approved<br />Amount</p>
+              <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
+            </div>
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
+              <p className="stat-label">Pending<br />Review</p>
+              <p className="stat-value">{stats.pendingReview}</p>
+            </div>
+            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+              <p className="stat-label">Success Rate</p>
+              <p className="stat-value">{stats.successRate}%</p>
+            </div>
+          </div>
+          <ApplicationsList statusFilter={statusFilter} />
+        </div>
+      ),
+    },
+  ];
+
   return <div className="space-y-4 sm:space-y-5 mb-12">
       {/* Onboarding Guide for new users */}
       <OnboardingGuide userId={user?.id} />
@@ -208,90 +278,96 @@ const DashboardView = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <QuickActions />
+      {/* Mobile Swipeable Dashboard */}
+      <SwipeableDashboard sections={dashboardSections} />
 
-      {/* Overview Card */}
-      <DashboardOverview />
+      {/* Desktop Layout - Hidden on mobile */}
+      <div className="hidden md:block space-y-4 sm:space-y-5">
+        {/* Quick Actions */}
+        <QuickActions />
 
-      {/* Dashboard Charts */}
-      <DashboardCharts userId={user?.id} />
+        {/* Overview Card */}
+        <DashboardOverview />
 
-      {/* Progress & Timeline Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-        <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-        <DocumentChecklist userId={user?.id} />
+        {/* Dashboard Charts */}
+        <DashboardCharts userId={user?.id} />
+
+        {/* Progress & Timeline Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
+          <DocumentChecklist userId={user?.id} />
+        </div>
+
+        {/* Bank Accounts & Credit Scores Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground">Bank Accounts</h2>
+            <BankBalanceWidget />
+          </div>
+          
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground">Credit Scores</h2>
+            <CreditScoreWidget />
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
+            <p className="stat-label">Total<br />Applications</p>
+            <p className="stat-value">{stats.totalApplications}</p>
+          </div>
+
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+            <p className="stat-label">Approved<br />Amount</p>
+            <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
+          </div>
+
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
+            <p className="stat-label">Pending<br />Review</p>
+            <p className="stat-value">{stats.pendingReview}</p>
+          </div>
+
+          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+            <p className="stat-label">Success Rate</p>
+            <p className="stat-value">{stats.successRate}%</p>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          
+
+          <TabsContent value="applications" className="mt-6">
+            {statusFilter && <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-blue-900 text-white">
+                    Filter: {statusFilter === 'all' ? 'All Applications' : statusFilter === 'pending' ? 'Pending Review' : statusFilter === 'approved' ? 'Approved/Funded' : statusFilter}
+                  </Badge>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setStatusFilter(null)} className="text-blue-900 hover:text-blue-700">
+                  Clear Filter
+                </Button>
+              </div>}
+            <ApplicationsList statusFilter={statusFilter} />
+          </TabsContent>
+
+          <TabsContent value="activity" className="mt-6">
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Clock className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Recent Activity</h3>
+                <p className="text-muted-foreground">Your recent application activity will appear here</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="loans" className="mt-6">
+            <FundedLoansView userId={user?.id} />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      {/* Bank Accounts & Credit Scores Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Bank Accounts</h2>
-          <BankBalanceWidget />
-        </div>
-        
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Credit Scores</h2>
-          <CreditScoreWidget />
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
-          <p className="stat-label">Total<br />Applications</p>
-          <p className="stat-value">{stats.totalApplications}</p>
-        </div>
-
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-          <p className="stat-label">Approved<br />Amount</p>
-          <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
-        </div>
-
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
-          <p className="stat-label">Pending<br />Review</p>
-          <p className="stat-value">{stats.pendingReview}</p>
-        </div>
-
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-          <p className="stat-label">Success Rate</p>
-          <p className="stat-value">{stats.successRate}%</p>
-        </div>
-      </div>
-
-      {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        
-
-        <TabsContent value="applications" className="mt-6">
-          {statusFilter && <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-blue-900 text-white">
-                  Filter: {statusFilter === 'all' ? 'All Applications' : statusFilter === 'pending' ? 'Pending Review' : statusFilter === 'approved' ? 'Approved/Funded' : statusFilter}
-                </Badge>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => setStatusFilter(null)} className="text-blue-900 hover:text-blue-700">
-                Clear Filter
-              </Button>
-            </div>}
-          <ApplicationsList statusFilter={statusFilter} />
-        </TabsContent>
-
-        <TabsContent value="activity" className="mt-6">
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Clock className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Recent Activity</h3>
-              <p className="text-muted-foreground">Your recent application activity will appear here</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="loans" className="mt-6">
-          <FundedLoansView userId={user?.id} />
-        </TabsContent>
-      </Tabs>
 
       {/* Floating Support Button */}
       <FloatingSupportButton />
