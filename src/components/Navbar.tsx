@@ -542,49 +542,51 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Bottom Bar - Light Gray Navigation */}
-      <div className="h-12 bg-[#f0f2f5] border-b border-slate-200 flex items-center justify-between px-4 lg:px-6">
-        {/* Main Navigation Links */}
-        <nav className="hidden lg:flex items-center">
-          {mainNavItems.map((item) => renderNavLink(item))}
-        </nav>
+      {/* Bottom Bar - Light Gray Navigation (only show when not authenticated) */}
+      {!authenticated && (
+        <div className="h-12 bg-[#f0f2f5] border-b border-slate-200 flex items-center justify-between px-4 lg:px-6">
+          {/* Main Navigation Links */}
+          <nav className="hidden lg:flex items-center">
+            {mainNavItems.map((item) => renderNavLink(item))}
+          </nav>
 
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 px-3 text-slate-700">
-                Menu
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 bg-white border shadow-lg">
-              {mainNavItems.map((item) => (
-                <DropdownMenuItem key={item.label} asChild className="cursor-pointer">
-                  {item.external ? (
-                    <a href={item.href} target="_blank" rel="noopener noreferrer" className="w-full">
-                      {item.label}
-                    </a>
-                  ) : (
-                    <Link to={item.href} className="w-full">
-                      {item.label}
-                    </Link>
-                  )}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Mobile Menu Button */}
+          <div className="lg:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 px-3 text-slate-700">
+                  Menu
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 bg-white border shadow-lg">
+                {mainNavItems.map((item) => (
+                  <DropdownMenuItem key={item.label} asChild className="cursor-pointer">
+                    {item.external ? (
+                      <a href={item.href} target="_blank" rel="noopener noreferrer" className="w-full">
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link to={item.href} className="w-full">
+                        {item.label}
+                      </Link>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Get Started Button */}
+          <Button
+            onClick={() => navigate('/borrower-portal')}
+            className="h-8 px-5 bg-primary hover:bg-primary/90 text-white rounded-full text-sm font-medium"
+          >
+            <Lock className="h-3.5 w-3.5 mr-1.5" />
+            Get Started
+          </Button>
         </div>
-
-        {/* Get Started Button */}
-        <Button
-          onClick={() => navigate('/borrower-portal')}
-          className="h-8 px-5 bg-primary hover:bg-primary/90 text-white rounded-full text-sm font-medium"
-        >
-          <Lock className="h-3.5 w-3.5 mr-1.5" />
-          Get Started
-        </Button>
-      </div>
+      )}
     </header>
   );
 };
