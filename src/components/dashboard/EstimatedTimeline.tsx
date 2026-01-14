@@ -66,65 +66,65 @@ export const EstimatedTimeline = ({
   const currentStage = stages.find(s => s.status === 'current');
   const completedStages = stages.filter(s => s.status === 'completed').length;
   return <Card className={cn("border border-border", className)}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
-          <Calendar className="h-5 w-5 text-primary" />
+      <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+        <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-card-foreground">
+          <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           Estimated Timeline
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
         {/* Summary */}
-        <div className="flex items-center justify-between p-3 rounded-lg mb-4 bg-secondary">
+        <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg mb-3 sm:mb-4 bg-secondary">
           <div>
-            <p className="text-sm font-medium text-card-foreground">Total Estimated Time</p>
-            <p className="text-xs text-muted-foreground">From application to funding</p>
+            <p className="text-xs sm:text-sm font-medium text-card-foreground">Total Estimated Time</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">From application to funding</p>
           </div>
           <div className="text-right">
-            <p className="text-lg font-bold text-primary">{totalDaysMin}-{totalDaysMax} days</p>
-            <p className="text-xs text-muted-foreground">Business days</p>
+            <p className="text-base sm:text-lg font-bold text-primary">{totalDaysMin}-{totalDaysMax} days</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Business days</p>
           </div>
         </div>
 
         {/* Current stage highlight */}
-        {currentStage && <div className="p-3 border border-primary/30 rounded-lg mb-4 bg-primary/5">
+        {currentStage && <div className="p-2.5 sm:p-3 border border-primary/30 rounded-lg mb-3 sm:mb-4 bg-primary/5">
             <div className="flex items-center gap-2 mb-1">
-              <Clock className="h-4 w-4 text-primary animate-pulse" />
-              <span className="text-sm font-medium text-primary">Current Stage</span>
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary animate-pulse" />
+              <span className="text-xs sm:text-sm font-medium text-primary">Current Stage</span>
             </div>
-            <p className="font-semibold text-card-foreground">{currentStage.name}</p>
-            <p className="text-xs text-muted-foreground">{currentStage.description}</p>
+            <p className="font-semibold text-sm sm:text-base text-card-foreground">{currentStage.name}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">{currentStage.description}</p>
           </div>}
 
         {/* Timeline stages */}
-        <div className="space-y-3">
-          {stages.map((stage, index) => <div key={stage.id} className={cn("flex items-center gap-3", stage.status === 'upcoming' && "opacity-50")}>
+        <div className="space-y-2.5 sm:space-y-3">
+          {stages.map((stage, index) => <div key={stage.id} className={cn("flex items-center gap-2.5 sm:gap-3", stage.status === 'upcoming' && "opacity-50")}>
               {/* Status indicator */}
-              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-medium", stage.status === 'completed' && "bg-green-500 text-white", stage.status === 'current' && "bg-primary text-primary-foreground ring-2 ring-primary/30", stage.status === 'upcoming' && "bg-muted text-muted-foreground")}>
-                {stage.status === 'completed' ? <CheckCircle className="h-4 w-4" /> : index + 1}
+              <div className={cn("w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 text-[10px] sm:text-xs font-medium", stage.status === 'completed' && "bg-green-500 text-white", stage.status === 'current' && "bg-primary text-primary-foreground ring-2 ring-primary/30", stage.status === 'upcoming' && "bg-muted text-muted-foreground")}>
+                {stage.status === 'completed' ? <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : index + 1}
               </div>
 
               {/* Stage info */}
               <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-medium text-card-foreground", stage.status === 'current' && "text-primary")}>
+                <p className={cn("text-xs sm:text-sm font-medium text-card-foreground truncate", stage.status === 'current' && "text-primary")}>
                   {stage.name}
                 </p>
               </div>
 
               {/* Duration */}
               <div className="text-right shrink-0">
-                <p className={cn("text-sm font-medium", stage.status === 'completed' ? "text-green-600" : "text-muted-foreground")}>
+                <p className={cn("text-[10px] sm:text-sm font-medium", stage.status === 'completed' ? "text-green-600" : "text-muted-foreground")}>
                   {stage.duration}
                 </p>
               </div>
 
-              {/* Arrow to next stage */}
-              {index < stages.length - 1 && <ArrowRight className="h-4 w-4 text-muted-foreground/50 hidden sm:block" />}
+              {/* Arrow to next stage - hide on mobile */}
+              {index < stages.length - 1 && <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground/50 hidden md:block" />}
             </div>)}
         </div>
 
         {/* Progress note */}
-        <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground text-center">
+        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border">
+          <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
             {completedStages === 0 ? "Submit your application to start the process" : completedStages === stages.length ? "🎉 Congratulations! Your loan has been funded!" : `${completedStages} of ${stages.length} stages completed`}
           </p>
         </div>

@@ -103,30 +103,30 @@ export const DashboardCharts = ({
       </div>;
   }
   const hasData = statusData.length > 0;
-  return <div className={cn("grid grid-cols-1 lg:grid-cols-2 gap-4", className)}>
+  return <div className={cn("grid grid-cols-1 gap-4 sm:gap-5", className)}>
       {/* Application Status Distribution */}
       <Card className="border border-border">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
           <CardTitle className="text-base flex items-center gap-2 text-card-foreground">
             <PieChartIcon className="h-4 w-4 text-primary" />
             Application Status
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {hasData ? <div className="flex items-center gap-4">
-              <div className="w-32 h-32">
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+          {hasData ? <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="w-28 h-28 sm:w-32 sm:h-32">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={statusData} cx="50%" cy="50%" innerRadius={25} outerRadius={50} dataKey="value" strokeWidth={2}>
+                    <Pie data={statusData} cx="50%" cy="50%" innerRadius={20} outerRadius={45} dataKey="value" strokeWidth={2}>
                       {statusData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 w-full space-y-2">
                 {statusData.map((item, index) => <div key={index} className="text-sm flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{
+                      <div className="w-3 h-3 rounded-full flex-shrink-0" style={{
                   backgroundColor: item.color
                 }} />
                       <span className="text-card-foreground">{item.name}</span>
@@ -134,7 +134,7 @@ export const DashboardCharts = ({
                     <span className="font-medium text-card-foreground">{item.value}</span>
                   </div>)}
               </div>
-            </div> : <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
+            </div> : <div className="h-28 sm:h-32 flex items-center justify-center text-muted-foreground text-sm">
               No application data available
             </div>}
         </CardContent>
@@ -142,18 +142,18 @@ export const DashboardCharts = ({
 
       {/* Monthly Applications Trend */}
       <Card className="border border-border">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
           <CardTitle className="text-base flex items-center gap-2 text-card-foreground">
             <TrendingUp className="h-4 w-4 text-primary" />
             Monthly Applications
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {monthlyData.some(d => d.applications > 0) ? <div className="h-32">
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+          {monthlyData.some(d => d.applications > 0) ? <div className="h-28 sm:h-32">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData}>
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{
-                fontSize: 12,
+                fontSize: 11,
                 fill: 'hsl(var(--muted-foreground))'
               }} />
                   <YAxis hide domain={[0, 'dataMax + 1']} />
@@ -167,7 +167,7 @@ export const DashboardCharts = ({
                   <Bar dataKey="applications" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            </div> : <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
+            </div> : <div className="h-28 sm:h-32 flex items-center justify-center text-muted-foreground text-sm">
               No application history yet
             </div>}
         </CardContent>

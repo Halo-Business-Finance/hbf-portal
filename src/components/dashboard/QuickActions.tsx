@@ -68,21 +68,22 @@ export const QuickActions = ({
     action: () => navigate('/support')
   }];
   return <Card className={cn("border border-border", className)}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
-          <Zap className="h-5 w-5 text-primary" />
+      <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+        <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-card-foreground">
+          <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           Quick Actions
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {actions.map(action => {
           const Icon = action.icon;
           return <Button 
             key={action.id} 
             variant={action.variant === 'primary' ? 'default' : 'outline'} 
             className={cn(
-              "h-auto flex-col items-center justify-center p-4 gap-2 transition-all duration-200",
+              "h-auto flex-col items-center justify-center p-3 sm:p-4 gap-1.5 sm:gap-2 transition-all duration-200",
+              "active:scale-[0.97] touch-manipulation min-h-[72px] sm:min-h-[80px]",
               "hover:scale-[1.02] hover:shadow-md",
               action.variant === 'primary' 
                 ? "bg-primary text-primary-foreground hover:bg-primary/90" 
@@ -90,8 +91,8 @@ export const QuickActions = ({
             )} 
             onClick={action.action}
           >
-                <Icon className="h-5 w-5" />
-                <span className="text-xs font-medium text-center leading-tight">
+                <Icon className="h-5 w-5 sm:h-5 sm:w-5" />
+                <span className="text-[11px] sm:text-xs font-medium text-center leading-tight">
                   {action.label}
                 </span>
               </Button>;

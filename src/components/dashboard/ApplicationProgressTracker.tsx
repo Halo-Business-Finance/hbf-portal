@@ -60,32 +60,32 @@ export const ApplicationProgressTracker = ({
   };
   const steps = getSteps();
   return <Card className={cn("overflow-hidden border border-border", className)}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
-          <Clock className="h-5 w-5 text-primary" />
+      <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+        <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-card-foreground">
+          <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           Application Progress
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
         <div className="relative">
           {/* Progress line */}
-          <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
+          <div className="absolute left-3.5 sm:left-4 top-0 bottom-0 w-0.5 bg-border" />
           
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {steps.map((step, index) => {
             const Icon = step.icon;
-            return <div key={step.id} className={cn("relative flex items-start gap-4 pl-10 transition-all duration-300", step.status === 'current' && "scale-[1.02]")}>
+            return <div key={step.id} className={cn("relative flex items-start gap-3 sm:gap-4 pl-9 sm:pl-10 transition-all duration-300", step.status === 'current' && "scale-[1.02]")}>
                   {/* Step indicator */}
-                  <div className={cn("absolute left-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300", step.status === 'completed' && "bg-green-500 text-white", step.status === 'current' && "bg-primary text-primary-foreground ring-4 ring-primary/20 animate-pulse", step.status === 'upcoming' && "bg-muted text-muted-foreground")}>
-                    {step.status === 'completed' ? <CheckCircle className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
+                  <div className={cn("absolute left-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300", step.status === 'completed' && "bg-green-500 text-white", step.status === 'current' && "bg-primary text-primary-foreground ring-4 ring-primary/20 animate-pulse", step.status === 'upcoming' && "bg-muted text-muted-foreground")}>
+                    {step.status === 'completed' ? <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                   </div>
 
                   {/* Step content */}
-                  <div className={cn("flex-1 pb-4", step.status === 'upcoming' && "opacity-50")}>
-                    <p className={cn("font-medium text-sm text-card-foreground", step.status === 'current' && "text-primary")}>
+                  <div className={cn("flex-1 pb-3 sm:pb-4", step.status === 'upcoming' && "opacity-50")}>
+                    <p className={cn("font-medium text-xs sm:text-sm text-card-foreground", step.status === 'current' && "text-primary")}>
                       {step.title}
                     </p>
-                    <p className="text-xs mt-0.5 text-muted-foreground">
+                    <p className="text-[10px] sm:text-xs mt-0.5 text-muted-foreground">
                       {step.description}
                     </p>
                   </div>
