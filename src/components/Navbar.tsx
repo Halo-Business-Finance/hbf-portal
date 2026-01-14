@@ -210,7 +210,7 @@ const Navbar = () => {
           {/* Customer Support Dropdown - Icon only on mobile */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors p-2 sm:p-0 min-h-[36px] sm:min-h-0">
+              <button className="flex items-center gap-1.5 text-sm text-white hover:text-white/80 transition-colors p-2 sm:p-0 min-h-[36px] sm:min-h-0">
                 <Phone className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-white" />
                 <span className="hidden sm:inline">Customer Support</span>
                 <ChevronDown className="h-3 w-3 hidden sm:inline" />
