@@ -745,18 +745,20 @@ Loan Marketplace
                 
                 <TabsContent value="login" className="space-y-4 mt-0">
                   <form onSubmit={handleAuthSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-foreground font-normal text-sm">Email</Label>
-                      <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="password" className="text-foreground font-normal text-sm">Password</Label>
-                      <div className="relative">
-                        <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
-                        <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
-                          {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                        </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-foreground font-normal text-sm">Email</Label>
+                        <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="password" className="text-foreground font-normal text-sm">Password</Label>
+                        <div className="relative">
+                          <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
+                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          </Button>
+                        </div>
                       </div>
                     </div>
 
@@ -764,9 +766,17 @@ Loan Marketplace
                         <AlertDescription>{authError}</AlertDescription>
                       </Alert>}
 
-                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={authLoading}>
-                      {authLoading ? "Signing in..." : "Sign In"}
-                    </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                      <Button type="submit" className="w-full h-11 text-base font-medium" disabled={authLoading}>
+                        {authLoading ? "Signing in..." : "Sign In"}
+                      </Button>
+                      
+                      <div className="text-center md:text-left">
+                        <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
+                          Forgot your password?
+                        </Button>
+                      </div>
+                    </div>
                     
                     <div className="relative py-2">
                       <div className="absolute inset-0 flex items-center">
@@ -779,7 +789,7 @@ Loan Marketplace
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
                       <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with Google">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
@@ -801,18 +811,12 @@ Loan Marketplace
                         </svg>
                       </Button>
                     </div>
-
-                    <div className="text-center">
-                      <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
-                        Forgot your password?
-                      </Button>
-                    </div>
                   </form>
                 </TabsContent>
                 
                 <TabsContent value="signup" className="space-y-4 mt-0">
                   <form onSubmit={handleAuthSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName" className="text-foreground font-normal text-sm">First Name</Label>
                         <Input id="firstName" placeholder="John" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading} className="h-10" />
@@ -823,22 +827,30 @@ Loan Marketplace
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="business" className="text-foreground font-normal text-sm">Business Name</Label>
-                      <Input id="business" placeholder="Your Business LLC" value={businessName} onChange={e => setBusinessName(e.target.value)} required disabled={authLoading} className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email" className="text-foreground font-normal text-sm">Email</Label>
-                      <Input id="signup-email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="business" className="text-foreground font-normal text-sm">Business Name</Label>
+                        <Input id="business" placeholder="Your Business LLC" value={businessName} onChange={e => setBusinessName(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email" className="text-foreground font-normal text-sm">Email</Label>
+                        <Input id="signup-email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password" className="text-foreground font-normal text-sm">Password</Label>
-                      <div className="relative">
-                        <Input id="signup-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
-                        <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
-                          {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password" className="text-foreground font-normal text-sm">Password</Label>
+                        <div className="relative">
+                          <Input id="signup-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
+                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-end">
+                        <Button type="submit" className="w-full h-10 text-base font-medium border-2 border-blue-500" disabled={authLoading}>
+                          {authLoading ? "Creating..." : "Create Account"}
                         </Button>
                       </div>
                     </div>
@@ -846,10 +858,6 @@ Loan Marketplace
                     {authError && <Alert variant="destructive">
                         <AlertDescription>{authError}</AlertDescription>
                       </Alert>}
-
-                    <Button type="submit" className="w-full h-11 text-base font-medium border-2 border-blue-500" disabled={authLoading}>
-                      {authLoading ? "Creating Account..." : "Create Account"}
-                    </Button>
 
                     <div className="relative py-2">
                       <div className="absolute inset-0 flex items-center">
@@ -862,7 +870,7 @@ Loan Marketplace
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
                       <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with Google">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
