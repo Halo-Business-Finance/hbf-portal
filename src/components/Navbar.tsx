@@ -158,7 +158,7 @@ const Navbar = () => {
   }
   return <header className="sticky top-0 z-50">
       {/* Top Bar - Dark Navy */}
-      <div className="min-h-[48px] md:min-h-[52px] flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2 bg-black">
+      <div className="min-h-[48px] md:min-h-[52px] flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2 bg-black text-white">
         {/* Logo */}
         <div className="cursor-pointer flex items-center flex-shrink-0" onClick={handleLogoClick}>
           <span className="text-white font-bold text-xs sm:text-lg lg:text-xl tracking-wide uppercase whitespace-nowrap">
