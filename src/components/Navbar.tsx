@@ -406,19 +406,19 @@ const Navbar = () => {
                 <ChevronDown className="h-3 w-3" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border shadow-lg min-w-[200px]">
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <a href="tel:1-800-555-0123" className="flex items-center gap-2 px-3 py-2">
-                  <Phone className="h-4 w-4" />
-                  1-800-555-0123
+            <DropdownMenuContent align="end" className="bg-white border shadow-lg min-w-[200px] z-50">
+              <DropdownMenuItem asChild className="cursor-pointer text-slate-700">
+                <a href="tel:1-800-555-0123" className="flex items-center gap-2 px-3 py-2 text-slate-700">
+                  <Phone className="h-4 w-4 text-slate-500" />
+                  <span>1-800-555-0123</span>
                 </a>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/support')} className="cursor-pointer px-3 py-2">
-                Support Center
+              <DropdownMenuItem onClick={() => navigate('/support')} className="cursor-pointer px-3 py-2 text-slate-700">
+                <span>Support Center</span>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <a href="https://halobusinessfinance.com/contact-us/" target="_blank" rel="noopener noreferrer" className="px-3 py-2">
-                  Contact Us
+              <DropdownMenuItem asChild className="cursor-pointer text-slate-700">
+                <a href="https://halobusinessfinance.com/contact-us/" target="_blank" rel="noopener noreferrer" className="px-3 py-2 text-slate-700">
+                  <span>Contact Us</span>
                 </a>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -503,29 +503,29 @@ const Navbar = () => {
                     <UserCircle className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white border shadow-xl">
-                  <DropdownMenuItem onClick={() => navigate('/my-account?tab=account')} className="cursor-pointer py-2.5">
+                <DropdownMenuContent align="end" className="w-56 bg-white border shadow-xl z-50">
+                  <DropdownMenuItem onClick={() => navigate('/my-account?tab=account')} className="cursor-pointer py-2.5 text-slate-700">
                     <FileText className="w-4 h-4 mr-3 text-slate-500" />
-                    My Account
+                    <span>My Account</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/notification-preferences')} className="cursor-pointer py-2.5">
+                  <DropdownMenuItem onClick={() => navigate('/notification-preferences')} className="cursor-pointer py-2.5 text-slate-700">
                     <BellRing className="w-4 h-4 mr-3 text-slate-500" />
-                    Notification Preferences
+                    <span>Notification Preferences</span>
                   </DropdownMenuItem>
                   {isAdmin() && (
-                    <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer py-2.5">
+                    <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer py-2.5 text-slate-700">
                       <Shield className="w-4 h-4 mr-3 text-slate-500" />
-                      Admin Dashboard
+                      <span>Admin Dashboard</span>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/change-password')} className="cursor-pointer py-2.5">
+                  <DropdownMenuItem onClick={() => navigate('/change-password')} className="cursor-pointer py-2.5 text-slate-700">
                     <KeyRound className="w-4 h-4 mr-3 text-slate-500" />
-                    Change Password
+                    <span>Change Password</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer py-2.5 text-red-600 focus:text-red-600">
                     <LogOut className="w-4 h-4 mr-3" />
-                    Sign Out
+                    <span>Sign Out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
