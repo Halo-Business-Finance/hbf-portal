@@ -118,11 +118,11 @@ export const DocumentChecklist = ({
   }
   return <Card className={cn("border border-border", className)}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
           <CollapsibleTrigger asChild>
-            <button className="flex items-center justify-between w-full text-left">
-              <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
-                <FileText className="h-5 w-5 text-primary" />
+            <button className="flex items-center justify-between w-full text-left touch-manipulation">
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-card-foreground">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 Document Checklist
               </CardTitle>
               {isOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
@@ -130,8 +130,8 @@ export const DocumentChecklist = ({
           </CollapsibleTrigger>
           
           {/* Progress summary always visible */}
-          <div className="mt-3">
-            <div className="flex items-center justify-between text-sm mb-2">
+          <div className="mt-2 sm:mt-3">
+            <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
               <span className="text-muted-foreground">Completion</span>
               <span className={cn("font-medium", progress === 100 ? "text-green-600" : "text-primary")}>
                 {uploadedCount}/{totalRequired} uploaded
@@ -142,36 +142,36 @@ export const DocumentChecklist = ({
         </CardHeader>
 
         <CollapsibleContent>
-          <CardContent className="pt-0">
-            <div className="space-y-4">
+          <CardContent className="pt-0 px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className="space-y-3 sm:space-y-4">
               {Object.entries(groupedDocs).map(([category, docs]) => <div key={category}>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                  <h4 className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                     {category}
                   </h4>
                   <div className="space-y-2">
-                    {docs.map(doc => <div key={doc.id} className={cn("flex items-center gap-3 p-3 rounded-lg border transition-all duration-200", doc.uploaded ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800" : "bg-background border-border hover:border-primary/30")}>
-                        {doc.uploaded ? <CheckCircle className="h-5 w-5 text-green-600 shrink-0" /> : doc.required ? <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" /> : <Circle className="h-5 w-5 text-muted-foreground shrink-0" />}
+                    {docs.map(doc => <div key={doc.id} className={cn("flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-lg border transition-all duration-200", doc.uploaded ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800" : "bg-background border-border hover:border-primary/30")}>
+                        {doc.uploaded ? <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" /> : doc.required ? <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 shrink-0" /> : <Circle className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground shrink-0" />}
                         <div className="flex-1 min-w-0">
-                          <p className={cn("text-sm font-medium", doc.uploaded && "text-green-700 dark:text-green-400")}>
+                          <p className={cn("text-xs sm:text-sm font-medium truncate", doc.uploaded && "text-green-700 dark:text-green-400")}>
                             {doc.name}
                             {doc.required && !doc.uploaded && <span className="text-destructive ml-1">*</span>}
                           </p>
-                          <p className="text-xs text-muted-foreground truncate">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                             {doc.description}
                           </p>
                         </div>
-                        {!doc.uploaded && <Button size="sm" variant="outline" className="shrink-0" onClick={() => navigate('/my-documents')}>
-                            <Upload className="h-3 w-3 mr-1" />
-                            Upload
+                        {!doc.uploaded && <Button size="sm" variant="outline" className="shrink-0 h-8 sm:h-9 px-2 sm:px-3 text-xs touch-manipulation" onClick={() => navigate('/my-documents')}>
+                            <Upload className="h-3 w-3 sm:mr-1" />
+                            <span className="hidden sm:inline">Upload</span>
                           </Button>}
                       </div>)}
                   </div>
                 </div>)}
             </div>
 
-            {uploadedCount < totalRequired && <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                <p className="text-sm text-amber-800 dark:text-amber-200">
-                  <AlertCircle className="h-4 w-4 inline mr-2" />
+            {uploadedCount < totalRequired && <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
+                  <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 inline mr-1.5 sm:mr-2" />
                   {totalRequired - uploadedCount} required document(s) still needed
                 </p>
               </div>}

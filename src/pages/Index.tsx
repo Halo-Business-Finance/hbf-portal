@@ -192,17 +192,17 @@ const DashboardView = () => {
     setStatusFilter(filter);
     setActiveTab('applications');
   };
-  return <div className="space-y-4 sm:space-y-5 mb-12">
+  return <div className="space-y-5 sm:space-y-6 mb-16 sm:mb-12 px-1 sm:px-0">
       {/* Onboarding Guide for new users */}
       <OnboardingGuide userId={user?.id} />
 
       {/* Header with bottom separator */}
       <div className="border-none rounded-none">
         <div className="flex-1">
-          {firstName && <h2 className="text-lg sm:text-xl font-bold mb-3 text-foreground">
+          {firstName && <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-foreground">
               Welcome, {firstName}
             </h2>}
-          <p className="text-sm sm:text-base mb-4 text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your loan applications and track your progress here
           </p>
         </div>
@@ -214,56 +214,56 @@ const DashboardView = () => {
       {/* Overview Card */}
       <DashboardOverview />
 
-      {/* Dashboard Charts */}
+      {/* Dashboard Charts - Stack on mobile */}
       <DashboardCharts userId={user?.id} />
 
-      {/* Progress & Timeline Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Progress & Timeline Section - Full width stacking on mobile/tablet */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
         <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
         <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-        <DocumentChecklist userId={user?.id} />
+        <DocumentChecklist userId={user?.id} className="md:col-span-2 xl:col-span-1" />
       </div>
 
       {/* Bank Accounts & Credit Scores Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Bank Accounts</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        <div className="space-y-3 sm:space-y-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Bank Accounts</h2>
           <BankBalanceWidget />
         </div>
         
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Credit Scores</h2>
+        <div className="space-y-3 sm:space-y-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Credit Scores</h2>
           <CreditScoreWidget />
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('all')}>
-          <CardContent className="p-5">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Total Applications</p>
-            <p className="text-2xl font-bold text-card-foreground">{stats.totalApplications}</p>
+      {/* Stats Cards - Better mobile grid */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('all')}>
+          <CardContent className="p-4 sm:p-5">
+            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Total Applications</p>
+            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stats.totalApplications}</p>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('approved')}>
-          <CardContent className="p-5">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Approved Amount</p>
-            <p className="text-2xl font-bold text-card-foreground">${stats.approvedAmount.toLocaleString()}</p>
+        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('approved')}>
+          <CardContent className="p-4 sm:p-5">
+            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Approved Amount</p>
+            <p className="text-xl sm:text-2xl font-bold text-card-foreground">${stats.approvedAmount.toLocaleString()}</p>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('pending')}>
-          <CardContent className="p-5">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Pending Review</p>
-            <p className="text-2xl font-bold text-card-foreground">{stats.pendingReview}</p>
+        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('pending')}>
+          <CardContent className="p-4 sm:p-5">
+            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Pending Review</p>
+            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stats.pendingReview}</p>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('approved')}>
-          <CardContent className="p-5">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Success Rate</p>
-            <p className="text-2xl font-bold text-card-foreground">{stats.successRate}%</p>
+        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('approved')}>
+          <CardContent className="p-4 sm:p-5">
+            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Success Rate</p>
+            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stats.successRate}%</p>
           </CardContent>
         </Card>
       </div>
