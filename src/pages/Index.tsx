@@ -771,7 +771,7 @@ const Index = () => {
                         <AlertDescription>{authError}</AlertDescription>
                       </Alert>}
 
-                    <Button type="submit" className="w-full h-11 text-base font-medium" disabled={authLoading}>
+                    <Button type="submit" className="w-full h-11 text-base font-medium border-2 border-blue-500" disabled={authLoading}>
                       {authLoading ? "Creating Account..." : "Create Account"}
                     </Button>
 
