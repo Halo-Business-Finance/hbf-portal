@@ -637,11 +637,11 @@ Loan Marketplace
           {/* Company Stats - Above Auth Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white underline underline-offset-4 decoration-white">$1 Billion+</div>
+              <div className="text-2xl font-bold mb-1 text-black underline underline-offset-4 decoration-black">$1 Billion+</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Loan Funding Provided</div>
             </Card>
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white underline underline-offset-4 decoration-white">95%</div>
+              <div className="text-2xl font-bold mb-1 underline underline-offset-4 decoration-black text-black">95%</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Loan Approval Rate</div>
             </Card>
             <Card className="p-6 border-0">
