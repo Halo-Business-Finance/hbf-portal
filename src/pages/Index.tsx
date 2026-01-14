@@ -662,7 +662,7 @@ const Index = () => {
             </CardHeader>
             <CardContent className="px-6 pb-6">
               <Tabs value={isLogin ? "login" : "signup"} onValueChange={switchMode} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-2 border-2 border-blue-500 rounded-lg">
                   <TabsTrigger value="login">Sign In</TabsTrigger>
                   <TabsTrigger value="signup">Sign Up</TabsTrigger>
                 </TabsList>
