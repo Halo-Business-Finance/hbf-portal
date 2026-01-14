@@ -12,7 +12,6 @@ import { userNotificationService, Notification } from '@/services/userNotificati
 import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-
 interface SearchResult {
   id: string;
   type: 'application' | 'document';
@@ -20,12 +19,16 @@ interface SearchResult {
   subtitle: string;
   url: string;
 }
-
-
 const Navbar = () => {
   const navigate = useNavigate();
-  const { authenticated, loading, signOut } = useAuth();
-  const { isAdmin } = useUserRole();
+  const {
+    authenticated,
+    loading,
+    signOut
+  } = useAuth();
+  const {
+    isAdmin
+  } = useUserRole();
   const [notificationCount, setNotificationCount] = useState(0);
   const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
@@ -33,7 +36,6 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
-
   useEffect(() => {
     if (authenticated) {
       loadNotifications();
@@ -43,7 +45,6 @@ const Navbar = () => {
       return unsubscribe;
     }
   }, [authenticated]);
-
   useEffect(() => {
     if (!searchQuery.trim() || !authenticated) {
       setSearchResults([]);
@@ -54,63 +55,50 @@ const Navbar = () => {
     }, 300);
     return () => clearTimeout(searchTimeout);
   }, [searchQuery, authenticated]);
-
   const sanitizeSearchQuery = (query: string): string => {
     const limited = query.slice(0, 100);
     const escaped = limited.replace(/[%_]/g, '\\$&');
     return escaped.replace(/[(),.'"\[\]{}|\\^$*+?]/g, '');
   };
-
   const performSearch = async (query: string) => {
     if (!query.trim()) return;
     setSearching(true);
     try {
       const results: SearchResult[] = [];
       const sanitizedQuery = sanitizeSearchQuery(query);
-
       if (!sanitizedQuery) {
         setSearchResults([]);
         setSearching(false);
         return;
       }
-
-      const { data: applications } = await supabase
-        .from('loan_applications')
-        .select('id, application_number, business_name, first_name, last_name, loan_type, status')
-        .or(`business_name.ilike.%${sanitizedQuery}%,first_name.ilike.%${sanitizedQuery}%,last_name.ilike.%${sanitizedQuery}%,application_number.ilike.%${sanitizedQuery}%`)
-        .limit(5);
-
+      const {
+        data: applications
+      } = await supabase.from('loan_applications').select('id, application_number, business_name, first_name, last_name, loan_type, status').or(`business_name.ilike.%${sanitizedQuery}%,first_name.ilike.%${sanitizedQuery}%,last_name.ilike.%${sanitizedQuery}%,application_number.ilike.%${sanitizedQuery}%`).limit(5);
       if (applications) {
-        applications.forEach((app) => {
+        applications.forEach(app => {
           results.push({
             id: app.id,
             type: 'application',
             title: app.business_name || `${app.first_name} ${app.last_name}`,
             subtitle: `#${app.application_number} · ${app.loan_type} · ${app.status}`,
-            url: isAdmin() ? `/admin/applications/${app.id}` : '/applications',
+            url: isAdmin() ? `/admin/applications/${app.id}` : '/applications'
           });
         });
       }
-
-      const { data: documents } = await supabase
-        .from('borrower_documents')
-        .select('id, file_name, document_category, uploaded_at')
-        .ilike('file_name', `%${sanitizedQuery}%`)
-        .eq('is_latest_version', true)
-        .limit(5);
-
+      const {
+        data: documents
+      } = await supabase.from('borrower_documents').select('id, file_name, document_category, uploaded_at').ilike('file_name', `%${sanitizedQuery}%`).eq('is_latest_version', true).limit(5);
       if (documents) {
-        documents.forEach((doc) => {
+        documents.forEach(doc => {
           results.push({
             id: doc.id,
             type: 'document',
             title: doc.file_name,
             subtitle: `${doc.document_category} · ${new Date(doc.uploaded_at).toLocaleDateString()}`,
-            url: '/documents',
+            url: '/documents'
           });
         });
       }
-
       setSearchResults(results);
     } catch (error) {
       console.error('Error searching:', error);
@@ -118,13 +106,11 @@ const Navbar = () => {
       setSearching(false);
     }
   };
-
   const handleSearchSelect = (result: SearchResult) => {
     navigate(result.url);
     setSearchOpen(false);
     setSearchQuery('');
   };
-
   const loadNotifications = async () => {
     try {
       const count = await userNotificationService.getUnreadCount();
@@ -135,7 +121,6 @@ const Navbar = () => {
       console.error('Error loading notifications:', error);
     }
   };
-
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.read) {
       await userNotificationService.markAsRead(notification.id);
@@ -145,7 +130,6 @@ const Navbar = () => {
       navigate(notification.action_url);
     }
   };
-
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -154,15 +138,11 @@ const Navbar = () => {
       console.error('Error signing out:', error);
     }
   };
-
   const handleLogoClick = () => {
     navigate('/');
   };
-
-
   if (loading) {
-    return (
-      <header className="sticky top-0 z-50">
+    return <header className="sticky top-0 z-50">
         <div className="h-12 bg-[#1a1f2e] flex items-center justify-between px-6">
           <div className="w-40 h-6 bg-white/10 rounded animate-pulse" />
           <div className="flex items-center gap-4">
@@ -171,32 +151,26 @@ const Navbar = () => {
         </div>
         <div className="h-12 bg-[#f0f2f5] flex items-center px-6">
           <div className="flex gap-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="w-20 h-5 bg-slate-300 rounded animate-pulse" />
-            ))}
+            {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-20 h-5 bg-slate-300 rounded animate-pulse" />)}
           </div>
         </div>
-      </header>
-    );
+      </header>;
   }
-
-  return (
-    <header className="sticky top-0 z-50">
+  return <header className="sticky top-0 z-50">
       {/* Top Bar - Dark Navy */}
-      <div className="min-h-[48px] md:min-h-[52px] bg-[#1a1f2e] flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2">
+      <div className="min-h-[48px] md:min-h-[52px] flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2 bg-black">
         {/* Logo */}
         <div className="cursor-pointer flex items-center flex-shrink-0" onClick={handleLogoClick}>
           <span className="text-white font-bold text-sm sm:text-base lg:text-lg tracking-wide uppercase leading-tight">
             <span className="hidden sm:inline">HALO BUSINESS FINANCE</span>
-            <span className="sm:hidden">HALO BUSINESS<br/>FINANCE</span>
+            <span className="sm:hidden">HALO BUSINESS<br />FINANCE</span>
           </span>
         </div>
 
         {/* Right Side - Top Bar */}
         <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
           {/* Search Icon */}
-          {authenticated && (
-            <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+          {authenticated && <Popover open={searchOpen} onOpenChange={setSearchOpen}>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10">
                   <Search className="h-4 w-4" />
@@ -204,63 +178,35 @@ const Navbar = () => {
               </PopoverTrigger>
               <PopoverContent className="w-[calc(100vw-24px)] sm:w-[400px] p-0 bg-white border shadow-xl" align="end">
                 <Command shouldFilter={false}>
-                  <CommandInput
-                    placeholder="Search applications and documents..."
-                    value={searchQuery}
-                    onValueChange={setSearchQuery}
-                    className="border-0"
-                  />
+                  <CommandInput placeholder="Search applications and documents..." value={searchQuery} onValueChange={setSearchQuery} className="border-0" />
                   <CommandList className="max-h-[300px]">
                     <CommandEmpty className="py-6 text-center text-sm text-slate-500">
                       {searching ? 'Searching...' : searchQuery ? 'No results found.' : 'Type to search...'}
                     </CommandEmpty>
-                    {searchResults.length > 0 && (
-                      <>
-                        {searchResults.filter((r) => r.type === 'application').length > 0 && (
-                          <CommandGroup heading="Applications">
-                            {searchResults
-                              .filter((r) => r.type === 'application')
-                              .map((result) => (
-                                <CommandItem
-                                  key={result.id}
-                                  onSelect={() => handleSearchSelect(result)}
-                                  className="cursor-pointer py-3"
-                                >
+                    {searchResults.length > 0 && <>
+                        {searchResults.filter(r => r.type === 'application').length > 0 && <CommandGroup heading="Applications">
+                            {searchResults.filter(r => r.type === 'application').map(result => <CommandItem key={result.id} onSelect={() => handleSearchSelect(result)} className="cursor-pointer py-3">
                                   <FileText className="mr-3 h-4 w-4 text-primary" />
                                   <div className="flex flex-col">
                                     <span className="font-medium">{result.title}</span>
                                     <span className="text-xs text-slate-500">{result.subtitle}</span>
                                   </div>
-                                </CommandItem>
-                              ))}
-                          </CommandGroup>
-                        )}
-                        {searchResults.filter((r) => r.type === 'document').length > 0 && (
-                          <CommandGroup heading="Documents">
-                            {searchResults
-                              .filter((r) => r.type === 'document')
-                              .map((result) => (
-                                <CommandItem
-                                  key={result.id}
-                                  onSelect={() => handleSearchSelect(result)}
-                                  className="cursor-pointer py-3"
-                                >
+                                </CommandItem>)}
+                          </CommandGroup>}
+                        {searchResults.filter(r => r.type === 'document').length > 0 && <CommandGroup heading="Documents">
+                            {searchResults.filter(r => r.type === 'document').map(result => <CommandItem key={result.id} onSelect={() => handleSearchSelect(result)} className="cursor-pointer py-3">
                                   <FileText className="mr-3 h-4 w-4 text-accent" />
                                   <div className="flex flex-col">
                                     <span className="font-medium">{result.title}</span>
                                     <span className="text-xs text-slate-500">{result.subtitle}</span>
                                   </div>
-                                </CommandItem>
-                              ))}
-                          </CommandGroup>
-                        )}
-                      </>
-                    )}
+                                </CommandItem>)}
+                          </CommandGroup>}
+                      </>}
                   </CommandList>
                 </Command>
               </PopoverContent>
-            </Popover>
-          )}
+            </Popover>}
 
           {/* Customer Support Dropdown - Icon only on mobile */}
           <DropdownMenu>
@@ -305,18 +251,15 @@ const Navbar = () => {
           </DropdownMenu>
 
           {/* Sign In Button or User Menu */}
-          {authenticated ? (
-            <div className="flex items-center gap-1 sm:gap-2">
+          {authenticated ? <div className="flex items-center gap-1 sm:gap-2">
               {/* Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10 relative">
                     <Bell className="h-4 w-4" />
-                    {notificationCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center text-[10px] font-bold bg-red-500 text-white rounded-full">
+                    {notificationCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center text-[10px] font-bold bg-red-500 text-white rounded-full">
                         {notificationCount > 9 ? '9+' : notificationCount}
-                      </span>
-                    )}
+                      </span>}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-[calc(100vw-24px)] sm:w-80 bg-white border shadow-xl">
@@ -327,21 +270,10 @@ const Navbar = () => {
                     </p>
                   </div>
                   <div className="max-h-[320px] overflow-y-auto">
-                    {recentNotifications.length === 0 ? (
-                      <div className="py-8 text-center">
+                    {recentNotifications.length === 0 ? <div className="py-8 text-center">
                         <Bell className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                         <p className="text-sm text-slate-500">No notifications yet</p>
-                      </div>
-                    ) : (
-                      recentNotifications.map((notification) => (
-                        <DropdownMenuItem
-                          key={notification.id}
-                          className={cn(
-                            'cursor-pointer py-3 px-4 border-b last:border-0',
-                            !notification.read && 'bg-primary/5'
-                          )}
-                          onClick={() => handleNotificationClick(notification)}
-                        >
+                      </div> : recentNotifications.map(notification => <DropdownMenuItem key={notification.id} className={cn('cursor-pointer py-3 px-4 border-b last:border-0', !notification.read && 'bg-primary/5')} onClick={() => handleNotificationClick(notification)}>
                           <div className="flex flex-col gap-1 w-full">
                             <div className="flex items-center gap-2">
                               {!notification.read && <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />}
@@ -349,12 +281,12 @@ const Navbar = () => {
                             </div>
                             <p className="text-xs text-slate-500 line-clamp-2">{notification.message}</p>
                             <p className="text-xs text-slate-400">
-                              {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                              {formatDistanceToNow(new Date(notification.created_at), {
+                        addSuffix: true
+                      })}
                             </p>
                           </div>
-                        </DropdownMenuItem>
-                      ))
-                    )}
+                        </DropdownMenuItem>)}
                   </div>
                   <div className="p-2 border-t">
                     <Button variant="ghost" className="w-full text-sm h-10 sm:h-9" onClick={() => navigate('/notifications')}>
@@ -365,13 +297,7 @@ const Navbar = () => {
               </DropdownMenu>
 
               {/* Calculator */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setCalculatorOpen(true)}
-                title="Loan Calculator"
-                className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10"
-              >
+              <Button variant="ghost" size="icon" onClick={() => setCalculatorOpen(true)} title="Loan Calculator" className="h-9 w-9 sm:h-8 sm:w-8 text-white/80 hover:text-white hover:bg-white/10">
                 <Calculator className="h-4 w-4" />
               </Button>
               <LoanCalculatorDialog open={calculatorOpen} onOpenChange={setCalculatorOpen} />
@@ -392,12 +318,10 @@ const Navbar = () => {
                     <BellRing className="w-4 h-4 mr-3 text-slate-500" />
                     <span>Notification Preferences</span>
                   </DropdownMenuItem>
-                  {isAdmin() && (
-                    <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
+                  {isAdmin() && <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
                       <Shield className="w-4 h-4 mr-3 text-slate-500" />
                       <span>Admin Dashboard</span>
-                    </DropdownMenuItem>
-                  )}
+                    </DropdownMenuItem>}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/change-password')} className="cursor-pointer py-3 sm:py-2.5 text-slate-700 hover:bg-slate-100 focus:bg-slate-100 transition-colors">
                     <KeyRound className="w-4 h-4 mr-3 text-slate-500" />
@@ -424,21 +348,13 @@ const Navbar = () => {
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
-          ) : (
-            <Button
-              onClick={() => navigate('/borrower-portal')}
-              className="h-9 sm:h-8 px-3 sm:px-4 bg-transparent border border-primary text-primary hover:bg-primary hover:text-white rounded-full text-sm font-medium"
-            >
+            </div> : <Button onClick={() => navigate('/borrower-portal')} className="h-9 sm:h-8 px-3 sm:px-4 bg-transparent border border-primary text-primary hover:bg-primary hover:text-white rounded-full text-sm font-medium">
               <Lock className="h-3.5 w-3.5 mr-1.5" />
               <span className="hidden xs:inline">Sign In</span>
               <span className="xs:hidden">Login</span>
-            </Button>
-          )}
+            </Button>}
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Navbar;
