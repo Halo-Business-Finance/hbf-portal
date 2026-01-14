@@ -192,17 +192,17 @@ const DashboardView = () => {
     setStatusFilter(filter);
     setActiveTab('applications');
   };
-  return <div className="space-y-5 sm:space-y-6 mb-16 sm:mb-12 px-1 sm:px-0">
+  return <div className="space-y-4 sm:space-y-5 mb-12">
       {/* Onboarding Guide for new users */}
       <OnboardingGuide userId={user?.id} />
 
       {/* Header with bottom separator */}
       <div className="border-none rounded-none">
         <div className="flex-1">
-          {firstName && <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-foreground">
+          {firstName && <h2 className="text-lg sm:text-xl font-bold mb-3 text-black">
               Welcome, {firstName}
             </h2>}
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <p className="text-sm sm:text-base mb-4 text-black">
             Manage your loan applications and track your progress here
           </p>
         </div>
@@ -214,58 +214,50 @@ const DashboardView = () => {
       {/* Overview Card */}
       <DashboardOverview />
 
-      {/* Dashboard Charts - Stack on mobile */}
+      {/* Dashboard Charts */}
       <DashboardCharts userId={user?.id} />
 
-      {/* Progress & Timeline Section - Full width stacking on mobile/tablet */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+      {/* Progress & Timeline Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
         <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-        <DocumentChecklist userId={user?.id} className="md:col-span-2 xl:col-span-1" />
+        <DocumentChecklist userId={user?.id} />
       </div>
 
       {/* Bank Accounts & Credit Scores Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-        <div className="space-y-3 sm:space-y-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Bank Accounts</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-foreground">Bank Accounts</h2>
           <BankBalanceWidget />
         </div>
         
-        <div className="space-y-3 sm:space-y-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Credit Scores</h2>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-foreground">Credit Scores</h2>
           <CreditScoreWidget />
         </div>
       </div>
 
-      {/* Stats Cards - Better mobile grid */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('all')}>
-          <CardContent className="p-4 sm:p-5">
-            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Total Applications</p>
-            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stats.totalApplications}</p>
-          </CardContent>
-        </Card>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
+          <p className="stat-label">Total<br />Applications</p>
+          <p className="stat-value">{stats.totalApplications}</p>
+        </div>
 
-        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('approved')}>
-          <CardContent className="p-4 sm:p-5">
-            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Approved Amount</p>
-            <p className="text-xl sm:text-2xl font-bold text-card-foreground">${stats.approvedAmount.toLocaleString()}</p>
-          </CardContent>
-        </Card>
+        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+          <p className="stat-label">Approved<br />Amount</p>
+          <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
+        </div>
 
-        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('pending')}>
-          <CardContent className="p-4 sm:p-5">
-            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Pending Review</p>
-            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stats.pendingReview}</p>
-          </CardContent>
-        </Card>
+        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
+          <p className="stat-label">Pending<br />Review</p>
+          <p className="stat-value">{stats.pendingReview}</p>
+        </div>
 
-        <Card className="cursor-pointer hover:shadow-md active:scale-[0.98] transition-all duration-200 border border-border touch-manipulation" onClick={() => handleMetricClick('approved')}>
-          <CardContent className="p-4 sm:p-5">
-            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1 leading-tight">Success Rate</p>
-            <p className="text-xl sm:text-2xl font-bold text-card-foreground">{stats.successRate}%</p>
-          </CardContent>
-        </Card>
+        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
+          <p className="stat-label">Success Rate</p>
+          <p className="stat-value">{stats.successRate}%</p>
+        </div>
       </div>
 
       {/* Tabs Section */}
@@ -653,7 +645,7 @@ Loan Marketplace
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Loan Approval Rate</div>
             </Card>
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white underline underline-offset-4 decoration-white">24 Hours</div>
+              <div className="text-2xl font-bold mb-1 underline underline-offset-4 decoration-black text-black">24 Hours</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Avg Loan Processing</div>
             </Card>
           </div>
