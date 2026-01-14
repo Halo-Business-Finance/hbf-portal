@@ -83,3 +83,32 @@ jobs:
             --name ${{ env.IMAGE_NAME }} \
             --image ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}"
+
+      - name: Wait for deployment to stabilize
+        run: sleep 30
+
+      - name: Health Check
+        run: |
+          APP_URL=$(ibmcloud ce application get --name ${{ env.IMAGE_NAME }} --output json | jq -r '.status.url')
+          echo "Application URL: $APP_URL"
+          
+          MAX_ATTEMPTS=5
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Health check attempt $ATTEMPT of $MAX_ATTEMPTS..."
+            
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL" --max-time 30 || echo "000")
+            
+            if [ "$RESPONSE" = "200" ]; then
+              echo "✅ Health check passed! Application is running correctly."
+              exit 0
+            fi
+            
+            echo "Response code: $RESPONSE - Waiting 15 seconds before retry..."
+            sleep 15
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+          
+          echo "❌ Health check failed after $MAX_ATTEMPTS attempts"
+          exit 1
