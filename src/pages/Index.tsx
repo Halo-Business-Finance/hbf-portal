@@ -711,15 +711,15 @@ Loan Marketplace
 
           {/* Company Stats - Above Auth Card */}
           <div className="grid grid-cols-3 gap-2 sm:gap-6 max-w-3xl mx-auto mb-6 sm:mb-8">
-            <Card className="p-2 sm:p-6 border-2 border-blue-500">
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
               <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 text-black underline underline-offset-2 sm:underline-offset-4 decoration-black">$1 Billion+</div>
               <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Funding Provided</div>
             </Card>
-            <Card className="p-2 sm:p-6 border-2 border-blue-500">
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
               <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">95%</div>
               <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Approval Rate</div>
             </Card>
-            <Card className="p-2 sm:p-6 border-2 border-blue-500">
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
               <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">24 Hours</div>
               <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Avg Loan Processing</div>
             </Card>
