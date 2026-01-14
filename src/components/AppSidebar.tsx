@@ -13,7 +13,7 @@ const items = [{
   url: '/',
   icon: LayoutDashboard
 }, {
-  title: 'Applications',
+  title: 'Loan Applications',
   url: '/loan-applications',
   icon: FileText
 }, {
@@ -21,7 +21,7 @@ const items = [{
   url: '/existing-loans',
   icon: Wallet
 }, {
-  title: 'Documents',
+  title: 'Loan Documents',
   url: '/document-storage',
   icon: FolderOpen
 }, {
