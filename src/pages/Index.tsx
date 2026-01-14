@@ -726,17 +726,17 @@ Loan Marketplace
           </div>
 
           {/* Auth Card */}
-          <div className="px-4 sm:px-6 w-full flex justify-center">
+          <div className="px-2 sm:px-6 w-full flex justify-center">
           <Card className="max-w-lg w-full shadow-lg">
-            <CardHeader className="text-center pb-3 pt-6">
-              <h2 className="text-2xl font-bold text-foreground mb-1">
+            <CardHeader className="text-center pb-3 pt-4 sm:pt-6 px-4 sm:px-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
                 Welcome to Halo Business Finance
               </h2>
               <p className="text-sm text-foreground">
                 Sign in to your account
               </p>
             </CardHeader>
-            <CardContent className="px-6 pb-6">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
               <Tabs value={isLogin ? "login" : "signup"} onValueChange={switchMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 h-9 gap-2">
                   <TabsTrigger value="login" className="text-sm py-1">Sign In</TabsTrigger>
