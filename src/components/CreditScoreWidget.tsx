@@ -53,11 +53,11 @@ export const CreditScoreWidget = () => {
           <div className="h-10 w-32 bg-muted animate-pulse rounded-full"></div>
           <div className="h-10 w-32 bg-muted animate-pulse rounded-full"></div>
         </div>
-        <Card className="dashboard-widget-card">
+        <Card className="border border-border">
           <CardContent className="p-6">
             <div className="animate-pulse space-y-3">
-              <div className="h-5 bg-white/10 rounded w-1/2"></div>
-              <div className="h-4 bg-white/10 rounded w-1/3"></div>
+              <div className="h-5 bg-muted rounded w-1/2"></div>
+              <div className="h-4 bg-muted rounded w-1/3"></div>
             </div>
           </CardContent>
         </Card>
@@ -68,18 +68,18 @@ export const CreditScoreWidget = () => {
   return (
     <div className="space-y-4">
       {/* Tab Buttons */}
-      <div className="inline-flex items-center rounded-full bg-sidebar p-1 border border-sidebar-border">
+      <div className="inline-flex items-center rounded-full bg-secondary p-1 border border-border">
         <button
           onClick={() => setActiveTab('personal')}
           className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all ${
             activeTab === 'personal'
               ? 'bg-primary text-primary-foreground'
-              : 'text-white/70 hover:text-white'
+              : 'text-muted-foreground hover:text-card-foreground'
           }`}
         >
           Personal Credit
           <span className={`inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
-            activeTab === 'personal' ? 'bg-white/20 text-white' : 'bg-white/10 text-white/70'
+            activeTab === 'personal' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
           }`}>
             {personalScores.length}
           </span>
@@ -89,12 +89,12 @@ export const CreditScoreWidget = () => {
           className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all ${
             activeTab === 'business'
               ? 'bg-primary text-primary-foreground'
-              : 'text-white/70 hover:text-white'
+              : 'text-muted-foreground hover:text-card-foreground'
           }`}
         >
           Business Credit
           <span className={`inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
-            activeTab === 'business' ? 'bg-white/20 text-white' : 'bg-white/10 text-white/70'
+            activeTab === 'business' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
           }`}>
             {businessScores.length}
           </span>
@@ -103,20 +103,20 @@ export const CreditScoreWidget = () => {
 
       {/* Content */}
       <Card 
-        className="dashboard-widget-card cursor-pointer"
+        className="border border-border cursor-pointer hover:shadow-md transition-all duration-200"
         onClick={() => navigate('/credit-reports')}
       >
         <CardContent className="p-6">
           {displayedScores.length === 0 ? (
-            <p className="text-sm text-white/70">No credit scores available</p>
+            <p className="text-sm text-muted-foreground">No credit scores available</p>
           ) : (
             <div className="grid grid-cols-2 gap-4">
               {displayedScores.slice(0, 2).map((score) => (
                 <div key={score.id} className="text-center">
-                  <p className="text-xs text-white/60 uppercase tracking-wide mb-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                     {score.bureau}
                   </p>
-                  <p className="text-3xl font-bold text-white">{score.score}</p>
+                  <p className="text-3xl font-bold text-card-foreground">{score.score}</p>
                 </div>
               ))}
             </div>

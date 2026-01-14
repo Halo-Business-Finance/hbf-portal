@@ -59,10 +59,10 @@ export const ApplicationProgressTracker = ({
     }];
   };
   const steps = getSteps();
-  return <Card className={cn("overflow-hidden", className)}>
+  return <Card className={cn("overflow-hidden border border-border", className)}>
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Clock className="h-5 w-5 text-white" />
+        <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
+          <Clock className="h-5 w-5 text-primary" />
           Application Progress
         </CardTitle>
       </CardHeader>
@@ -82,10 +82,10 @@ export const ApplicationProgressTracker = ({
 
                   {/* Step content */}
                   <div className={cn("flex-1 pb-4", step.status === 'upcoming' && "opacity-50")}>
-                    <p className={cn("font-medium text-sm", step.status === 'current' && "text-primary")}>
+                    <p className={cn("font-medium text-sm text-card-foreground", step.status === 'current' && "text-primary")}>
                       {step.title}
                     </p>
-                    <p className="text-xs mt-0.5 text-black">
+                    <p className="text-xs mt-0.5 text-muted-foreground">
                       {step.description}
                     </p>
                   </div>
