@@ -629,8 +629,7 @@ Loan Marketplace
               Comprehensive Business Financing Solutions
             </h1>
             <p className="max-w-3xl mx-auto leading-relaxed text-black text-base font-sans">
-              We provide credit, financing, treasury and payment solutions to help your business succeed. 
-              Discover our comprehensive range of SBA-backed and conventional financing options designed to fuel your business growth.
+              Our Marketplace provides Conventional, SBA, USDA, and Bridge loan financing nationwide to meet any business need. Discover our comprehensive range of SBA, USDA and conventional financing options.      
             </p>
           </div>
 
