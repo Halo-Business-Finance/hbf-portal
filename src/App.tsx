@@ -15,6 +15,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ForgotPassword from "./pages/ForgotPassword";
 
 // Lazy load all other pages to reduce initial bundle
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/calculator" element={<LoanCalculator />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               
               {/* Protected routes with Layout */}
               <Route path="/admin" element={
