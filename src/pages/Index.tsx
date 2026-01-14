@@ -199,10 +199,10 @@ const DashboardView = () => {
       {/* Header with bottom separator */}
       <div className="border-none rounded-none">
         <div className="flex-1">
-          {firstName && <h2 className="text-lg sm:text-xl font-bold mb-3 text-black">
+          {firstName && <h2 className="text-lg sm:text-xl font-bold mb-3 text-foreground">
               Welcome, {firstName}
             </h2>}
-          <p className="text-sm sm:text-base mb-4 text-black">
+          <p className="text-sm sm:text-base mb-4 text-muted-foreground">
             Manage your loan applications and track your progress here
           </p>
         </div>
@@ -239,25 +239,33 @@ const DashboardView = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
-          <p className="stat-label">Total<br />Applications</p>
-          <p className="stat-value">{stats.totalApplications}</p>
-        </div>
+        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('all')}>
+          <CardContent className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-1">Total Applications</p>
+            <p className="text-2xl font-bold text-card-foreground">{stats.totalApplications}</p>
+          </CardContent>
+        </Card>
 
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-          <p className="stat-label">Approved<br />Amount</p>
-          <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
-        </div>
+        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('approved')}>
+          <CardContent className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-1">Approved Amount</p>
+            <p className="text-2xl font-bold text-card-foreground">${stats.approvedAmount.toLocaleString()}</p>
+          </CardContent>
+        </Card>
 
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
-          <p className="stat-label">Pending<br />Review</p>
-          <p className="stat-value">{stats.pendingReview}</p>
-        </div>
+        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('pending')}>
+          <CardContent className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-1">Pending Review</p>
+            <p className="text-2xl font-bold text-card-foreground">{stats.pendingReview}</p>
+          </CardContent>
+        </Card>
 
-        <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-          <p className="stat-label">Success Rate</p>
-          <p className="stat-value">{stats.successRate}%</p>
-        </div>
+        <Card className="cursor-pointer hover:shadow-md transition-all duration-200 border border-border" onClick={() => handleMetricClick('approved')}>
+          <CardContent className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-1">Success Rate</p>
+            <p className="text-2xl font-bold text-card-foreground">{stats.successRate}%</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Tabs Section */}

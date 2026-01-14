@@ -65,33 +65,33 @@ export const EstimatedTimeline = ({
   const totalDaysMax = 19;
   const currentStage = stages.find(s => s.status === 'current');
   const completedStages = stages.filter(s => s.status === 'completed').length;
-  return <Card className={className}>
+  return <Card className={cn("border border-border", className)}>
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-white" />
+        <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
+          <Calendar className="h-5 w-5 text-primary" />
           Estimated Timeline
         </CardTitle>
       </CardHeader>
       <CardContent>
         {/* Summary */}
-        <div className="flex items-center justify-between p-3 rounded-lg mb-4 bg-white">
+        <div className="flex items-center justify-between p-3 rounded-lg mb-4 bg-secondary">
           <div>
-            <p className="text-sm font-medium text-foreground">Total Estimated Time</p>
-            <p className="text-xs text-black">From application to funding</p>
+            <p className="text-sm font-medium text-card-foreground">Total Estimated Time</p>
+            <p className="text-xs text-muted-foreground">From application to funding</p>
           </div>
           <div className="text-right">
             <p className="text-lg font-bold text-primary">{totalDaysMin}-{totalDaysMax} days</p>
-            <p className="text-xs text-black">Business days</p>
+            <p className="text-xs text-muted-foreground">Business days</p>
           </div>
         </div>
 
         {/* Current stage highlight */}
-        {currentStage && <div className="p-3 border border-primary/30 rounded-lg mb-4 bg-white">
+        {currentStage && <div className="p-3 border border-primary/30 rounded-lg mb-4 bg-primary/5">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="h-4 w-4 text-primary animate-pulse" />
               <span className="text-sm font-medium text-primary">Current Stage</span>
             </div>
-            <p className="font-semibold text-foreground">{currentStage.name}</p>
+            <p className="font-semibold text-card-foreground">{currentStage.name}</p>
             <p className="text-xs text-muted-foreground">{currentStage.description}</p>
           </div>}
 
@@ -105,7 +105,7 @@ export const EstimatedTimeline = ({
 
               {/* Stage info */}
               <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-medium", stage.status === 'current' && "text-primary")}>
+                <p className={cn("text-sm font-medium text-card-foreground", stage.status === 'current' && "text-primary")}>
                   {stage.name}
                 </p>
               </div>

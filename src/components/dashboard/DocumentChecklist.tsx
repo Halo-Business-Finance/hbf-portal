@@ -116,13 +116,13 @@ export const DocumentChecklist = ({
         </CardContent>
       </Card>;
   }
-  return <Card className={className}>
+  return <Card className={cn("border border-border", className)}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CardHeader className="pb-3">
           <CollapsibleTrigger asChild>
             <button className="flex items-center justify-between w-full text-left">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5 text-white" />
+              <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
+                <FileText className="h-5 w-5 text-primary" />
                 Document Checklist
               </CardTitle>
               {isOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
@@ -132,7 +132,7 @@ export const DocumentChecklist = ({
           {/* Progress summary always visible */}
           <div className="mt-3">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-black">Completion</span>
+              <span className="text-muted-foreground">Completion</span>
               <span className={cn("font-medium", progress === 100 ? "text-green-600" : "text-primary")}>
                 {uploadedCount}/{totalRequired} uploaded
               </span>

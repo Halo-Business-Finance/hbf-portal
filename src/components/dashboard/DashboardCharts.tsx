@@ -105,10 +105,10 @@ export const DashboardCharts = ({
   const hasData = statusData.length > 0;
   return <div className={cn("grid grid-cols-1 lg:grid-cols-2 gap-4", className)}>
       {/* Application Status Distribution */}
-      <Card>
+      <Card className="border border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <PieChartIcon className="h-4 w-4 text-white" />
+          <CardTitle className="text-base flex items-center gap-2 text-card-foreground">
+            <PieChartIcon className="h-4 w-4 text-primary" />
             Application Status
           </CardTitle>
         </CardHeader>
@@ -129,9 +129,9 @@ export const DashboardCharts = ({
                       <div className="w-3 h-3 rounded-full" style={{
                   backgroundColor: item.color
                 }} />
-                      <span className="text-white">{item.name}</span>
+                      <span className="text-card-foreground">{item.name}</span>
                     </div>
-                    <span className="font-medium">{item.value}</span>
+                    <span className="font-medium text-card-foreground">{item.value}</span>
                   </div>)}
               </div>
             </div> : <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
@@ -141,17 +141,17 @@ export const DashboardCharts = ({
       </Card>
 
       {/* Monthly Applications Trend */}
-      <Card>
+      <Card className="border border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-white" />
+          <CardTitle className="text-base flex items-center gap-2 text-card-foreground">
+            <TrendingUp className="h-4 w-4 text-primary" />
             Monthly Applications
           </CardTitle>
         </CardHeader>
         <CardContent>
           {monthlyData.some(d => d.applications > 0) ? <div className="h-32">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData} className="text-white">
+                <BarChart data={monthlyData}>
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{
                 fontSize: 12,
                 fill: 'hsl(var(--muted-foreground))'
@@ -161,7 +161,8 @@ export const DashboardCharts = ({
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
-                fontSize: '12px'
+                fontSize: '12px',
+                color: 'hsl(var(--card-foreground))'
               }} formatter={(value: number) => [`${value} application(s)`, 'Count']} />
                   <Bar dataKey="applications" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>

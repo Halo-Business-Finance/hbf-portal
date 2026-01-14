@@ -8,36 +8,36 @@
 
 @layer base {
   :root {
-    /* Halo Business Finance - Dark Navy Theme */
-    --background: 222 47% 6%;
-    --foreground: 215 25% 26.6667%;
+    /* Halo Business Finance - Professional Dark Navy Theme */
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 222 40% 8%;
-    --popover-foreground: 215 25% 26.6667%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
     --primary: 213 94% 50%;
-    --primary-foreground: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 33% 14%;
-    --secondary-foreground: 215 25% 26.6667%;
+    --secondary: 222 33% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 222 33% 14%;
-    --muted-foreground: 215 25% 26.6667%;
+    --muted: 222 33% 96%;
+    --muted-foreground: 222 20% 45%;
 
-    --accent: 152 82% 45%;
-    --accent-foreground: 215 25% 26.6667%;
+    --accent: 213 94% 50%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 215 19.3182% 34.5098%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 222 33% 18%;
-    --input: 222 33% 18%;
+    --border: 222 20% 88%;
+    --input: 222 20% 88%;
     --ring: 213 94% 50%;
 
-    --success: 152 82% 45%;
+    --success: 152 82% 40%;
     --warning: 38 92% 50%;
     --info: 199 89% 48%;
 
@@ -257,10 +257,9 @@
     @apply flex items-center gap-2 text-sm text-muted-foreground;
   }
 
-  /* Dark Navy Widget Card - Matches dashboard UI */
+  /* Widget Card - Clean Professional Style */
   .dashboard-widget-card {
-    @apply rounded-xl border-0 transition-all duration-300;
-    background: hsl(222 47% 11%);
+    @apply rounded-xl border border-border bg-card transition-all duration-300;
     box-shadow: var(--shadow-card);
   }
 
@@ -269,10 +268,9 @@
     transform: translateY(-2px);
   }
 
-  /* Dark Navy Stats Card */
+  /* Stats Card - Professional Style */
   .dashboard-stat-card {
-    @apply rounded-xl border-0 p-5 transition-all duration-300;
-    background: hsl(222 47% 11%);
+    @apply rounded-xl border border-border bg-card p-5 transition-all duration-300;
     box-shadow: var(--shadow-card);
   }
 
@@ -282,11 +280,11 @@
   }
 
   .dashboard-stat-card .stat-label {
-    @apply text-xs font-medium text-white/60 mb-1;
+    @apply text-xs font-medium text-muted-foreground mb-1;
   }
 
   .dashboard-stat-card .stat-value {
-    @apply text-2xl font-bold text-white tracking-tight;
+    @apply text-2xl font-bold text-card-foreground tracking-tight;
   }
 
   /* Premium Button Styles */
