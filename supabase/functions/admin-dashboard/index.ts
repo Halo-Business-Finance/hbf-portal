@@ -402,6 +402,23 @@ async function updateApplicationStatus(
   }
 }
 
+/**
+ * Sanitize a value for CSV export to prevent CSV injection attacks.
+ * Prefixes dangerous characters (=, +, -, @, tab, carriage return) with a single quote
+ * to neutralize any formulas that could execute in spreadsheet applications.
+ */
+function sanitizeCSVField(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) return '';
+  const strValue = String(value);
+  // Prefix dangerous characters with single quote to neutralize formulas
+  // These characters at the start of a cell can trigger formula execution in Excel/LibreOffice
+  if (/^[=+\-@\t\r]/.test(strValue)) {
+    return "'" + strValue;
+  }
+  // Also escape any double quotes within the value
+  return strValue.replace(/"/g, '""');
+}
+
 async function exportApplications(supabase: any, filters: ApplicationFilter): Promise<Response> {
   try {
     // Query applications directly for export to avoid extra processing done in getFilteredApplications
@@ -448,7 +465,7 @@ async function exportApplications(supabase: any, filters: ApplicationFilter): Pr
       );
     }
 
-    // Convert to CSV format
+    // Convert to CSV format with CSV injection protection
     const csvHeader = [
       'Application Number',
       'Status',
@@ -462,14 +479,15 @@ async function exportApplications(supabase: any, filters: ApplicationFilter): Pr
       'Submitted Date'
     ].join(',');
 
+    // Sanitize all user-supplied fields to prevent CSV injection attacks
     const csvRows = (applications ?? []).map((app: any) => [
-      app.application_number || '',
-      app.status || '',
-      app.loan_type || '',
+      sanitizeCSVField(app.application_number),
+      sanitizeCSVField(app.status),
+      sanitizeCSVField(app.loan_type),
       app.amount_requested || 0,
-      `"${app.first_name || ''} ${app.last_name || ''}"`,
-      `"${app.business_name || ''}"`,
-      app.phone || '',
+      `"${sanitizeCSVField(app.first_name)} ${sanitizeCSVField(app.last_name)}"`,
+      `"${sanitizeCSVField(app.business_name)}"`,
+      sanitizeCSVField(app.phone),
       app.years_in_business || 0,
       app.application_started_date ? new Date(app.application_started_date).toLocaleDateString() : '',
       app.application_submitted_date ? new Date(app.application_submitted_date).toLocaleDateString() : ''
