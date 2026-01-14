@@ -695,16 +695,16 @@ const Index = () => {
           <div className="max-w-7xl mx-auto px-6 bg-white">
             <main>
           {/* Header with Stats */}
-          <div className="text-center mb-12 animate-fade-in">
-            <p className="sm:text-2xl font-bold text-black mb-0 mt-px my-0 py-0 pt-[10px] pb-0 text-2xl px-[10px] font-sans">
+          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+            <p className="text-xl sm:text-2xl font-bold text-black mb-0 mt-px my-0 py-0 pt-[10px] pb-0 px-[10px] font-sans">
                SBA & Commercial 
 Loan Marketplace                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
             </p>
-            <h1 className="sm:text-xl font-bold tracking-tight mb-4 text-black px-[10px] text-lg font-sans">
+            <h1 className="text-base sm:text-xl font-bold tracking-tight mb-3 sm:mb-4 text-black px-[10px] font-sans">
               Comprehensive Business Financing Solutions
             </h1>
-            <p className="max-w-3xl mx-auto leading-relaxed text-black text-base font-sans">
+            <p className="max-w-3xl mx-auto leading-relaxed text-black text-sm sm:text-base font-sans px-2">
               Our Marketplace provides Conventional, SBA, USDA, and Bridge loan financing nationwide to meet any business need. Discover our comprehensive range of SBA, USDA and conventional financing options.      
             </p>
           </div>
