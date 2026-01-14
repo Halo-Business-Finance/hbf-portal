@@ -521,13 +521,7 @@ const Index = () => {
   const getSafeRedirectUrl = (): string => {
     const origin = window.location.origin;
     // Allow Lovable preview domains, localhost for dev, and common production patterns
-    const allowedPatterns = [
-      /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
-      /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
-      /^http:\/\/localhost:\d+$/,
-      /^http:\/\/127\.0\.0\.1:\d+$/,
-    ];
-    
+    const allowedPatterns = [/^https:\/\/[a-z0-9-]+\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/, /^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/];
     if (allowedPatterns.some(pattern => pattern.test(origin))) {
       return `${origin}/`;
     }
@@ -538,7 +532,6 @@ const Index = () => {
     // Last resort - return empty to let Supabase use configured default
     return '';
   };
-
   const handleMicrosoftSignIn = async () => {
     setAuthLoading(true);
     setAuthError("");
@@ -548,7 +541,9 @@ const Index = () => {
         error
       } = await supabase.auth.signInWithOAuth({
         provider: 'azure',
-        options: redirectTo ? { redirectTo } : undefined
+        options: redirectTo ? {
+          redirectTo
+        } : undefined
       });
       if (error) {
         setAuthError(error.message || "Failed to sign in with Microsoft");
@@ -568,7 +563,9 @@ const Index = () => {
         error
       } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: redirectTo ? { redirectTo } : undefined
+        options: redirectTo ? {
+          redirectTo
+        } : undefined
       });
       if (error) {
         setAuthError(error.message || "Failed to sign in with Google");
@@ -588,7 +585,9 @@ const Index = () => {
         error
       } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
-        options: redirectTo ? { redirectTo } : undefined
+        options: redirectTo ? {
+          redirectTo
+        } : undefined
       });
       if (error) {
         setAuthError(error.message || "Failed to sign in with Apple");
@@ -614,21 +613,20 @@ const Index = () => {
 
   // Show auth forms for unauthenticated users
   if (!authenticated && !loading) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
+    return <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
         <div className="flex-1 py-12">
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-6 bg-white">
             <main>
           {/* Header with Stats */}
           <div className="text-center mb-12 animate-fade-in">
-            <p className="text-2xl font-bold mb-4 text-white">
+            <p className="text-2xl font-bold mb-4 text-black">
               Nationwide SBA & Commercial Financing
             </p>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight mb-4 text-white">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight mb-4 text-black">
               Comprehensive Business Financing Solutions
             </h1>
-            <p className="text-sm max-w-3xl mx-auto mb-10 leading-relaxed text-white">
+            <p className="text-sm max-w-3xl mx-auto mb-10 leading-relaxed text-black">
               We provide credit, financing, treasury and payment solutions to help your business succeed. 
               Discover our comprehensive range of SBA-backed and conventional financing options designed to fuel your business growth.
             </p>
@@ -637,12 +635,12 @@ const Index = () => {
           {/* Company Stats - Above Auth Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white">$2.5B+</div>
+              <div className="text-2xl font-bold mb-1 text-white">$1 Billion+</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Funding Provided</div>
             </Card>
             <Card className="p-6 border-0">
               <div className="text-2xl font-bold mb-1 text-white">95%</div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Approval Rate</div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Loan Approval Rate</div>
             </Card>
             <Card className="p-6 border-0">
               <div className="text-2xl font-bold mb-1 text-white">24 Hours</div>
@@ -839,8 +837,7 @@ const Index = () => {
           </div>
         </div>
         <Footer />
-      </div>
-    );
+      </div>;
   }
   return <Layout>
       <div className="min-h-screen bg-background">
