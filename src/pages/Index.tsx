@@ -34,6 +34,7 @@ import InvoiceFactoringForm from "@/components/forms/InvoiceFactoringForm";
 import SBAExpressLoanForm from "@/components/forms/SBAExpressLoanForm";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
+import Navbar from "@/components/Navbar";
 import { CreditScoreWidget } from '@/components/CreditScoreWidget';
 import { BankBalanceWidget } from '@/components/BankBalanceWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
@@ -613,9 +614,12 @@ const Index = () => {
 
   // Show auth forms for unauthenticated users
   if (!authenticated && !loading) {
-    return <div className="min-h-screen bg-background py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <main>
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <div className="flex-1 py-12">
+          <div className="max-w-7xl mx-auto px-6">
+            <main>
           {/* Header with Stats */}
           <div className="text-center mb-12 animate-fade-in">
             <p className="text-2xl font-bold mb-4 text-white">
@@ -831,10 +835,12 @@ const Index = () => {
             .
           </p>
 
-          </main>
+            </main>
+          </div>
         </div>
         <Footer />
-      </div>;
+      </div>
+    );
   }
   return <Layout>
       <div className="min-h-screen bg-background">
