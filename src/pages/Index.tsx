@@ -620,15 +620,15 @@ const Index = () => {
             <main>
           {/* Header with Stats */}
           <div className="text-center mb-12 animate-fade-in">
-            <p className="sm:text-2xl font-bold text-black mb-0 mt-px my-0 py-0 pt-[10px] pb-0 font-serif text-2xl px-[10px]">
+            <p className="sm:text-2xl font-bold text-black mb-0 mt-px my-0 py-0 pt-[10px] pb-0 text-2xl px-[10px] font-sans">
                SBA & Commercial 
 Loan Marketplace                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
             </p>
-            <h1 className="sm:text-xl font-bold tracking-tight mb-4 text-black font-serif px-[10px] text-lg">
+            <h1 className="sm:text-xl font-bold tracking-tight mb-4 text-black px-[10px] text-lg font-sans">
               Comprehensive Business Financing Solutions
             </h1>
-            <p className="max-w-3xl mx-auto mb-10 leading-relaxed text-black text-xs font-serif">
+            <p className="max-w-3xl mx-auto leading-relaxed text-black text-base font-sans">
               We provide credit, financing, treasury and payment solutions to help your business succeed. 
               Discover our comprehensive range of SBA-backed and conventional financing options designed to fuel your business growth.
             </p>
@@ -823,13 +823,13 @@ Loan Marketplace
           </div>
           
           {/* Terms text below card */}
-          <p className="text-center text-sm text-foreground mt-6 max-w-xl mx-auto">
+          <p className="text-center text-black mt-6 max-w-xl mx-auto my-[20px] text-base">
             By signing up, you agree to our{" "}
-            <a href="/terms" className="hover:underline text-white">
+            <a href="/terms" className="hover:underline text-black">
               terms of service
             </a>{" "}
             and{" "}
-            <a href="/privacy" className="hover:underline text-white">
+            <a href="/privacy" className="hover:underline text-black">
               privacy policy
             </a>
             .
