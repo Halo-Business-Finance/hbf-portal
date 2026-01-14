@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -10,32 +11,32 @@
     /* Halo Business Finance - Dark Navy Theme */
     --background: 222 47% 6%;
     --foreground: 0 0% 100%;
-    
-    --card: 222 40% 10%;
-    --card-foreground: 0 0% 100%;
-    
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
     --popover: 222 40% 8%;
     --popover-foreground: 0 0% 100%;
-    
+
     --primary: 213 94% 50%;
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: 222 33% 14%;
-    --secondary-foreground: 0 0% 100%;
-    
+    --secondary-foreground: 215 25% 26.6667%;
+
     --muted: 222 33% 14%;
     --muted-foreground: 0 0% 85%;
-    
+
     --accent: 152 82% 45%;
     --accent-foreground: 0 0% 100%;
-    
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --border: 222 33% 18%;
     --input: 222 33% 18%;
     --ring: 213 94% 50%;
-    
+
     --success: 152 82% 45%;
     --warning: 38 92% 50%;
     --info: 199 89% 48%;
@@ -47,7 +48,7 @@
     --violet: 262 83% 58%;
     --cyan: 186 94% 41%;
     --indigo: 239 84% 67%;
-    
+
     /* Glass & Surface Effects */
     --glass-light: 222 40% 10% / 0.8;
     --glass-border: 222 33% 25% / 0.5;
@@ -64,7 +65,7 @@
     --gradient-mesh: radial-gradient(at 40% 20%, hsl(213 94% 50% / 0.08) 0px, transparent 50%),
                      radial-gradient(at 80% 0%, hsl(152 82% 45% / 0.05) 0px, transparent 50%),
                      radial-gradient(at 0% 50%, hsl(186 94% 41% / 0.05) 0px, transparent 50%);
-    
+
     /* Professional Shadows */
     --shadow-xs: 0 1px 2px 0 hsl(222 47% 2% / 0.3);
     --shadow-sm: 0 1px 3px 0 hsl(222 47% 2% / 0.4), 0 1px 2px -1px hsl(222 47% 2% / 0.4);
@@ -77,7 +78,7 @@
     --shadow-card: 0 1px 3px hsl(222 47% 2% / 0.2), 0 4px 12px hsl(222 47% 2% / 0.3);
     --shadow-card-hover: 0 4px 12px hsl(222 47% 2% / 0.3), 0 16px 32px hsl(222 47% 2% / 0.4);
     --shadow-glow: 0 0 40px hsl(213 94% 50% / 0.15);
-    
+
     --radius: 0.75rem;
 
     /* Sidebar */
@@ -96,28 +97,28 @@
     /* Dark mode is the same as root for Halo theme */
     --background: 222 47% 6%;
     --foreground: 0 0% 100%;
-    
+
     --card: 222 40% 10%;
     --card-foreground: 0 0% 100%;
-    
+
     --popover: 222 40% 8%;
     --popover-foreground: 0 0% 100%;
-    
+
     --primary: 213 94% 50%;
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: 222 33% 14%;
     --secondary-foreground: 0 0% 100%;
-    
+
     --muted: 222 33% 14%;
     --muted-foreground: 0 0% 85%;
-    
+
     --accent: 152 82% 45%;
     --accent-foreground: 0 0% 100%;
-    
+
     --destructive: 0 63% 51%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --border: 222 33% 18%;
     --input: 222 33% 18%;
     --ring: 213 94% 50%;
@@ -143,13 +144,13 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
@@ -213,45 +214,45 @@
     @apply bg-card border border-border/60 rounded-xl p-6 transition-all duration-300;
     box-shadow: var(--shadow-card);
   }
-  
+
   .metric-card:hover {
     @apply border-primary/20;
     box-shadow: var(--shadow-card-hover), var(--shadow-glow);
     transform: translateY(-3px) scale(1.01);
   }
-  
+
   .metric-value {
     @apply text-3xl font-bold text-foreground mb-1 tracking-tight;
   }
-  
+
   .metric-label {
     @apply text-xs font-semibold text-muted-foreground uppercase tracking-wider;
   }
-  
+
   .metric-change {
     @apply text-sm font-medium;
   }
-  
+
   .metric-change.positive {
     color: hsl(var(--success));
   }
-  
+
   .metric-change.negative {
     color: hsl(var(--destructive));
   }
-  
+
   .dashboard-header {
     @apply mb-8 space-y-2;
   }
-  
+
   .dashboard-title {
     @apply text-2xl md:text-3xl font-bold text-foreground tracking-tight;
   }
-  
+
   .dashboard-subtitle {
     @apply text-muted-foreground text-sm md:text-base;
   }
-  
+
   .dashboard-timestamp {
     @apply flex items-center gap-2 text-sm text-muted-foreground;
   }
