@@ -620,11 +620,11 @@ const Index = () => {
             <main>
           {/* Header with Stats */}
           <div className="text-center mb-12 animate-fade-in">
-            <p className="text-2xl font-bold text-black my-[10px] py-0 mb-0 mt-px pb-px pt-[20px]">
+            <p className="text-xl sm:text-2xl font-bold text-black my-[10px] py-0 mb-0 mt-px pb-px pt-[20px]">
                Nationwide SBA & Commercial Loan Marketplace                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
             </p>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight mb-4 text-black">
+            <h1 className="text-base sm:text-xl font-bold tracking-tight mb-4 text-black">
               Comprehensive Business Financing Solutions
             </h1>
             <p className="text-sm max-w-3xl mx-auto mb-10 leading-relaxed text-black">
