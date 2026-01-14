@@ -615,7 +615,7 @@ const Index = () => {
   if (!authenticated && !loading) {
     return <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <div className="flex-1 py-12">
+        <div className="flex-1 py-0">
           <div className="max-w-7xl mx-auto px-6 bg-white">
             <main>
           {/* Header with Stats */}
