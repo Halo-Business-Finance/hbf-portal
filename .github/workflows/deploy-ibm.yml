@@ -30,8 +30,13 @@ jobs:
       - name: Authenticate with IBM Cloud
         run: |
           ibmcloud login --apikey "${{ secrets.IBM_CLOUD_API_KEY }}" -r ${{ env.IBM_CLOUD_REGION }}
-          ibmcloud cr region-set ${{ env.IBM_CLOUD_REGION }}
+
+      - name: Log in to IBM Cloud Container Registry
+        run: |
+          ibmcloud login --apikey $IBM_CLOUD_API_KEY -r us-south
           ibmcloud cr login
+        env:
+          IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
 
       - name: Debug - Show Dockerfile content
         run: |
