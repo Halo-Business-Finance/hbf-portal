@@ -105,9 +105,6 @@ export function AppSidebar() {
                 <Menu className="h-5 w-5 text-white" />
               </button>
             </div>
-            {open && <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider px-3 mb-2 text-white">
-                Main Menu
-              </SidebarGroupLabel>}
             <SidebarGroupContent>
               <SidebarMenu className={cn("space-y-1", !open && "items-center")}>
                 {items.map(item => <SidebarMenuItem key={item.title} className={cn(!open && "w-auto")}>
