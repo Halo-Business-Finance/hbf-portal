@@ -644,7 +644,7 @@ const Index = () => {
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Loan Approval Rate</div>
             </Card>
             <Card className="p-6 border-0">
-              <div className="text-2xl font-bold mb-1 text-white">24 Hours</div>
+              <div className="text-2xl font-bold mb-1 text-white underline underline-offset-4 decoration-white">24 Hours</div>
               <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Avg Loan Processing</div>
             </Card>
           </div>
