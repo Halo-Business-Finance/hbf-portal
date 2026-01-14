@@ -34,8 +34,9 @@ jobs:
 
       - name: Log in to IBM Cloud Container Registry
         run: |
-          ibmcloud login --apikey $IBM_CLOUD_API_KEY -r us-south
-          ibmcloud cr region-set us-south
+          ibmcloud login --apikey $IBM_CLOUD_API_KEY -r ${{ env.IBM_CLOUD_REGION }}
+          ibmcloud target -g "${{ secrets.IBM_RESOURCE_GROUP }}"
+          ibmcloud cr region-set ${{ env.IBM_CLOUD_REGION }}
           ibmcloud cr login
         env:
           IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
