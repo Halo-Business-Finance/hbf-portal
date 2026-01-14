@@ -727,7 +727,7 @@ Loan Marketplace
 
           {/* Auth Card */}
           <div className="px-2 sm:px-6 w-full flex justify-center">
-          <Card className="max-w-3xl w-full shadow-lg">
+          <Card className="max-w-3xl w-full shadow-lg border-2 border-blue-500">
             <CardHeader className="text-center pb-3 pt-4 sm:pt-6 px-4 sm:px-6">
               <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
                 Welcome to Halo Business Finance
