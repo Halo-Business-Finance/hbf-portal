@@ -73,6 +73,7 @@ jobs:
             --src . \
             --strategy dockerfile \
             --registry-secret icr-secret \
+            --image "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}" \
             --env "DATABASE_URL=$DB_URL"
 
       - name: Wait for deployment to stabilize
