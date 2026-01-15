@@ -57,8 +57,9 @@ const Navbar = () => {
   }, [searchQuery, authenticated]);
   const sanitizeSearchQuery = (query: string): string => {
     const limited = query.slice(0, 100);
-    const escaped = limited.replace(/[%_]/g, '\\$&');
-    return escaped.replace(/[(),.'"\[\]{}|\\^$*+?]/g, '');
+    const escapedBackslashes = limited.replace(/\\/g, '\\\\');
+    const escapedWildcards = escapedBackslashes.replace(/[%_]/g, '\\$&');
+    return escapedWildcards.replace(/[(),.'"\[\]{}|\\^$*+?]/g, '');
   };
   const performSearch = async (query: string) => {
     if (!query.trim()) return;
