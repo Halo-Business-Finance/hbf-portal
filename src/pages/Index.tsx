@@ -688,7 +688,7 @@ const Index = () => {
   };
 
   // Show auth forms for unauthenticated users
-  if (!authenticated && !loading) {
+  if (!authenticated) {
     return <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
         <div className="flex-1 py-0">
