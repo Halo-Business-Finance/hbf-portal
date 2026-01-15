@@ -186,15 +186,11 @@ const MFAVerification = () => {
       setVerificationCode('');
       
       // Create a new challenge after failed attempt
-      if (factorId) {
-        const { data: newChallenge } = await supabase.auth.mfa.challenge({
-          factorId
-        });
-        if (newChallenge) {
-          setChallengeId(newChallenge.id);
-        }
-      }
-    } finally {
+      const { data: newChallenge } = await supabase.auth.mfa.challenge({
+        factorId
+      });
+      if (newChallenge) {
+        setChallengeId(newChallenge.id);
       setVerifying(false);
     }
   };
