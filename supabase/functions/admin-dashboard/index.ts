@@ -18,6 +18,19 @@ interface ApplicationStats {
   thisWeek: number;
 }
 
+/**
+ * Escape a value for safe use inside a SQL LIKE/ILIKE pattern.
+ * - Escapes backslashes first so they don't affect later escapes.
+ * - Escapes '%' and '_' which are SQL LIKE wildcards.
+ */
+function escapeLikePattern(input: string): string {
+  // First escape backslash itself
+  let result = input.replace(/\\/g, '\\\\');
+  // Then escape LIKE wildcards
+  result = result.replace(/[%_]/g, '\\$&');
+  return result;
+}
+
 interface ApplicationFilter {
   status?: string;
   loanType?: string;
@@ -259,13 +272,15 @@ async function getFilteredApplications(supabase: any, filters: ApplicationFilter
     if (filters.searchTerm) {
       // SECURITY: Sanitize search term to prevent query manipulation
       // - Escape SQL LIKE wildcards (% and _)
+      // - Escape backslashes used as the LIKE escape character
       // - Remove any PostgREST operators or special characters
       // - Limit length to prevent abuse
-      const sanitizedSearch = String(filters.searchTerm)
+      const rawSearch = String(filters.searchTerm)
         .slice(0, 100) // Limit length
-        .replace(/[\\(),.'"\[\]{}|^$*+?]/g, '') // Remove backslashes and special chars that could break query
-        .trim()
-        .replace(/[%_]/g, '\\$&'); // Escape LIKE wildcards for safe ilike usage
+        .replace(/[(),.'"\[\]{}|^$*+?]/g, '') // Remove special chars that could break query (backslash is handled by escapeLikePattern)
+        .trim();
+
+      const sanitizedSearch = escapeLikePattern(rawSearch);
       
       if (sanitizedSearch.length > 0) {
         query = query.or(`business_name.ilike.%${sanitizedSearch}%,first_name.ilike.%${sanitizedSearch}%,last_name.ilike.%${sanitizedSearch}%,application_number.ilike.%${sanitizedSearch}%`);
