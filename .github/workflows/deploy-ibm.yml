@@ -62,6 +62,8 @@ jobs:
 
       - name: Build & Deploy from source (Code Engine managed build)
         timeout-minutes: 45
+        env:
+          DB_URL: ${{ secrets.IBM_DATABASE_URL }}
         run: |
           echo "Building from source using Code Engine managed build..."
           echo "This builds the Dockerfile on IBM servers and pushes to the registry."
@@ -71,7 +73,7 @@ jobs:
             --src . \
             --str dockerfile \
             --registry-secret icr-secret \
-            --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}"
+            --env "DATABASE_URL=$DB_URL"
 
       - name: Wait for deployment to stabilize
         run: sleep 45
