@@ -31,7 +31,7 @@ jobs:
           # Ensure plugin repository is present
           ibmcloud plugin repo-add ibmcloud https://plugins.cloud.ibm.com || true
 
-          # Install required plugins (fail fast if install fails)
+          # Install required plugins
           ibmcloud plugin install container-registry -f
           ibmcloud plugin install code-engine -f
 
@@ -42,61 +42,32 @@ jobs:
           echo "=== Installed plugins ==="
           ibmcloud plugin list
 
-          echo "=== Verifying Container Registry build command ==="
-          ibmcloud cr --help >/dev/null
-          ibmcloud cr build --help >/dev/null
-
       - name: Authenticate with IBM Cloud
         run: |
           ibmcloud login --apikey "${{ secrets.IBM_CLOUD_API_KEY }}" -r ${{ env.IBM_CLOUD_REGION }}
           ibmcloud target -g "${{ secrets.IBM_RESOURCE_GROUP }}"
 
-      - name: Log in to IBM Cloud Container Registry
-        run: |
-          ibmcloud login --apikey $IBM_CLOUD_API_KEY -r ${{ env.IBM_CLOUD_REGION }}
-          ibmcloud target -g "${{ secrets.IBM_RESOURCE_GROUP }}"
-          ibmcloud cr region-set ${{ env.IBM_CLOUD_REGION }}
-          ibmcloud cr login
-        env:
-          IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
-
-      - name: Registry preflight diagnostics
-        run: |
-          echo "=== Registry Info ==="
-          ibmcloud cr info
-          echo ""
-          echo "=== Available Namespaces ==="
-          ibmcloud cr namespaces
-          echo ""
-          echo "=== Current Region ==="
-          ibmcloud cr region
-          echo ""
-          echo "=== DNS Check ==="
-          nslookup us.icr.io || echo "nslookup not available"
-          echo ""
-          echo "=== Commit SHA: ${{ github.sha }} ==="
-
-      - name: Build & push on IBM Cloud (server-side)
-        timeout-minutes: 45
-        run: |
-          echo "Building image on IBM Cloud (no docker push from GitHub)..."
-          ibmcloud cr build \
-            --tag ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --tag ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest \
-            --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
-            --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }} \
-            .
-
-      - name: Deploy to Code Engine
+      - name: Select Code Engine project
         run: |
           ibmcloud ce project select --name "${{ env.CODE_ENGINE_PROJECT }}"
+
+      - name: Build & Deploy from source (Code Engine managed build)
+        timeout-minutes: 45
+        run: |
+          echo "Building from source using Code Engine managed build..."
+          echo "This builds the Dockerfile on IBM servers and pushes to the registry."
+          
           ibmcloud ce application update \
             --name ${{ env.IMAGE_NAME }} \
-            --image ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --src . \
+            --build-strategy dockerfile \
+            --registry-secret icr-secret \
+            --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
+            --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }} \
             --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}"
 
       - name: Wait for deployment to stabilize
-        run: sleep 30
+        run: sleep 45
 
       - name: Health Check
         run: |
