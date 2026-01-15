@@ -63,7 +63,8 @@ jobs:
           ibmcloud ce application update \
             --name ${{ env.IMAGE_NAME }} \
             --src . \
-            --build-strategy dockerfile \
+            --rebuild \
+            --str dockerfile \
             --registry-secret icr-secret \
             --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
             --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }} \

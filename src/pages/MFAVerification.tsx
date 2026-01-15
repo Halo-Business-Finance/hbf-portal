@@ -191,6 +191,8 @@ const MFAVerification = () => {
       });
       if (newChallenge) {
         setChallengeId(newChallenge.id);
+      }
+    } finally {
       setVerifying(false);
     }
   };
