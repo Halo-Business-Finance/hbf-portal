@@ -8,8 +8,8 @@ on:
 
 env:
   IBM_CLOUD_REGION: us-south
-  ICR_NAMESPACE: halo-website
-  ICR_REGISTRY: us.icr.io
+  ICR_NAMESPACE: hbf-portal
+  ICR_REGISTRY: private.us.icr.io
   IMAGE_NAME: hbf-portal
   CODE_ENGINE_PROJECT: Halo Business Finance
 
