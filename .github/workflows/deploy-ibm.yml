@@ -57,19 +57,20 @@ jobs:
             .
 
       - name: Push to IBM Container Registry
+        timeout-minutes: 20
         run: |
           push_with_retry() {
             local image=$1
-            local max_attempts=3
+            local max_attempts=5
             local attempt=1
             while [ $attempt -le $max_attempts ]; do
               echo "Push attempt $attempt of $max_attempts for $image"
-              if docker push "$image"; then
+              if timeout 600 docker push "$image"; then
                 echo "Successfully pushed $image"
                 return 0
               fi
-              echo "Push failed, waiting 30 seconds before retry..."
-              sleep 30
+              echo "Push failed, waiting 60 seconds before retry..."
+              sleep 60
               attempt=$((attempt + 1))
             done
             echo "Failed to push $image after $max_attempts attempts"
