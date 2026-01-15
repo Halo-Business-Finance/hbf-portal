@@ -23,19 +23,28 @@ jobs:
 
       - name: Install IBM Cloud CLI
         run: |
+          set -euo pipefail
+
           curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
           ibmcloud --version
 
+          # Ensure plugin repository is present
+          ibmcloud plugin repo-add ibmcloud https://plugins.cloud.ibm.com || true
 
-          # Ensure required plugins are installed and up-to-date.
-          # `ibmcloud cr build` is provided by the container-registry plugin.
-          ibmcloud plugin install container-registry -f || true
-          ibmcloud plugin install code-engine -f || true
+          # Install required plugins (fail fast if install fails)
+          ibmcloud plugin install container-registry -f
+          ibmcloud plugin install code-engine -f
+
+          # Update plugins (non-fatal if already latest)
           ibmcloud plugin update container-registry -f || true
           ibmcloud plugin update code-engine -f || true
 
           echo "=== Installed plugins ==="
           ibmcloud plugin list
+
+          echo "=== Verifying Container Registry build command ==="
+          ibmcloud cr --help >/dev/null
+          ibmcloud cr build --help >/dev/null
 
       - name: Authenticate with IBM Cloud
         run: |
