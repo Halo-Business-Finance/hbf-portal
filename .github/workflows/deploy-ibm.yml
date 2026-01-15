@@ -66,8 +66,8 @@ jobs:
             --rebuild \
             --str dockerfile \
             --registry-secret icr-secret \
-            --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
-            --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }} \
+            --build-env VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
+            --build-env VITE_SUPABASE_PUBLISHABLE_KEY=${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }} \
             --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}"
 
       - name: Wait for deployment to stabilize
