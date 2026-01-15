@@ -2,13 +2,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Accept build args for Vite environment variables
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_PUBLISHABLE_KEY
-
-# Set environment variables for the build
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+# Code Engine passes build-time environment variables via --build-env
+# These are automatically available as ENV during build
+# No ARG declarations needed - the vars come from the build environment
 
 COPY package*.json ./
 
@@ -17,6 +13,8 @@ RUN npm install
 
 COPY . .
 
+# VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY are passed via --build-env
+# and are available as environment variables during build
 RUN npm run build
 
 FROM nginx:alpine
