@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   IBM_CLOUD_REGION: us-south
   ICR_NAMESPACE: hbf-portal
