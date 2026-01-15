@@ -18,7 +18,7 @@ const SecureInput = React.forwardRef<HTMLInputElement, SecureInputProps>(
     const [showValue, setShowValue] = React.useState(false)
     
     const validateInput = React.useCallback((inputValue: string) => {
-      let valid = true;
+      let valid;
       
       switch (type) {
         case 'ssn':
