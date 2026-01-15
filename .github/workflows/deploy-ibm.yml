@@ -41,44 +41,32 @@ jobs:
         env:
           IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
 
-      - name: Debug - Show Dockerfile content
+      - name: Registry preflight diagnostics
         run: |
+          echo "=== Registry Info ==="
+          ibmcloud cr info
+          echo ""
+          echo "=== Available Namespaces ==="
+          ibmcloud cr namespaces
+          echo ""
+          echo "=== Current Region ==="
+          ibmcloud cr region
+          echo ""
+          echo "=== DNS Check ==="
+          nslookup us.icr.io || echo "nslookup not available"
+          echo ""
           echo "=== Commit SHA: ${{ github.sha }} ==="
-          echo "=== First 30 lines of Dockerfile ==="
-          head -n 30 Dockerfile
 
-      - name: Build Docker image
+      - name: Build & push on IBM Cloud (server-side)
+        timeout-minutes: 45
         run: |
-          docker build \
+          echo "Building image on IBM Cloud (no docker push from GitHub)..."
+          ibmcloud cr build \
+            --tag ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --tag ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest \
             --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
             --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }} \
-            -t ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            -t ${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest \
             .
-
-      - name: Push to IBM Container Registry
-        timeout-minutes: 20
-        run: |
-          push_with_retry() {
-            local image=$1
-            local max_attempts=5
-            local attempt=1
-            while [ $attempt -le $max_attempts ]; do
-              echo "Push attempt $attempt of $max_attempts for $image"
-              if timeout 600 docker push "$image"; then
-                echo "Successfully pushed $image"
-                return 0
-              fi
-              echo "Push failed, waiting 60 seconds before retry..."
-              sleep 60
-              attempt=$((attempt + 1))
-            done
-            echo "Failed to push $image after $max_attempts attempts"
-            return 1
-          }
-          
-          push_with_retry "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-          push_with_retry "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
 
       - name: Deploy to Code Engine
         run: |

@@ -1,0 +1,38 @@
+# Git
+.git/
+.gitignore
+
+# Dependencies (rebuilt in container)
+node_modules/
+
+# Build output
+dist/
+
+# CI/CD
+.github/
+
+# Supabase (not needed for frontend build)
+supabase/
+
+# Environment files (defense-in-depth)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Documentation (not needed in image)
+README.md
+DEPLOYMENT.md
+MIGRATION_COMPLETE.md
+SECURITY.md
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
