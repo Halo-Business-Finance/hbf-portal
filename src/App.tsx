@@ -51,6 +51,7 @@ const SupportTickets = lazy(() => import("./pages/admin/SupportTickets"));
 const DatabaseManagement = lazy(() => import("./pages/admin/DatabaseManagement"));
 const ApiIntegrations = lazy(() => import("./pages/admin/ApiIntegrations"));
 const ExistingLoansManagement = lazy(() => import("./pages/admin/ExistingLoansManagement"));
+const ApplicationAssignments = lazy(() => import("./pages/admin/ApplicationAssignments"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -189,6 +190,13 @@ const App = () => (
                 <Layout>
                   <ProtectedRoute requiredRole="admin">
                     <ExistingLoansManagement />
+                  </ProtectedRoute>
+                </Layout>
+              } />
+              <Route path="/admin/assignments" element={
+                <Layout>
+                  <ProtectedRoute requiredRole="admin">
+                    <ApplicationAssignments />
                   </ProtectedRoute>
                 </Layout>
               } />

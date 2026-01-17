@@ -12,7 +12,9 @@ export type AuditAction =
   | 'VIEW_ADMIN_DASHBOARD'
   | 'VIEW_SECURITY_AUDIT'
   | 'MANAGE_USER_ROLES'
-  | 'ASSIGN_APPLICATION';
+  | 'ASSIGN_APPLICATION'
+  | 'UPDATE_ASSIGNMENT'
+  | 'DELETE_ASSIGNMENT';
 
 export type ResourceType = 
   | 'bank_account'
