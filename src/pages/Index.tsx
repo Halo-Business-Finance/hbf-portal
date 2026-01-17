@@ -803,7 +803,7 @@ const Index = () => {
               </form>
 
               {/* Alternative login section */}
-              <div className="mt-8">
+              <div className="mt-8 text-center">
                 <p className="text-sm text-blue-600 mb-3">Alternative login</p>
                 <div className="flex items-center justify-center gap-3">
                   <Button type="button" variant="outline" className="h-12 w-12 border-gray-300 hover:bg-gray-50 p-0 rounded-none flex items-center justify-center" onClick={handleLinkedInSignIn} disabled={authLoading} title="Continue with LinkedIn">
