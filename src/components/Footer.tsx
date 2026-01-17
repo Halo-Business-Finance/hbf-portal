@@ -103,7 +103,7 @@ export const Footer = () => {
               <a href="https://halobusinessfinance.com/licenses" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Company Licenses</a>
               <a href="https://halobusinessfinance.com/nmls" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">NMLS Compliance</a>
               <a href="https://halobusinessfinance.com/cfipa" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">CFIPA</a>
-              <Link to="/privacy" className="text-white hover:underline transition-colors">Privacy Policy</Link>
+              <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-white hover:underline transition-colors">Privacy</a>
               <Link to="/terms" className="text-white hover:underline transition-colors">Terms of Use</Link>
             </div>
           </div>
