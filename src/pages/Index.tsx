@@ -860,13 +860,6 @@ const Index = () => {
               {/* Small filled circle */}
               <div className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-blue-400/30" />
               
-              {/* Triangle shape using clip-path */}
-              <div className="absolute bottom-1/4 right-1/3 w-48 h-48 bg-white/10" style={{
-              clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
-            }} />
-              
-              {/* Rectangle */}
-              <div className="absolute top-1/2 right-1/4 w-24 h-48 bg-indigo-400/20 transform rotate-12" />
               
               {/* Dots pattern */}
               <div className="absolute top-20 right-20 grid grid-cols-4 gap-4">
