@@ -695,7 +695,7 @@ const Index = () => {
               {/* Header with title and signup link */}
               <div className="mb-8">
                 <h1 className="text-3xl font-normal text-gray-900 mb-3">
-                  {isLogin ? "Log in to Halo Business Finance" : "Create your account"}
+                  {isLogin ? "Log in to your account" : "Create your account"}
                 </h1>
                 <p className="text-gray-600">
                   {isLogin ? (
