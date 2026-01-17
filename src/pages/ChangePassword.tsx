@@ -29,6 +29,22 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+// Password strength calculation
+const getPasswordStrength = (password: string): { score: number; label: string; color: string } => {
+  let score = 0;
+  
+  if (password.length >= 6) score++;
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+  if (/\d/.test(password)) score++;
+  if (/[^a-zA-Z0-9]/.test(password)) score++;
+  
+  if (score <= 2) return { score, label: 'Weak', color: 'bg-red-500' };
+  if (score <= 4) return { score, label: 'Medium', color: 'bg-yellow-500' };
+  return { score, label: 'Strong', color: 'bg-green-500' };
+};
+
 const ChangePassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -216,33 +232,57 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="newPassword"
-            render={({ field }) => (
-              <FormItem className="max-w-sm">
-                <Label htmlFor="newPassword" className="text-sm text-blue-600 mb-2 block">
-                  New password
-                </Label>
-                <FormControl>
-                  <div className="relative">
-                    <Input 
-                      id="newPassword"
-                      type={showNewPassword ? "text" : "password"}
-                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
-                      {...field} 
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                    >
-                      {showNewPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const strength = getPasswordStrength(field.value);
+              return (
+                <FormItem className="max-w-sm">
+                  <Label htmlFor="newPassword" className="text-sm text-blue-600 mb-2 block">
+                    New password
+                  </Label>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        id="newPassword"
+                        type={showNewPassword ? "text" : "password"}
+                        className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
+                        {...field} 
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  {/* Password strength indicator */}
+                  {field.value && (
+                    <div className="mt-2 space-y-1">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5, 6].map((level) => (
+                          <div
+                            key={level}
+                            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                              level <= strength.score ? strength.color : 'bg-gray-200'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className={`text-xs ${
+                        strength.label === 'Weak' ? 'text-red-600' : 
+                        strength.label === 'Medium' ? 'text-yellow-600' : 'text-green-600'
+                      }`}>
+                        Password strength: {strength.label}
+                      </p>
+                    </div>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
 
           <FormField
