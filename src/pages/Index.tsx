@@ -687,242 +687,347 @@ const Index = () => {
     resetForm();
   };
 
-  // Show auth forms for unauthenticated users
+  // Show auth forms for unauthenticated users - IBM-style login
   if (!authenticated) {
-    return <div className="min-h-screen bg-background flex flex-col">
-        <Navbar />
-        <div className="flex-1 py-0">
-          <div className="max-w-7xl mx-auto px-6 bg-white">
-            <main>
-          {/* Header with Stats */}
-          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-            <p className="text-xl sm:text-2xl font-bold text-black mb-0 mt-px my-0 py-0 pt-[10px] pb-0 px-[10px] font-sans">
-               SBA & Commercial 
-Loan Marketplace                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-
-            </p>
-            <h1 className="text-base sm:text-xl font-bold tracking-tight mb-3 sm:mb-4 text-black px-[10px] font-sans">
-              Comprehensive Business Financing Solutions
-            </h1>
-            <p className="max-w-3xl mx-auto leading-relaxed text-black text-sm sm:text-base font-sans px-2">
-              Our Marketplace provides Conventional, SBA, USDA, and Bridge loan financing nationwide to meet any business need. Discover our comprehensive range of SBA, USDA and conventional financing options.      
-            </p>
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        {/* Blue accent bar at top */}
+        <div className="h-1 bg-primary w-full" />
+        
+        {/* Header with logo */}
+        <header className="px-6 py-4 border-b border-border/30">
+          <div className="max-w-7xl mx-auto">
+            <span className="text-xl font-bold text-foreground tracking-tight">HBF</span>
           </div>
+        </header>
 
-          {/* Company Stats - Above Auth Card */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-6 max-w-3xl mx-auto mb-6 sm:mb-8">
-            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
-              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 text-black underline underline-offset-2 sm:underline-offset-4 decoration-black">$1 Billion+</div>
-              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Funding Provided</div>
-            </Card>
-            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
-              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">95%</div>
-              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Approval Rate</div>
-            </Card>
-            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
-              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">24 Hours</div>
-              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Avg Loan Processing</div>
-            </Card>
-          </div>
+        {/* Main content - two column layout */}
+        <main className="flex-1 flex">
+          <div className="flex w-full max-w-7xl mx-auto">
+            {/* Left side - Login form */}
+            <div className="w-full lg:w-[45%] px-6 sm:px-12 lg:px-16 py-12 lg:py-16">
+              <div className="max-w-md">
+                <h1 className="text-3xl sm:text-4xl font-light text-foreground mb-2">
+                  Log in to HBF
+                </h1>
+                <p className="text-sm text-muted-foreground mb-8">
+                  Don't have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setIsLogin(false)}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    Create an account
+                  </button>
+                </p>
 
-          {/* Auth Card */}
-          <div className="px-2 sm:px-6 w-full flex justify-center">
-          <Card className="max-w-3xl w-full shadow-lg border-2 border-blue-500">
-            <CardHeader className="text-center pb-3 pt-4 sm:pt-6 px-4 sm:px-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
-                Welcome to Halo Business Finance
-              </h2>
-              <p className="text-sm text-foreground">
-                Sign in to your account
-              </p>
-            </CardHeader>
-            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-              <Tabs value={isLogin ? "login" : "signup"} onValueChange={switchMode} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 h-9 gap-2">
-                  <TabsTrigger value="login" className="text-sm py-1">Sign In</TabsTrigger>
-                  <TabsTrigger value="signup" className="text-sm py-1 border-2 border-blue-500 rounded-md">Sign Up</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="login" className="space-y-4 mt-0">
-                  <form onSubmit={handleAuthSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-foreground font-normal text-sm">Email</Label>
-                        <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="password" className="text-foreground font-normal text-sm">Password</Label>
-                        <div className="relative">
-                          <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
-                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
-                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                          </Button>
-                        </div>
-                      </div>
+                <div className="h-px bg-border mb-8" />
+
+                {isLogin ? (
+                  <form onSubmit={handleAuthSubmit} className="space-y-6">
+                    <div className="space-y-1">
+                      <Label htmlFor="email" className="text-xs font-normal text-muted-foreground">
+                        Email
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        disabled={authLoading}
+                        className="h-12 rounded-none border-0 border-b-2 border-border bg-muted/30 px-3 focus-visible:ring-0 focus-visible:border-primary"
+                      />
                     </div>
 
-                    {authError && <Alert variant="destructive">
-                        <AlertDescription>{authError}</AlertDescription>
-                      </Alert>}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                      <Button type="submit" className="w-full h-11 text-base font-medium" disabled={authLoading}>
-                        {authLoading ? "Signing in..." : "Sign In"}
-                      </Button>
-                      
-                      <div className="text-center md:text-left">
-                        <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
-                          Forgot your password?
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="relative py-2">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-3 text-foreground tracking-wider">
-                          OR CONTINUE WITH
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
-                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with Google">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
-                          <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
-                          <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
-                          <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
-                        </svg>
-                      </Button>
-
-                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with Apple">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 384 512">
-                          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-                        </svg>
-                      </Button>
-
-                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with X (Twitter)">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.145 12.086c.007.206.01.412.01.62 0 6.337-4.824 10.81-13.615 10.81-2.711 0-5.234-.78-7.354-2.116.375.041.756.062 1.142.062 2.244 0 4.309-.757 5.954-2.03-2.098-.038-3.868-1.416-4.478-3.307.293.056.593.086.902.086.437 0 .86-.058 1.262-.167-2.189-.439-3.838-2.364-3.838-4.673v-.061c.645.356 1.383.57 2.169.595-1.284-.853-2.128-2.313-2.128-3.963 0-.874.237-1.693.65-2.397 2.359 2.883 5.887 4.78 9.864 4.979-.082-.348-.124-.711-.124-1.084 0-2.624 2.138-4.755 4.773-4.755 1.373 0 2.613.575 3.484 1.495 1.088-.213 2.11-.61 3.034-1.155-.357 1.106-1.114 2.035-2.099 2.621.967-.115 1.887-.369 2.742-.746-.64.955-1.448 1.794-2.38 2.467z" />
-                        </svg>
-                      </Button>
-                    </div>
-                  </form>
-                </TabsContent>
-                
-                <TabsContent value="signup" className="space-y-4 mt-0">
-                  <form onSubmit={handleAuthSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-foreground font-normal text-sm">First Name</Label>
-                        <Input id="firstName" placeholder="John" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading} className="h-10" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-foreground font-normal text-sm">Last Name</Label>
-                        <Input id="lastName" placeholder="Smith" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading} className="h-10" />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="business" className="text-foreground font-normal text-sm">Business Name</Label>
-                        <Input id="business" placeholder="Your Business LLC" value={businessName} onChange={e => setBusinessName(e.target.value)} required disabled={authLoading} className="h-10" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-email" className="text-foreground font-normal text-sm">Email</Label>
-                        <Input id="signup-email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-password" className="text-foreground font-normal text-sm">Password</Label>
-                        <div className="relative">
-                          <Input id="signup-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
-                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
-                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex items-end">
-                        <Button type="submit" className="w-full h-10 text-base font-medium border-2 border-blue-500" disabled={authLoading}>
-                          {authLoading ? "Creating..." : "Create Account"}
+                    <div className="space-y-1">
+                      <Label htmlFor="password" className="text-xs font-normal text-muted-foreground">
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          disabled={authLoading}
+                          className="h-12 rounded-none border-0 border-b-2 border-border bg-muted/30 px-3 pr-12 focus-visible:ring-0 focus-visible:border-primary"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                          disabled={authLoading}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-muted-foreground" />
+                          )}
                         </Button>
                       </div>
                     </div>
 
-                    {authError && <Alert variant="destructive">
+                    {authError && (
+                      <Alert variant="destructive" className="rounded-none">
                         <AlertDescription>{authError}</AlertDescription>
-                      </Alert>}
+                      </Alert>
+                    )}
 
-                    <div className="relative py-2">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-3 text-foreground tracking-wider">
-                          OR CONTINUE WITH
-                        </span>
-                      </div>
+                    <Button
+                      type="submit"
+                      className="w-full h-12 rounded-none bg-primary hover:bg-primary/90 text-primary-foreground font-normal text-base flex items-center justify-between px-4"
+                      disabled={authLoading}
+                    >
+                      <span>{authLoading ? "Signing in..." : "Continue"}</span>
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="remember"
+                        className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="remember" className="text-sm font-normal text-foreground cursor-pointer">
+                        Remember me
+                      </Label>
+                      <button type="button" className="ml-1 text-muted-foreground hover:text-foreground">
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
-                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with Google">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
-                          <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
-                          <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
-                          <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
-                        </svg>
-                      </Button>
+                    <div className="h-px bg-border my-6" />
 
-                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with Apple">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 384 512">
-                          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-                        </svg>
-                      </Button>
-
-                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with X (Twitter)">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.145 12.086c.007.206.01.412.01.62 0 6.337-4.824 10.81-13.615 10.81-2.711 0-5.234-.78-7.354-2.116.375.041.756.062 1.142.062 2.244 0 4.309-.757 5.954-2.03-2.098-.038-3.868-1.416-4.478-3.307.293.056.593.086.902.086.437 0 .86-.058 1.262-.167-2.189-.439-3.838-2.364-3.838-4.673v-.061c.645.356 1.383.57 2.169.595-1.284-.853-2.128-2.313-2.128-3.963 0-.874.237-1.693.65-2.397 2.359 2.883 5.887 4.78 9.864 4.979-.082-.348-.124-.711-.124-1.084 0-2.624 2.138-4.755 4.773-4.755 1.373 0 2.613.575 3.484 1.495 1.088-.213 2.11-.61 3.034-1.155-.357 1.106-1.114 2.035-2.099 2.621.967-.115 1.887-.369 2.742-.746-.64.955-1.448 1.794-2.38 2.467z" />
+                    <div className="space-y-3">
+                      <p className="text-xs font-normal text-muted-foreground">Alternative login</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full h-12 rounded-none border-2 border-border bg-white hover:bg-muted/20 text-primary font-normal justify-between px-4"
+                        onClick={handleGoogleSignIn}
+                        disabled={authLoading}
+                      >
+                        <span>Continue with Google</span>
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                         </svg>
                       </Button>
                     </div>
 
-                    <div className="text-center">
-                      <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
-                        Forgot your password?
-                      </Button>
-                    </div>
+                    <div className="h-px bg-border my-6" />
+
+                    <p className="text-sm text-foreground">
+                      Forgot email?{" "}
+                      <button
+                        type="button"
+                        onClick={() => navigate('/forgot-password')}
+                        className="text-primary hover:underline"
+                      >
+                        Contact support
+                      </button>
+                    </p>
                   </form>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-          </div>
-          
-          {/* Terms text below card */}
-          <p className="text-center text-black mt-6 max-w-xl mx-auto my-[20px] text-base">
-            By signing up, you agree to our{" "}
-            <a href="/terms" className="hover:underline text-black">
-              terms of service
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" className="hover:underline text-black">
-              privacy policy
-            </a>
-            .
-          </p>
+                ) : (
+                  <form onSubmit={handleAuthSubmit} className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <Label htmlFor="firstName" className="text-xs font-normal text-muted-foreground">
+                          First Name
+                        </Label>
+                        <Input
+                          id="firstName"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          required
+                          disabled={authLoading}
+                          className="h-12 rounded-none border-0 border-b-2 border-border bg-muted/30 px-3 focus-visible:ring-0 focus-visible:border-primary"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="lastName" className="text-xs font-normal text-muted-foreground">
+                          Last Name
+                        </Label>
+                        <Input
+                          id="lastName"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          required
+                          disabled={authLoading}
+                          className="h-12 rounded-none border-0 border-b-2 border-border bg-muted/30 px-3 focus-visible:ring-0 focus-visible:border-primary"
+                        />
+                      </div>
+                    </div>
 
-            </main>
+                    <div className="space-y-1">
+                      <Label htmlFor="business" className="text-xs font-normal text-muted-foreground">
+                        Business Name
+                      </Label>
+                      <Input
+                        id="business"
+                        value={businessName}
+                        onChange={(e) => setBusinessName(e.target.value)}
+                        required
+                        disabled={authLoading}
+                        className="h-12 rounded-none border-0 border-b-2 border-border bg-muted/30 px-3 focus-visible:ring-0 focus-visible:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="signup-email" className="text-xs font-normal text-muted-foreground">
+                        Email
+                      </Label>
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        disabled={authLoading}
+                        className="h-12 rounded-none border-0 border-b-2 border-border bg-muted/30 px-3 focus-visible:ring-0 focus-visible:border-primary"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="signup-password" className="text-xs font-normal text-muted-foreground">
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="signup-password"
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          disabled={authLoading}
+                          className="h-12 rounded-none border-0 border-b-2 border-border bg-muted/30 px-3 pr-12 focus-visible:ring-0 focus-visible:border-primary"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                          disabled={authLoading}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-muted-foreground" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-muted-foreground" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {authError && (
+                      <Alert variant="destructive" className="rounded-none">
+                        <AlertDescription>{authError}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full h-12 rounded-none bg-primary hover:bg-primary/90 text-primary-foreground font-normal text-base flex items-center justify-between px-4"
+                      disabled={authLoading}
+                    >
+                      <span>{authLoading ? "Creating account..." : "Create Account"}</span>
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+
+                    <p className="text-sm text-foreground">
+                      Already have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={() => setIsLogin(true)}
+                        className="text-primary hover:underline"
+                      >
+                        Sign in
+                      </button>
+                    </p>
+                  </form>
+                )}
+              </div>
+            </div>
+
+            {/* Right side - Decorative illustration */}
+            <div className="hidden lg:flex lg:w-[55%] items-center justify-center p-12 relative overflow-hidden">
+              {/* Abstract geometric pattern inspired by IBM */}
+              <svg
+                className="w-full h-full max-w-2xl"
+                viewBox="0 0 600 500"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Grid dots */}
+                {Array.from({ length: 15 }).map((_, row) =>
+                  Array.from({ length: 12 }).map((_, col) => (
+                    <circle
+                      key={`dot-${row}-${col}`}
+                      cx={50 + col * 45}
+                      cy={30 + row * 35}
+                      r="1.5"
+                      fill="hsl(var(--muted-foreground) / 0.2)"
+                    />
+                  ))
+                )}
+                
+                {/* Large circle outline */}
+                <circle cx="400" cy="250" r="120" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="1" fill="none" />
+                <circle cx="400" cy="250" r="80" stroke="hsl(var(--muted-foreground) / 0.1)" strokeWidth="1" fill="none" />
+                
+                {/* Vertical lines */}
+                <line x1="180" y1="80" x2="180" y2="420" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="1" />
+                <line x1="320" y1="50" x2="320" y2="450" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="1" />
+                <line x1="500" y1="100" x2="500" y2="400" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="1" />
+                
+                {/* Horizontal lines */}
+                <line x1="100" y1="180" x2="550" y2="180" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="1" />
+                <line x1="150" y1="320" x2="520" y2="320" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="1" />
+                
+                {/* Blue accent shapes */}
+                <rect x="130" y="165" width="60" height="10" rx="2" fill="hsl(199 89% 70%)" />
+                <circle cx="210" cy="170" r="12" fill="hsl(199 89% 60%)" />
+                
+                {/* Purple diamonds */}
+                <rect x="295" y="215" width="30" height="30" rx="2" transform="rotate(45 310 230)" fill="hsl(270 70% 75%)" />
+                <rect x="330" y="205" width="40" height="40" rx="2" transform="rotate(45 350 225)" fill="hsl(270 70% 65%)" />
+                <rect x="375" y="215" width="30" height="30" rx="2" transform="rotate(45 390 230)" fill="hsl(270 70% 55%)" />
+                <circle cx="420" cy="230" r="8" fill="white" stroke="hsl(270 70% 55%)" strokeWidth="2" />
+                
+                {/* Gray filled circle */}
+                <circle cx="240" cy="280" r="20" fill="hsl(var(--muted-foreground) / 0.2)" />
+                <circle cx="280" cy="280" r="8" stroke="hsl(var(--muted-foreground) / 0.3)" strokeWidth="1" fill="none" />
+                
+                {/* Bottom blue bar */}
+                <rect x="290" y="380" width="50" height="10" rx="2" fill="hsl(199 89% 70%)" />
+                <circle cx="360" y="385" r="12" fill="hsl(199 89% 60%)" />
+                
+                {/* Purple vertical bar */}
+                <rect x="530" y="120" width="8" height="80" rx="2" fill="hsl(270 70% 65%)" />
+                
+                {/* Accent dots */}
+                <circle cx="180" cy="100" r="6" fill="hsl(270 70% 45%)" />
+                <circle cx="180" y="270" r="8" fill="hsl(var(--muted-foreground) / 0.15)" />
+                <circle cx="210" cy="380" r="6" stroke="hsl(270 70% 65%)" strokeWidth="1" fill="none" />
+                
+                {/* Bottom gray circle */}
+                <circle cx="290" cy="420" r="16" fill="hsl(var(--muted-foreground) / 0.15)" />
+                <circle cx="370" cy="430" r="10" stroke="hsl(270 70% 65%)" strokeWidth="1" fill="none" />
+              </svg>
+            </div>
           </div>
-        </div>
-        <Footer />
-      </div>;
+        </main>
+
+        {/* Footer bar */}
+        <footer className="h-1 bg-primary w-full" />
+      </div>
+    );
   }
   return <Layout>
       <div className="min-h-screen bg-background">
