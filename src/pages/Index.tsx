@@ -980,7 +980,7 @@ const Index = () => {
         {/* Footer */}
         <footer className="bg-white border-t border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>© 2024 Halo Business Finance. All rights reserved.</span>
+            <span>© 2026 Halo Business Finance. All rights reserved.</span>
             <div className="flex items-center gap-6">
               <button onClick={() => navigate('/privacy-policy')} className="hover:text-gray-700">Privacy</button>
               <button onClick={() => navigate('/terms-of-service')} className="hover:text-gray-700">Terms</button>
