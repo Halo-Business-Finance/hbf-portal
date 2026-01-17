@@ -893,8 +893,7 @@ const Index = () => {
             <div className="relative z-10 text-center text-white px-12">
               <p className="text-lg font-semibold tracking-wider mb-2 text-blue-200">HALO BUSINESS FINANCE</p>
               <h1 className="text-2xl font-bold mb-4">Commercial Loan Marketplace</h1>
-              <h2 className="text-base font-medium mb-8 drop-shadow-md">Business Financing Made Simple</h2>
-              <div className="flex items-center justify-center gap-8 text-sm text-blue-200">
+              <div className="flex items-center justify-center gap-8 text-sm text-blue-200 mb-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5" />
                   <span>Fast Approval</span>
@@ -908,6 +907,7 @@ const Index = () => {
                   <span>Expert Support</span>
                 </div>
               </div>
+              <h2 className="text-base font-medium drop-shadow-md">Business Financing Made Simple</h2>
             </div>
           </div>
         </div>
