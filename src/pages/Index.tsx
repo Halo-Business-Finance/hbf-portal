@@ -752,36 +752,34 @@ const Index = () => {
                     </div>
                   </div>}
 
-                <div>
+                <div className="max-w-sm">
                   <Label htmlFor="email" className="text-sm text-blue-600 mb-2 block">
                     Email
                   </Label>
                   <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0" />
                 </div>
 
-                {!isLogin && <>
-                    <div>
-                      <Label htmlFor="password" className="text-sm text-blue-600 mb-2 block">
-                        Password
-                      </Label>
-                      <div className="relative">
-                        <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12" />
-                        <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading}>
-                          {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
-                        </Button>
-                      </div>
-                    </div>
+                <div className="max-w-sm">
+                  <Label htmlFor="password" className="text-sm text-blue-600 mb-2 block">
+                    Password
+                  </Label>
+                  <div className="relative">
+                    <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12" />
+                    <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading}>
+                      {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                    </Button>
+                  </div>
+                </div>
 
-                    <div>
-                      <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
-                        Confirm password
-                      </Label>
-                      <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0" />
-                    </div>
-                  </>}
+                {!isLogin && <div className="max-w-sm">
+                    <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
+                      Confirm password
+                    </Label>
+                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0" />
+                  </div>}
 
                 {/* Continue Button */}
-                <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none" disabled={authLoading}>
+                <Button type="submit" className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none" disabled={authLoading}>
                   <span>{authLoading ? "Please wait..." : "Continue"}</span>
                   {!authLoading && <ArrowRight className="h-5 w-5" />}
                 </Button>
