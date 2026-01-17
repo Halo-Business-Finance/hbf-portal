@@ -1,15 +1,15 @@
 import { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Lock, ArrowLeft } from 'lucide-react';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { ArrowLeft, ArrowRight, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
 // Rate limiting configuration
 const RATE_LIMIT = { maxAttempts: 3, windowMs: 300000, lockoutMs: 600000 }; // 10 min lockout
@@ -33,6 +33,10 @@ const ChangePassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
   
   // Rate limiting
   const rateLimitRef = useRef<RateLimitEntry | null>(null);
@@ -121,7 +125,7 @@ const ChangePassword = () => {
       });
       
       form.reset();
-      navigate('/my-account?tab=account');
+      setPasswordUpdated(true);
     } catch (error: any) {
       console.error('Error updating password:', error);
       toast({
@@ -134,96 +138,255 @@ const ChangePassword = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto p-4 md:p-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/my-account?tab=account')}
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Account
-        </Button>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="w-5 h-5" />
-              Change Password
-            </CardTitle>
-            <CardDescription>
-              Update your password to keep your account secure
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="currentPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Current Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="Enter current password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="newPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="Enter new password (min 6 characters)"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="Confirm new password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="pt-4">
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Updating..." : "Update Password"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+  const renderSuccessState = () => (
+    <div className="w-full max-w-md">
+      <div className="mb-8">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+          <CheckCircle className="h-8 w-8 text-green-600" />
+        </div>
+        <h1 className="text-xl font-normal text-gray-900 mb-3 text-center">
+          Password updated
+        </h1>
+        <p className="text-gray-600 text-center">
+          Your password has been successfully updated. You can now use your new password to log in.
+        </p>
       </div>
+
+      <div className="border-t border-gray-200 mb-8" />
+
+      <Button 
+        type="button"
+        variant="outline"
+        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-none border-gray-300"
+        onClick={() => navigate('/')}
+      >
+        <ArrowLeft className="mr-2 h-5 w-5" />
+        Back to Dashboard
+      </Button>
+    </div>
+  );
+
+  const renderFormState = () => (
+    <div className="w-full max-w-md">
+      <div className="mb-8">
+        <h1 className="text-xl font-normal text-gray-900 mb-3">
+          Change your password
+        </h1>
+        <p className="text-gray-600">
+          Update your password to keep your account secure.
+        </p>
+      </div>
+
+      <div className="border-t border-gray-200 mb-8" />
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="currentPassword"
+            render={({ field }) => (
+              <FormItem className="max-w-sm">
+                <Label htmlFor="currentPassword" className="text-sm text-blue-600 mb-2 block">
+                  Current password
+                </Label>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      id="currentPassword"
+                      type={showCurrentPassword ? "text" : "password"}
+                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
+                      {...field} 
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    >
+                      {showCurrentPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="newPassword"
+            render={({ field }) => (
+              <FormItem className="max-w-sm">
+                <Label htmlFor="newPassword" className="text-sm text-blue-600 mb-2 block">
+                  New password
+                </Label>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      id="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
+                      {...field} 
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem className="max-w-sm">
+                <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
+                  Confirm new password
+                </Label>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
+                      {...field} 
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button 
+            type="submit" 
+            className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none w-full"
+            disabled={isSubmitting}
+          >
+            <span>{isSubmitting ? "Updating..." : "Update Password"}</span>
+            {!isSubmitting && <ArrowRight className="h-5 w-5" />}
+          </Button>
+
+          <div className="pt-6 border-t border-gray-200">
+            <button 
+              type="button"
+              onClick={() => navigate('/')}
+              className="text-sm text-gray-700 hover:text-gray-900"
+            >
+              <span className="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
+              </span>
+            </button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Header */}
+      <header className="bg-black px-4 sm:px-6 py-4">
+        <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-bold text-sm">HBF</span>
+          </div>
+          <span className="text-lg sm:text-xl font-semibold text-white">Halo Business Finance</span>
+        </a>
+      </header>
+
+      {/* Main Content - Two Column Layout */}
+      <div className="flex-1 flex flex-col lg:flex-row">
+        {/* Left Column - Form */}
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 bg-white">
+          {passwordUpdated ? renderSuccessState() : renderFormState()}
+        </div>
+
+        {/* Right Column - Decorative Geometric Shapes */}
+        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden items-center justify-center">
+          {/* Geometric shapes */}
+          <div className="absolute inset-0">
+            {/* Large circle - centered */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border-2 border-white/20" />
+            
+            {/* Medium circle */}
+            <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-white/10" />
+            
+            {/* Small filled circle */}
+            <div className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-blue-400/30" />
+            
+            {/* Dots pattern */}
+            <div className="absolute top-20 right-20 grid grid-cols-4 gap-4">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <div key={i} className="w-2 h-2 rounded-full bg-white/30" />
+              ))}
+            </div>
+            
+            {/* Lines */}
+            <div className="absolute bottom-20 left-20 space-y-3">
+              <div className="w-32 h-0.5 bg-white/20" />
+              <div className="w-24 h-0.5 bg-white/20" />
+              <div className="w-16 h-0.5 bg-white/20" />
+            </div>
+          </div>
+
+          {/* Center content */}
+          <div className="relative z-10 text-center text-white px-12">
+            <p className="text-2xl font-bold tracking-wider mb-2 text-white">Account Security</p>
+            <h1 className="text-2xl font-bold mb-4 text-white">Keep Your Account Safe</h1>
+            <div className="flex items-center justify-center gap-8 text-sm text-white mb-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-white" />
+                <span>Secure</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-white" />
+                <span>Encrypted</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-white" />
+                <span>Protected</span>
+              </div>
+            </div>
+            <h2 className="text-base font-medium drop-shadow-md text-white">Your security is our priority</h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
+          <span className="text-center sm:text-left">
+            © {new Date().getFullYear()} Halo Business Finance.
+            <span className="block sm:inline"> All rights reserved.</span>
+          </span>
+          <div className="flex items-center gap-4 sm:gap-6">
+            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Privacy Policy</a>
+            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Terms of Service</a>
+            <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Support</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
