@@ -29,20 +29,23 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+// Password requirements check
+const getPasswordRequirements = (password: string) => [
+  { met: password.length >= 8, label: 'At least 8 characters' },
+  { met: /[a-z]/.test(password), label: 'One lowercase letter' },
+  { met: /[A-Z]/.test(password), label: 'One uppercase letter' },
+  { met: /\d/.test(password), label: 'One number' },
+  { met: /[^a-zA-Z0-9]/.test(password), label: 'One special character' },
+];
+
 // Password strength calculation
 const getPasswordStrength = (password: string): { score: number; label: string; color: string } => {
-  let score = 0;
+  const requirements = getPasswordRequirements(password);
+  const metCount = requirements.filter(r => r.met).length;
   
-  if (password.length >= 6) score++;
-  if (password.length >= 8) score++;
-  if (password.length >= 12) score++;
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
-  if (/\d/.test(password)) score++;
-  if (/[^a-zA-Z0-9]/.test(password)) score++;
-  
-  if (score <= 2) return { score, label: 'Weak', color: 'bg-red-500' };
-  if (score <= 4) return { score, label: 'Medium', color: 'bg-yellow-500' };
-  return { score, label: 'Strong', color: 'bg-green-500' };
+  if (metCount <= 2) return { score: metCount, label: 'Weak', color: 'bg-red-500' };
+  if (metCount <= 4) return { score: metCount, label: 'Medium', color: 'bg-yellow-500' };
+  return { score: metCount, label: 'Strong', color: 'bg-green-500' };
 };
 
 const ChangePassword = () => {
@@ -234,6 +237,7 @@ const ChangePassword = () => {
             name="newPassword"
             render={({ field }) => {
               const strength = getPasswordStrength(field.value);
+              const requirements = getPasswordRequirements(field.value);
               return (
                 <FormItem className="max-w-sm">
                   <Label htmlFor="newPassword" className="text-sm text-blue-600 mb-2 block">
@@ -260,9 +264,9 @@ const ChangePassword = () => {
                   </FormControl>
                   {/* Password strength indicator */}
                   {field.value && (
-                    <div className="mt-2 space-y-1">
+                    <div className="mt-3 space-y-2">
                       <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5, 6].map((level) => (
+                        {[1, 2, 3, 4, 5].map((level) => (
                           <div
                             key={level}
                             className={`h-1 flex-1 rounded-full transition-all duration-300 ${
@@ -271,12 +275,30 @@ const ChangePassword = () => {
                           />
                         ))}
                       </div>
-                      <p className={`text-xs ${
+                      <p className={`text-xs font-medium ${
                         strength.label === 'Weak' ? 'text-red-600' : 
                         strength.label === 'Medium' ? 'text-yellow-600' : 'text-green-600'
                       }`}>
                         Password strength: {strength.label}
                       </p>
+                      {/* Requirements checklist */}
+                      <ul className="space-y-1 mt-2">
+                        {requirements.map((req, index) => (
+                          <li 
+                            key={index}
+                            className={`text-xs flex items-center gap-2 transition-colors duration-200 ${
+                              req.met ? 'text-green-600' : 'text-gray-500'
+                            }`}
+                          >
+                            {req.met ? (
+                              <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                            ) : (
+                              <div className="h-3.5 w-3.5 rounded-full border border-gray-400 flex-shrink-0" />
+                            )}
+                            {req.label}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                   <FormMessage />
