@@ -707,7 +707,7 @@ const Index = () => {
             {/* Left side - Login form */}
             <div className="w-full lg:w-[45%] px-6 sm:px-12 lg:px-16 py-12 lg:py-16">
               <div className="max-w-md">
-                <h1 className="text-3xl sm:text-4xl font-light text-foreground mb-2">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-light text-foreground mb-2 whitespace-nowrap">
                   Log in to Halo Business Finance
                 </h1>
                 <p className="text-sm text-muted-foreground mb-8">
