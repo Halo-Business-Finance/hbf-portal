@@ -10,20 +10,36 @@ import { Shield, AlertTriangle } from 'lucide-react';
 interface ProtectedRouteProps {
   children: ReactNode;
   requiredRole?: UserRole;
+  allowedRoles?: UserRole[]; // New: allow specific roles
   redirectTo?: string;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole = 'user',
+  allowedRoles,
   redirectTo = '/'
 }) => {
   const { authenticated, loading: authLoading } = useAuth();
-  const { hasRole, isAdmin, loading: roleLoading } = useUserRole();
+  const { hasRole, hasSpecificRole, isSuperAdmin, canAccessAdminPanel, loading: roleLoading } = useUserRole();
   const { mfaEnabled, currentLevel, loading: mfaLoading } = useMFAStatus();
   const navigate = useNavigate();
   const location = useLocation();
   const [mfaChecked, setMfaChecked] = useState(false);
+
+  // Check if user has access based on either requiredRole or allowedRoles
+  const hasAccess = (): boolean => {
+    // If specific roles are allowed, check if user has any of them
+    if (allowedRoles && allowedRoles.length > 0) {
+      return allowedRoles.some(role => hasSpecificRole(role)) || isSuperAdmin();
+    }
+    // Otherwise use role hierarchy
+    return hasRole(requiredRole);
+  };
+
+  // Determine if this is an admin-level route
+  const isAdminRoute = requiredRole === 'admin' || requiredRole === 'super_admin' || 
+    (allowedRoles && allowedRoles.some(r => ['admin', 'super_admin', 'underwriter', 'customer_service'].includes(r)));
 
   useEffect(() => {
     if (!authLoading && !authenticated) {
@@ -35,9 +51,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   useEffect(() => {
     if (authLoading || roleLoading || mfaLoading || mfaChecked) return;
     
-    // Only enforce MFA for admin routes
-    if (requiredRole === 'admin' && hasRole('admin')) {
-      // Admin user trying to access admin route
+    // Only enforce MFA for admin-level routes
+    if (isAdminRoute && canAccessAdminPanel()) {
+      // Admin-level user trying to access admin route
       if (mfaEnabled && currentLevel !== 'aal2') {
         // MFA is enabled but not verified in this session - redirect to verify
         navigate('/mfa-verify', { 
@@ -58,9 +74,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
     
     setMfaChecked(true);
-  }, [authLoading, roleLoading, mfaLoading, requiredRole, hasRole, mfaEnabled, currentLevel, navigate, location.pathname, mfaChecked]);
+  }, [authLoading, roleLoading, mfaLoading, isAdminRoute, canAccessAdminPanel, mfaEnabled, currentLevel, navigate, location.pathname, mfaChecked]);
 
-  if (authLoading || roleLoading || (requiredRole === 'admin' && mfaLoading)) {
+  if (authLoading || roleLoading || (isAdminRoute && mfaLoading)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4 flex items-center justify-center">
         <div className="text-center">
@@ -75,7 +91,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return null; // Will redirect via useEffect
   }
 
-  if (!hasRole(requiredRole)) {
+  if (!hasAccess()) {
+    const displayRoles = allowedRoles ? allowedRoles.join(', ') : requiredRole;
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
@@ -91,7 +108,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             </p>
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Shield className="w-4 h-4" />
-              Required role: {requiredRole}
+              Required role: {displayRoles}
             </div>
           </CardContent>
         </Card>
@@ -100,7 +117,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // For admin routes, show loading until MFA check is complete
-  if (requiredRole === 'admin' && !mfaChecked) {
+  if (isAdminRoute && !mfaChecked) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4 flex items-center justify-center">
         <div className="text-center">
