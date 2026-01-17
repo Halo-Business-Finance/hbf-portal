@@ -805,27 +805,27 @@ const Index = () => {
               {/* Alternative login section */}
               <div className="mt-8 text-center">
                 <p className="text-sm text-blue-600 mb-3">Alternative login</p>
-                <div className="flex items-center justify-center gap-3">
-                  <Button type="button" variant="outline" className="h-12 w-12 border-gray-300 hover:bg-gray-50 p-0 rounded-none flex items-center justify-center" onClick={handleLinkedInSignIn} disabled={authLoading} title="Continue with LinkedIn">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2">
+                <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleLinkedInSignIn} disabled={authLoading} title="Continue with LinkedIn">
+                    <svg className="w-6 h-6 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="#0A66C2">
                       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                     </svg>
                   </Button>
-                  <Button type="button" variant="outline" className="h-12 w-12 border-gray-300 hover:bg-gray-50 p-0 rounded-none flex items-center justify-center" onClick={handleGoogleSignIn} disabled={authLoading} title="Continue with Google">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleGoogleSignIn} disabled={authLoading} title="Continue with Google">
+                    <svg className="w-6 h-6 sm:w-5 sm:h-5" viewBox="0 0 24 24">
                       <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
                       <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
                       <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
                       <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
                     </svg>
                   </Button>
-                  <Button type="button" variant="outline" className="h-12 w-12 border-gray-300 hover:bg-gray-50 p-0 rounded-none flex items-center justify-center" onClick={handleAppleSignIn} disabled={authLoading} title="Continue with Apple">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
+                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleAppleSignIn} disabled={authLoading} title="Continue with Apple">
+                    <svg className="w-6 h-6 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 384 512">
                       <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
                     </svg>
                   </Button>
-                  <Button type="button" variant="outline" className="h-12 w-12 border-gray-300 hover:bg-gray-50 p-0 rounded-none flex items-center justify-center" onClick={handleMicrosoftSignIn} disabled={authLoading} title="Continue with Microsoft">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleMicrosoftSignIn} disabled={authLoading} title="Continue with Microsoft">
+                    <svg className="w-6 h-6 sm:w-5 sm:h-5" viewBox="0 0 24 24">
                       <path fill="#F25022" d="M1 1h10v10H1z" />
                       <path fill="#00A4EF" d="M1 13h10v10H1z" />
                       <path fill="#7FBA00" d="M13 1h10v10H13z" />
