@@ -673,322 +673,242 @@ const Index = () => {
     resetForm();
   };
 
-  // Show auth forms for unauthenticated users - IBM-style login
+  // Show auth forms for unauthenticated users
   if (!authenticated) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">HBF</span>
-            </div>
-            <span className="text-xl font-semibold text-gray-900">Halo Business Finance</span>
-          </a>
-        </header>
+    return <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <div className="flex-1 py-0">
+          <div className="max-w-7xl mx-auto px-6 bg-white">
+            <main>
+          {/* Header with Stats */}
+          <div className="text-center mb-8 sm:mb-12 animate-fade-in bg-black text-white">
+            <p className="text-xl sm:text-2xl font-bold mb-0 mt-px my-0 py-0 pt-[10px] pb-0 px-[10px] font-sans text-white">
+               SBA & Commercial 
+Loan Marketplace                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
-        {/* Main Content - Two Column Layout */}
-        <div className="flex-1 flex">
-          {/* Left Column - Login Form */}
-          <div className="flex-1 flex items-center justify-center px-8 py-12">
-            <div className="w-full max-w-md">
-              <div className="mb-8">
-                <h1 className="text-3xl font-light text-gray-900 mb-2">
-                  {isLogin ? "Log in to your account" : "Create your account"}
-                </h1>
-                <p className="text-gray-600">
-                  {isLogin 
-                    ? "Access your loan applications and financial dashboard" 
-                    : "Start your business financing journey today"}
-                </p>
-              </div>
-
-              <form onSubmit={handleAuthSubmit} className="space-y-5">
-                {!isLogin && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                        First name
-                      </Label>
-                      <Input
-                        id="firstName"
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                        disabled={authLoading}
-                        className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                        Last name
-                      </Label>
-                      <Input
-                        id="lastName"
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                        disabled={authLoading}
-                        className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                    Email address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={authLoading}
-                    className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={authLoading}
-                      className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-12"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-12 px-4 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={authLoading}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-500" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-gray-500" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                {!isLogin && (
-                  <div>
-                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                      Confirm password
-                    </Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={authLoading}
-                      className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                )}
-
-                {isLogin && (
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                      <span className="text-sm text-gray-600">Remember me</span>
-                    </label>
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="text-sm text-blue-600 hover:text-blue-700 p-0 h-auto"
-                      onClick={() => navigate('/forgot-password')}
-                    >
-                      Forgot password?
-                    </Button>
-                  </div>
-                )}
-
-                {authError && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{authError}</AlertDescription>
-                  </Alert>
-                )}
-
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
-                  disabled={authLoading}
-                >
-                  {authLoading ? "Please wait..." : "Continue"}
-                  {!authLoading && <ArrowRight className="ml-2 h-5 w-5" />}
-                </Button>
-              </form>
-
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-gray-100 px-4 text-gray-500">Or continue with</span>
-                </div>
-              </div>
-
-              {/* Social Login Buttons */}
-              <div className="grid grid-cols-3 gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 border-gray-300 hover:bg-gray-50"
-                  onClick={handleGoogleSignIn}
-                  disabled={authLoading}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
-                    <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
-                    <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
-                    <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
-                  </svg>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 border-gray-300 hover:bg-gray-50"
-                  onClick={handleAppleSignIn}
-                  disabled={authLoading}
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
-                    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-                  </svg>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 border-gray-300 hover:bg-gray-50"
-                  onClick={handleMicrosoftSignIn}
-                  disabled={authLoading}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#F25022" d="M1 1h10v10H1z" />
-                    <path fill="#00A4EF" d="M1 13h10v10H1z" />
-                    <path fill="#7FBA00" d="M13 1h10v10H13z" />
-                    <path fill="#FFB900" d="M13 13h10v10H13z" />
-                  </svg>
-                </Button>
-              </div>
-
-              {/* Switch mode link */}
-              <p className="mt-8 text-center text-sm text-gray-600">
-                {isLogin ? (
-                  <>
-                    Don't have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => switchMode("signup")}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Create an account
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => switchMode("login")}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Sign in
-                    </button>
-                  </>
-                )}
-              </p>
-            </div>
+            </p>
+            <h1 className="text-base sm:text-xl font-bold tracking-tight mb-3 sm:mb-4 text-black px-[10px] font-sans">
+              Comprehensive Business Financing Solutions
+            </h1>
+            <p className="max-w-3xl mx-auto leading-relaxed text-black text-sm sm:text-base font-sans px-2">
+              Our Marketplace provides Conventional, SBA, USDA, and Bridge loan financing nationwide to meet any business need. Discover our comprehensive range of SBA, USDA and conventional financing options.      
+            </p>
           </div>
 
-          {/* Right Column - Decorative Geometric Shapes */}
-          <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden items-center justify-center">
-            {/* Geometric shapes */}
-            <div className="absolute inset-0">
-              {/* Large circle */}
-              <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full border-2 border-white/20" />
-              
-              {/* Medium circle */}
-              <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-white/10" />
-              
-              {/* Small filled circle */}
-              <div className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-blue-400/30" />
-              
-              {/* Triangle shape using clip-path */}
-              <div 
-                className="absolute bottom-1/4 right-1/3 w-48 h-48 bg-white/10"
-                style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}
-              />
-              
-              {/* Rectangle */}
-              <div className="absolute top-1/2 right-1/4 w-24 h-48 bg-indigo-400/20 transform rotate-12" />
-              
-              {/* Dots pattern */}
-              <div className="absolute top-20 right-20 grid grid-cols-4 gap-4">
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i} className="w-2 h-2 rounded-full bg-white/30" />
-                ))}
-              </div>
-              
-              {/* Lines */}
-              <div className="absolute bottom-20 left-20 space-y-3">
-                <div className="w-32 h-0.5 bg-white/20" />
-                <div className="w-24 h-0.5 bg-white/20" />
-                <div className="w-16 h-0.5 bg-white/20" />
-              </div>
-            </div>
+          {/* Company Stats - Above Auth Card */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-6 max-w-3xl mx-auto mb-6 sm:mb-8">
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 text-black underline underline-offset-2 sm:underline-offset-4 decoration-black">$1 Billion+</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Funding Provided</div>
+            </Card>
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">95%</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Loan Approval Rate</div>
+            </Card>
+            <Card className="p-2 sm:p-6 border-2 border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
+              <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 underline underline-offset-2 sm:underline-offset-4 decoration-black text-black">24 Hours</div>
+              <div className="text-[8px] sm:text-xs font-semibold uppercase tracking-wider text-foreground leading-tight">Avg Loan Processing</div>
+            </Card>
+          </div>
 
-            {/* Center content */}
-            <div className="relative z-10 text-center text-white px-12">
-              <h2 className="text-4xl font-light mb-8">Business Financing Made Simple</h2>
-              <div className="flex items-center justify-center gap-8 text-sm text-blue-200">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5" />
-                  <span>Fast Approval</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5" />
-                  <span>Low Rates</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5" />
-                  <span>Expert Support</span>
-                </div>
-              </div>
-            </div>
+          {/* Auth Card */}
+          <div className="px-2 sm:px-6 w-full flex justify-center">
+          <Card className="max-w-3xl w-full shadow-lg border-2 border-blue-500">
+            <CardHeader className="text-center pb-3 pt-4 sm:pt-6 px-4 sm:px-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
+                Welcome to Halo Business Finance
+              </h2>
+              <p className="text-sm text-foreground">
+                Sign in to your account
+              </p>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <Tabs value={isLogin ? "login" : "signup"} onValueChange={switchMode} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 h-9 gap-2">
+                  <TabsTrigger value="login" className="text-sm py-1">Sign In</TabsTrigger>
+                  <TabsTrigger value="signup" className="text-sm py-1 border-2 border-blue-500 rounded-md">Sign Up</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="login" className="space-y-4 mt-0">
+                  <form onSubmit={handleAuthSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-foreground font-normal text-sm">Email</Label>
+                        <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="password" className="text-foreground font-normal text-sm">Password</Label>
+                        <div className="relative">
+                          <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
+                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {authError && <Alert variant="destructive">
+                        <AlertDescription>{authError}</AlertDescription>
+                      </Alert>}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                      <Button type="submit" className="w-full h-11 text-base font-medium" disabled={authLoading}>
+                        {authLoading ? "Signing in..." : "Sign In"}
+                      </Button>
+                      
+                      <div className="text-center md:text-left">
+                        <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
+                          Forgot your password?
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="relative py-2">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-3 text-foreground tracking-wider">
+                          OR CONTINUE WITH
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
+                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with Google">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
+                          <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
+                          <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
+                          <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
+                        </svg>
+                      </Button>
+
+                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with Apple">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 384 512">
+                          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+                        </svg>
+                      </Button>
+
+                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign in with X (Twitter)">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.145 12.086c.007.206.01.412.01.62 0 6.337-4.824 10.81-13.615 10.81-2.711 0-5.234-.78-7.354-2.116.375.041.756.062 1.142.062 2.244 0 4.309-.757 5.954-2.03-2.098-.038-3.868-1.416-4.478-3.307.293.056.593.086.902.086.437 0 .86-.058 1.262-.167-2.189-.439-3.838-2.364-3.838-4.673v-.061c.645.356 1.383.57 2.169.595-1.284-.853-2.128-2.313-2.128-3.963 0-.874.237-1.693.65-2.397 2.359 2.883 5.887 4.78 9.864 4.979-.082-.348-.124-.711-.124-1.084 0-2.624 2.138-4.755 4.773-4.755 1.373 0 2.613.575 3.484 1.495 1.088-.213 2.11-.61 3.034-1.155-.357 1.106-1.114 2.035-2.099 2.621.967-.115 1.887-.369 2.742-.746-.64.955-1.448 1.794-2.38 2.467z" />
+                        </svg>
+                      </Button>
+                    </div>
+                  </form>
+                </TabsContent>
+                
+                <TabsContent value="signup" className="space-y-4 mt-0">
+                  <form onSubmit={handleAuthSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName" className="text-foreground font-normal text-sm">First Name</Label>
+                        <Input id="firstName" placeholder="John" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName" className="text-foreground font-normal text-sm">Last Name</Label>
+                        <Input id="lastName" placeholder="Smith" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="business" className="text-foreground font-normal text-sm">Business Name</Label>
+                        <Input id="business" placeholder="Your Business LLC" value={businessName} onChange={e => setBusinessName(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email" className="text-foreground font-normal text-sm">Email</Label>
+                        <Input id="signup-email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-10" />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password" className="text-foreground font-normal text-sm">Password</Label>
+                        <div className="relative">
+                          <Input id="signup-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-10 pr-10" />
+                          <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-end">
+                        <Button type="submit" className="w-full h-10 text-base font-medium border-2 border-blue-500" disabled={authLoading}>
+                          {authLoading ? "Creating..." : "Create Account"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {authError && <Alert variant="destructive">
+                        <AlertDescription>{authError}</AlertDescription>
+                      </Alert>}
+
+                    <div className="relative py-2">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-3 text-foreground tracking-wider">
+                          OR CONTINUE WITH
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto md:max-w-sm">
+                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with Google">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
+                          <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
+                          <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
+                          <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
+                        </svg>
+                      </Button>
+
+                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with Apple">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 384 512">
+                          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+                        </svg>
+                      </Button>
+
+                      <Button type="button" variant="outline" className="w-full h-10" disabled={authLoading} aria-label="Sign up with X (Twitter)">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.145 12.086c.007.206.01.412.01.62 0 6.337-4.824 10.81-13.615 10.81-2.711 0-5.234-.78-7.354-2.116.375.041.756.062 1.142.062 2.244 0 4.309-.757 5.954-2.03-2.098-.038-3.868-1.416-4.478-3.307.293.056.593.086.902.086.437 0 .86-.058 1.262-.167-2.189-.439-3.838-2.364-3.838-4.673v-.061c.645.356 1.383.57 2.169.595-1.284-.853-2.128-2.313-2.128-3.963 0-.874.237-1.693.65-2.397 2.359 2.883 5.887 4.78 9.864 4.979-.082-.348-.124-.711-.124-1.084 0-2.624 2.138-4.755 4.773-4.755 1.373 0 2.613.575 3.484 1.495 1.088-.213 2.11-.61 3.034-1.155-.357 1.106-1.114 2.035-2.099 2.621.967-.115 1.887-.369 2.742-.746-.64.955-1.448 1.794-2.38 2.467z" />
+                        </svg>
+                      </Button>
+                    </div>
+
+                    <div className="text-center">
+                      <Button type="button" variant="link" className="text-xs text-foreground" onClick={() => navigate('/forgot-password')}>
+                        Forgot your password?
+                      </Button>
+                    </div>
+                  </form>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+          </div>
+          
+          {/* Terms text below card */}
+          <p className="text-center text-black mt-6 max-w-xl mx-auto my-[20px] text-base">
+            By signing up, you agree to our{" "}
+            <a href="/terms" className="hover:underline text-black">
+              terms of service
+            </a>{" "}
+            and{" "}
+            <a href="/privacy" className="hover:underline text-black">
+              privacy policy
+            </a>
+            .
+          </p>
+
+            </main>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>© 2026 Halo Business Finance. All rights reserved.</span>
-            <div className="flex items-center gap-6">
-              <button onClick={() => navigate('/privacy-policy')} className="hover:text-gray-700">Privacy</button>
-              <button onClick={() => navigate('/terms-of-service')} className="hover:text-gray-700">Terms</button>
-              <button onClick={() => navigate('/support')} className="hover:text-gray-700">Support</button>
-            </div>
-          </div>
-        </footer>
-      </div>
-    );
+        <Footer />
+      </div>;
   }
   return <Layout>
       <div className="min-h-screen bg-background">
@@ -1023,7 +943,7 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xl">
                 {loanPrograms.map((program, index) => {
                   const IconComponent = program.icon;
                   const isComingSoon = ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].includes(program.id);
