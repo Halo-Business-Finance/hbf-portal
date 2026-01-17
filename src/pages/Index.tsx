@@ -697,7 +697,7 @@ const Index = () => {
         {/* Header with logo */}
         <header className="px-6 py-4 border-b border-border/30">
           <div className="max-w-7xl mx-auto">
-            <span className="text-xl font-bold text-foreground tracking-tight whitespace-nowrap">Halo Business Finance</span>
+            <a href="https://halobusinessfinance.com" className="text-xl font-bold text-foreground tracking-tight whitespace-nowrap hover:opacity-80 transition-opacity">Halo Business Finance</a>
           </div>
         </header>
 
