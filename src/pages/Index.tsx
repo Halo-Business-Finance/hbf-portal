@@ -690,24 +690,48 @@ const Index = () => {
         {/* Main Content - Two Column Layout */}
         <div className="flex-1 flex">
           {/* Left Column - Login Form */}
-          <div className="flex-1 flex items-center justify-center px-8 py-12">
+          <div className="flex-1 flex items-center justify-center px-8 py-12 bg-white">
             <div className="w-full max-w-md">
+              {/* Header with title and signup link */}
               <div className="mb-8">
-                <h1 className="text-3xl font-light text-gray-900 mb-2">
-                  {isLogin ? "Log in to your account" : "Create your account"}
+                <h1 className="text-3xl font-normal text-gray-900 mb-3">
+                  {isLogin ? "Log in to Halo Business Finance" : "Create your account"}
                 </h1>
                 <p className="text-gray-600">
-                  {isLogin 
-                    ? "Access your loan applications and financial dashboard" 
-                    : "Start your business financing journey today"}
+                  {isLogin ? (
+                    <>
+                      Don't have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={() => switchMode("signup")}
+                        className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                      >
+                        Create an account
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      Already have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={() => switchMode("login")}
+                        className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                      >
+                        Sign in
+                      </button>
+                    </>
+                  )}
                 </p>
               </div>
 
-              <form onSubmit={handleAuthSubmit} className="space-y-5">
+              {/* Separator line */}
+              <div className="border-t border-gray-200 mb-8" />
+
+              <form onSubmit={handleAuthSubmit} className="space-y-6">
                 {!isLogin && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700 mb-1.5 block">
+                      <Label htmlFor="firstName" className="text-sm text-blue-600 mb-2 block">
                         First name
                       </Label>
                       <Input
@@ -717,11 +741,11 @@ const Index = () => {
                         onChange={(e) => setFirstName(e.target.value)}
                         required
                         disabled={authLoading}
-                        className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                        className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700 mb-1.5 block">
+                      <Label htmlFor="lastName" className="text-sm text-blue-600 mb-2 block">
                         Last name
                       </Label>
                       <Input
@@ -731,92 +755,103 @@ const Index = () => {
                         onChange={(e) => setLastName(e.target.value)}
                         required
                         disabled={authLoading}
-                        className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                        className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
                       />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                    Email address
+                  <Label htmlFor="email" className="text-sm text-blue-600 mb-2 block">
+                    Email
                   </Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={authLoading}
-                    className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={authLoading}
-                      className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-12"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-12 px-4 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={authLoading}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-500" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-gray-500" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
                 {!isLogin && (
-                  <div>
-                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                      Confirm password
-                    </Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={authLoading}
-                      className="h-12 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <Label htmlFor="password" className="text-sm text-blue-600 mb-2 block">
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          disabled={authLoading}
+                          className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                          disabled={authLoading}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-500" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-500" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
+                        Confirm password
+                      </Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        disabled={authLoading}
+                        className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                      />
+                    </div>
+                  </>
                 )}
 
+                {/* Continue Button */}
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4"
+                  disabled={authLoading}
+                >
+                  <span>{authLoading ? "Please wait..." : "Continue"}</span>
+                  {!authLoading && <ArrowRight className="h-5 w-5" />}
+                </Button>
+
                 {isLogin && (
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                      <span className="text-sm text-gray-600">Remember me</span>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="checkbox" 
+                      id="rememberMe"
+                      className="w-4 h-4 border-2 border-gray-400 rounded-sm text-blue-600 focus:ring-blue-500" 
+                    />
+                    <label htmlFor="rememberMe" className="text-sm text-gray-700 cursor-pointer">
+                      Remember me
                     </label>
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="text-sm text-blue-600 hover:text-blue-700 p-0 h-auto"
-                      onClick={() => navigate('/forgot-password')}
-                    >
-                      Forgot password?
-                    </Button>
+                    <div className="relative group">
+                      <svg className="w-4 h-4 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                        <path strokeWidth="2" d="M12 16v-4m0-4h.01" />
+                      </svg>
+                    </div>
                   </div>
                 )}
 
@@ -825,36 +860,19 @@ const Index = () => {
                     <AlertDescription>{authError}</AlertDescription>
                   </Alert>
                 )}
-
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
-                  disabled={authLoading}
-                >
-                  {authLoading ? "Please wait..." : "Continue"}
-                  {!authLoading && <ArrowRight className="ml-2 h-5 w-5" />}
-                </Button>
               </form>
 
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-gray-100 px-4 text-gray-500">Or continue with</span>
-                </div>
-              </div>
-
-              {/* Social Login Buttons */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* Alternative login section */}
+              <div className="mt-8">
+                <p className="text-sm text-blue-600 mb-3">Alternative login</p>
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-12 border-gray-300 hover:bg-gray-50"
+                  className="w-full h-12 border-gray-300 hover:bg-gray-50 justify-between px-4 text-blue-600 font-normal"
                   onClick={handleGoogleSignIn}
                   disabled={authLoading}
                 >
+                  <span>Continue with Google</span>
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
                     <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
@@ -862,59 +880,23 @@ const Index = () => {
                     <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
                   </svg>
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 border-gray-300 hover:bg-gray-50"
-                  onClick={handleAppleSignIn}
-                  disabled={authLoading}
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
-                    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-                  </svg>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 border-gray-300 hover:bg-gray-50"
-                  onClick={handleMicrosoftSignIn}
-                  disabled={authLoading}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#F25022" d="M1 1h10v10H1z" />
-                    <path fill="#00A4EF" d="M1 13h10v10H1z" />
-                    <path fill="#7FBA00" d="M13 1h10v10H13z" />
-                    <path fill="#FFB900" d="M13 13h10v10H13z" />
-                  </svg>
-                </Button>
               </div>
 
-              {/* Switch mode link */}
-              <p className="mt-8 text-center text-sm text-gray-600">
-                {isLogin ? (
-                  <>
-                    Don't have an account?{" "}
+              {/* Footer links */}
+              {isLogin && (
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <p className="text-sm text-gray-700">
+                    Forgot password?{" "}
                     <button
                       type="button"
-                      onClick={() => switchMode("signup")}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
+                      onClick={() => navigate('/forgot-password')}
+                      className="text-blue-600 hover:text-blue-700 hover:underline"
                     >
-                      Create an account
+                      Reset your password
                     </button>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => switchMode("login")}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Sign in
-                    </button>
-                  </>
-                )}
-              </p>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
