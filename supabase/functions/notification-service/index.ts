@@ -1,5 +1,4 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.52.1";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
@@ -7,6 +6,23 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Rate limit configurations per action
+const RATE_LIMITS: Record<string, { maxRequests: number; windowSeconds: number }> = {
+  'send': { maxRequests: 50, windowSeconds: 60 },              // 50 per minute
+  'send-bulk': { maxRequests: 10, windowSeconds: 60 },         // 10 per minute (admin only)
+  'get-templates': { maxRequests: 30, windowSeconds: 60 },     // 30 per minute
+  'application-status-change': { maxRequests: 100, windowSeconds: 60 }, // 100 per minute
+  'loan-funded': { maxRequests: 20, windowSeconds: 60 },       // 20 per minute (admin only)
+  'send-external': { maxRequests: 30, windowSeconds: 60 },     // 30 per minute (admin only)
+};
+
+interface RateLimitResult {
+  allowed: boolean;
+  remaining_requests: number;
+  reset_at: string;
+  current_count: number;
+}
 
 interface NotificationData {
   type: 'email' | 'sms' | 'system';
@@ -25,7 +41,55 @@ interface EmailTemplate {
 // Actions that require admin role
 const ADMIN_ONLY_ACTIONS = ['loan-funded', 'send-external', 'send-bulk'];
 
-serve(async (req) => {
+async function checkRateLimit(
+  supabase: any,
+  identifier: string,
+  endpoint: string,
+  config: { maxRequests: number; windowSeconds: number }
+): Promise<RateLimitResult> {
+  try {
+    const { data, error } = await supabase.rpc('check_rate_limit', {
+      _identifier: identifier,
+      _endpoint: endpoint,
+      _max_requests: config.maxRequests,
+      _window_seconds: config.windowSeconds
+    });
+
+    if (error) {
+      console.error('Rate limit check error:', error);
+      // Fail open - allow request if rate limiting fails
+      return { allowed: true, remaining_requests: 1, reset_at: new Date().toISOString(), current_count: 0 };
+    }
+
+    const result = data?.[0] || { allowed: true, remaining_requests: 1, reset_at: new Date().toISOString(), current_count: 0 };
+    return result;
+  } catch (error) {
+    console.error('Rate limit check exception:', error);
+    return { allowed: true, remaining_requests: 1, reset_at: new Date().toISOString(), current_count: 0 };
+  }
+}
+
+function createRateLimitResponse(resetAt: string, endpoint: string): Response {
+  const retryAfter = Math.ceil((new Date(resetAt).getTime() - Date.now()) / 1000);
+  return new Response(
+    JSON.stringify({ 
+      error: 'Rate limit exceeded',
+      message: `Too many requests for ${endpoint}. Please try again later.`,
+      retryAfter: retryAfter > 0 ? retryAfter : 60
+    }),
+    { 
+      status: 429, 
+      headers: { 
+        ...corsHeaders, 
+        'Content-Type': 'application/json',
+        'Retry-After': String(retryAfter > 0 ? retryAfter : 60),
+        'X-RateLimit-Reset': resetAt
+      } 
+    }
+  );
+}
+
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -73,6 +137,14 @@ serve(async (req) => {
     // Create service role client for privileged operations
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
+    // Get client IP for rate limiting
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const realIp = req.headers.get('x-real-ip');
+    const clientIp = forwardedFor?.split(',')[0]?.trim() || realIp || 'unknown';
+
+    // Rate limit identifier
+    const rateLimitIdentifier = user.id;
+
     // Validation schema for request body
     const requestSchema = z.object({
       action: z.enum(['send', 'send-bulk', 'get-templates', 'application-status-change', 'loan-funded', 'send-external']),
@@ -117,6 +189,50 @@ serve(async (req) => {
 
     const { action, notificationData } = requestValidation.data;
 
+    // ========== SERVER-SIDE RATE LIMITING ==========
+    const rateLimitConfig = RATE_LIMITS[action] || { maxRequests: 60, windowSeconds: 60 };
+    const rateLimitResult = await checkRateLimit(
+      supabase,
+      rateLimitIdentifier,
+      `notification-service:${action}`,
+      rateLimitConfig
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`Rate limit exceeded for ${rateLimitIdentifier} on action ${action}`);
+      
+      // Log rate limit violation to audit
+      try {
+        await supabase.rpc('log_audit_event', {
+          _user_id: user.id,
+          _action: 'RATE_LIMIT_EXCEEDED',
+          _resource_type: 'notification',
+          _resource_id: null,
+          _ip_address: clientIp,
+          _user_agent: req.headers.get('user-agent'),
+          _details: {
+            endpoint: 'notification-service',
+            action,
+            identifier: rateLimitIdentifier,
+            currentCount: rateLimitResult.current_count
+          }
+        });
+      } catch (auditError) {
+        console.error('Failed to log rate limit audit:', auditError);
+      }
+
+      return createRateLimitResponse(rateLimitResult.reset_at, action);
+    }
+
+    // Add rate limit headers to all responses
+    const rateLimitHeaders = {
+      'X-RateLimit-Limit': String(rateLimitConfig.maxRequests),
+      'X-RateLimit-Remaining': String(rateLimitResult.remaining_requests),
+      'X-RateLimit-Reset': rateLimitResult.reset_at
+    };
+
+    console.log(`Rate limit check passed for ${rateLimitIdentifier}: ${rateLimitResult.remaining_requests} remaining`);
+
     // ========== AUTHORIZATION - Check admin role for sensitive actions ==========
     if (ADMIN_ONLY_ACTIONS.includes(action)) {
       const { data: roleCheck, error: roleError } = await supabase
@@ -126,7 +242,7 @@ serve(async (req) => {
         console.error('Admin role check failed for user:', user.id, 'Action:', action);
         return new Response(
           JSON.stringify({ error: 'Forbidden - admin role required for this action' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 403, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
         );
       }
       console.log('Admin role verified for user:', user.id);
@@ -141,7 +257,7 @@ serve(async (req) => {
             error: 'Invalid notification data',
             details: dataValidation.error.format()
           }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
         );
       }
     }
@@ -151,27 +267,27 @@ serve(async (req) => {
 
     switch (action) {
       case 'send':
-        return await sendNotification(notificationData);
+        return await sendNotification(notificationData, rateLimitHeaders);
       
       case 'send-bulk':
-        return await sendBulkNotifications(notificationData.notifications);
+        return await sendBulkNotifications(notificationData.notifications, rateLimitHeaders);
       
       case 'get-templates':
-        return await getEmailTemplates();
+        return await getEmailTemplates(rateLimitHeaders);
 
       case 'application-status-change':
-        return await handleApplicationStatusChange(supabase, notificationData);
+        return await handleApplicationStatusChange(supabase, notificationData, rateLimitHeaders);
 
       case 'loan-funded':
-        return await handleLoanFunded(supabase, notificationData);
+        return await handleLoanFunded(supabase, notificationData, rateLimitHeaders);
 
       case 'send-external':
-        return await sendExternalNotifications(supabase, notificationData);
+        return await sendExternalNotifications(supabase, notificationData, rateLimitHeaders);
 
       default:
         return new Response(
           JSON.stringify({ error: 'Invalid action' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
         );
     }
 
@@ -184,17 +300,17 @@ serve(async (req) => {
   }
 });
 
-async function sendNotification(notificationData: NotificationData): Promise<Response> {
+async function sendNotification(notificationData: NotificationData, rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     console.log(`Sending ${notificationData.type} notification to ${notificationData.recipient}`);
 
     switch (notificationData.type) {
       case 'email':
-        return await sendEmail(notificationData);
+        return await sendEmail(notificationData, rateLimitHeaders);
       case 'sms':
-        return await sendSMS(notificationData);
+        return await sendSMS(notificationData, rateLimitHeaders);
       case 'system':
-        return await createSystemNotification(notificationData);
+        return await createSystemNotification(notificationData, rateLimitHeaders);
       default:
         throw new Error('Invalid notification type');
     }
@@ -205,23 +321,20 @@ async function sendNotification(notificationData: NotificationData): Promise<Res
         success: false, 
         message: 'Failed to send notification'
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
 
-async function sendEmail(notificationData: NotificationData): Promise<Response> {
+async function sendEmail(notificationData: NotificationData, rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     const template = getEmailTemplate(notificationData.template, notificationData.data);
     
-    // For demo purposes, we'll log the email instead of actually sending it
-    // In production, you would integrate with SendGrid, Resend, or similar service
     console.log('EMAIL NOTIFICATION:');
     console.log('To:', notificationData.recipient);
     console.log('Subject:', template.subject);
     console.log('Content:', template.text);
     
-    // Simulate email sending
     const emailLog = {
       timestamp: new Date().toISOString(),
       recipient: notificationData.recipient,
@@ -237,7 +350,7 @@ async function sendEmail(notificationData: NotificationData): Promise<Response> 
         message: 'Email notification sent successfully',
         emailLog
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -247,17 +360,15 @@ async function sendEmail(notificationData: NotificationData): Promise<Response> 
         success: false, 
         message: 'Failed to send email'
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
 
-async function sendSMS(notificationData: NotificationData): Promise<Response> {
+async function sendSMS(notificationData: NotificationData, rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     const message = getSMSTemplate(notificationData.template, notificationData.data);
     
-    // For demo purposes, we'll log the SMS instead of actually sending it
-    // In production, you would integrate with Twilio, AWS SNS, or similar service
     console.log('SMS NOTIFICATION:');
     console.log('To:', notificationData.recipient);
     console.log('Message:', message);
@@ -277,7 +388,7 @@ async function sendSMS(notificationData: NotificationData): Promise<Response> {
         message: 'SMS notification sent successfully',
         smsLog
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -287,13 +398,12 @@ async function sendSMS(notificationData: NotificationData): Promise<Response> {
         success: false, 
         message: 'Failed to send SMS'
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
 
-async function createSystemNotification(notificationData: NotificationData): Promise<Response> {
-  // This would typically store in-app notifications in the database
+async function createSystemNotification(notificationData: NotificationData, rateLimitHeaders: Record<string, string>): Promise<Response> {
   console.log('SYSTEM NOTIFICATION:', notificationData);
   
   return new Response(
@@ -301,15 +411,14 @@ async function createSystemNotification(notificationData: NotificationData): Pro
       success: true,
       message: 'System notification created successfully'
     }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
   );
 }
 
-async function handleApplicationStatusChange(supabase: any, notificationData: any): Promise<Response> {
+async function handleApplicationStatusChange(supabase: any, notificationData: any, rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     const { applicationId, newStatus, applicantEmail, applicantName, applicationNumber } = notificationData;
 
-    // Send email notification based on status change
     const emailNotification: NotificationData = {
       type: 'email',
       recipient: applicantEmail,
@@ -323,7 +432,7 @@ async function handleApplicationStatusChange(supabase: any, notificationData: an
       applicationId
     };
 
-    return await sendNotification(emailNotification);
+    return await sendNotification(emailNotification, rateLimitHeaders);
 
   } catch (error) {
     console.error('Error handling application status change:', error);
@@ -332,12 +441,12 @@ async function handleApplicationStatusChange(supabase: any, notificationData: an
         success: false, 
         message: 'Failed to handle application status change'
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
 
-async function handleLoanFunded(supabase: any, notificationData: any): Promise<Response> {
+async function handleLoanFunded(supabase: any, notificationData: any, rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     const { applicantEmail, applicantName, loanNumber, loanAmount, loanType, monthlyPayment, interestRate, termMonths, userId } = notificationData;
 
@@ -358,7 +467,7 @@ async function handleLoanFunded(supabase: any, notificationData: any): Promise<R
           interestRate: `${interestRate.toFixed(2)}%`,
           termMonths: `${termMonths} months`
         }
-      });
+      }, rateLimitHeaders);
     } catch (error) {
       console.error('Error sending to external webhooks:', error);
     }
@@ -411,7 +520,7 @@ async function handleLoanFunded(supabase: any, notificationData: any): Promise<R
       }
     };
 
-    return await sendNotification(emailNotification);
+    return await sendNotification(emailNotification, rateLimitHeaders);
 
   } catch (error) {
     console.error('Error handling loan funded notification:', error);
@@ -420,7 +529,7 @@ async function handleLoanFunded(supabase: any, notificationData: any): Promise<R
         success: false, 
         message: 'Failed to send loan funded notification'
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
@@ -434,7 +543,7 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-async function sendExternalNotifications(supabase: any, notificationData: any): Promise<Response> {
+async function sendExternalNotifications(supabase: any, notificationData: any, rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     const { eventType, title, message, data } = notificationData;
 
@@ -449,14 +558,14 @@ async function sendExternalNotifications(supabase: any, notificationData: any): 
       console.error('Error fetching webhooks:', error);
       return new Response(
         JSON.stringify({ success: false, error: 'Failed to fetch webhooks' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     if (!webhooks || webhooks.length === 0) {
       return new Response(
         JSON.stringify({ success: true, message: 'No active webhooks for this event type' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -495,14 +604,14 @@ async function sendExternalNotifications(supabase: any, notificationData: any): 
 
     return new Response(
       JSON.stringify({ success: true, results }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in sendExternalNotifications:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Internal error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
@@ -576,10 +685,10 @@ function formatDiscordMessage(title: string, message: string, data: any) {
   };
 }
 
-async function sendBulkNotifications(notifications: NotificationData[]): Promise<Response> {
+async function sendBulkNotifications(notifications: NotificationData[], rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     const results = await Promise.all(
-      notifications.map(notification => sendNotification(notification))
+      notifications.map(notification => sendNotification(notification, rateLimitHeaders))
     );
 
     return new Response(
@@ -588,19 +697,19 @@ async function sendBulkNotifications(notifications: NotificationData[]): Promise
         message: 'Bulk notifications processed',
         resultsCount: results.length
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error sending bulk notifications:', error);
     return new Response(
       JSON.stringify({ success: false, message: 'Failed to send bulk notifications' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
 
-async function getEmailTemplates(): Promise<Response> {
+async function getEmailTemplates(rateLimitHeaders: Record<string, string>): Promise<Response> {
   const templates = {
     application_submitted: {
       subject: 'Application Received - Heritage Business Funding',
@@ -638,7 +747,7 @@ async function getEmailTemplates(): Promise<Response> {
 
   return new Response(
     JSON.stringify({ templates }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
   );
 }
 
