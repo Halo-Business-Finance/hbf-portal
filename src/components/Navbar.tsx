@@ -139,9 +139,6 @@ const Navbar = () => {
       console.error('Error signing out:', error);
     }
   };
-  const handleLogoClick = () => {
-    navigate('/');
-  };
   if (loading) {
     return <header className="sticky top-0 z-50">
         <div className="h-12 bg-[#1a1f2e] flex items-center justify-between px-6">
@@ -161,11 +158,16 @@ const Navbar = () => {
       {/* Top Bar - Dark Navy */}
       <div className="min-h-[48px] md:min-h-[52px] flex items-center justify-between px-3 sm:px-4 lg:px-6 py-2 bg-black text-white">
         {/* Logo */}
-        <div className="cursor-pointer flex items-center flex-shrink-0" onClick={handleLogoClick}>
+        <a
+          href="https://halobusinessfinance.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center flex-shrink-0"
+        >
           <span className="text-white font-bold text-xs sm:text-lg lg:text-xl tracking-wide uppercase whitespace-nowrap">
             HALO BUSINESS FINANCE
           </span>
-        </div>
+        </a>
 
         {/* Right Side - Top Bar */}
         <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
