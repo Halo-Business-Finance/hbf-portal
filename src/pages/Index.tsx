@@ -957,7 +957,8 @@ const Index = () => {
 
             {/* Center content */}
             <div className="relative z-10 text-center text-white px-12">
-              <h2 className="text-4xl font-light mb-8">Business Financing Made Simple</h2>
+              <h1 className="text-5xl font-bold mb-4">Commercial Loan Marketplace</h1>
+              <h2 className="text-2xl font-light mb-8">Business Financing Made Simple</h2>
               <div className="flex items-center justify-center gap-8 text-sm text-blue-200">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5" />
