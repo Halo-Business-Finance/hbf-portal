@@ -904,9 +904,9 @@ const Index = () => {
           <div className="flex items-center justify-between text-sm text-gray-500">
             <span>© 2026 Halo Business Finance. All rights reserved.</span>
             <div className="flex items-center gap-6">
-              <button onClick={() => navigate('/privacy-policy')} className="hover:text-gray-700">Privacy</button>
-              <button onClick={() => navigate('/terms-of-service')} className="hover:text-gray-700">Terms</button>
-              <button onClick={() => navigate('/support')} className="hover:text-gray-700">Support</button>
+              <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700">Privacy</a>
+              <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700">Terms</a>
+              <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700">Support</a>
             </div>
           </div>
         </footer>
