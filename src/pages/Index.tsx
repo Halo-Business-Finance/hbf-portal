@@ -851,8 +851,8 @@ const Index = () => {
           <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden items-center justify-center">
             {/* Geometric shapes */}
             <div className="absolute inset-0">
-              {/* Large circle */}
-              <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full border-2 border-white/20" />
+              {/* Large circle - centered */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border-2 border-white/20" />
               
               {/* Medium circle */}
               <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-white/10" />
