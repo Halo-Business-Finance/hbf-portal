@@ -688,7 +688,7 @@ Loan Marketplace
 
             </p>
             <h1 className="text-base sm:text-xl font-bold tracking-tight mb-3 sm:mb-4 text-black px-[10px] font-sans">
-              Comprehensive Business Financing Solutions
+              Business Financing Made Simple
             </h1>
             <p className="max-w-3xl mx-auto leading-relaxed text-black text-sm sm:text-base font-sans px-2">
               Our Marketplace provides Conventional, SBA, USDA, and Bridge loan financing nationwide to meet any business need. Discover our comprehensive range of SBA, USDA and conventional financing options.      
@@ -716,7 +716,15 @@ Loan Marketplace
           <Card className="max-w-3xl w-full shadow-lg border-2 border-blue-500">
             <CardHeader className="text-center pb-3 pt-4 sm:pt-6 px-4 sm:px-6">
               <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
-                Welcome to Halo Business Finance
+                Welcome to{" "}
+                <a
+                  href="https://halobusinessfinance.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-4 transition-opacity hover:opacity-90"
+                >
+                  Halo Business Finance
+                </a>
               </h2>
               <p className="text-sm text-foreground">
                 Sign in to your account
