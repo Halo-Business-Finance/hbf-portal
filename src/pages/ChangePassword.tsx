@@ -52,9 +52,7 @@ const ChangePassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showAllPasswords, setShowAllPasswords] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   
   // Rate limiting
@@ -200,6 +198,22 @@ const ChangePassword = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Show all passwords toggle */}
+          <div className="flex items-center gap-2 max-w-sm">
+            <button
+              type="button"
+              onClick={() => setShowAllPasswords(!showAllPasswords)}
+              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              {showAllPasswords ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+              {showAllPasswords ? 'Hide all passwords' : 'Show all passwords'}
+            </button>
+          </div>
+
           <FormField
             control={form.control}
             name="currentPassword"
@@ -209,23 +223,12 @@ const ChangePassword = () => {
                   Current password
                 </Label>
                 <FormControl>
-                  <div className="relative">
-                    <Input 
-                      id="currentPassword"
-                      type={showCurrentPassword ? "text" : "password"}
-                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
-                      {...field} 
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    >
-                      {showCurrentPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
-                    </Button>
-                  </div>
+                  <Input 
+                    id="currentPassword"
+                    type={showAllPasswords ? "text" : "password"}
+                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -244,23 +247,12 @@ const ChangePassword = () => {
                     New password
                   </Label>
                   <FormControl>
-                    <div className="relative">
-                      <Input 
-                        id="newPassword"
-                        type={showNewPassword ? "text" : "password"}
-                        className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
-                        {...field} 
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                      >
-                        {showNewPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
-                      </Button>
-                    </div>
+                    <Input 
+                      id="newPassword"
+                      type={showAllPasswords ? "text" : "password"}
+                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                      {...field} 
+                    />
                   </FormControl>
                   {/* Password strength indicator */}
                   {field.value && (
@@ -322,29 +314,18 @@ const ChangePassword = () => {
                     Confirm new password
                   </Label>
                   <FormControl>
-                    <div className="relative">
-                      <Input 
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        className={`h-12 bg-white border-0 border-b-2 rounded-none focus:ring-0 px-0 pr-12 transition-colors ${
-                          showMatch 
-                            ? passwordsMatch 
-                              ? 'border-green-500 focus:border-green-500' 
-                              : 'border-red-400 focus:border-red-400'
-                            : 'border-gray-300 focus:border-blue-600'
-                        }`}
-                        {...field} 
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
-                      </Button>
-                    </div>
+                    <Input 
+                      id="confirmPassword"
+                      type={showAllPasswords ? "text" : "password"}
+                      className={`h-12 bg-white border-0 border-b-2 rounded-none focus:ring-0 px-0 transition-colors ${
+                        showMatch 
+                          ? passwordsMatch 
+                            ? 'border-green-500 focus:border-green-500' 
+                            : 'border-red-400 focus:border-red-400'
+                          : 'border-gray-300 focus:border-blue-600'
+                      }`}
+                      {...field} 
+                    />
                   </FormControl>
                   {/* Password match indicator */}
                   {showMatch && (
