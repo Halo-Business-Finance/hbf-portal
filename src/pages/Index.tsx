@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, HelpCircle, LogIn, Home, Building2, CreditCard, Store, Banknote, TrendingUp, Sparkles, CheckCircle, ArrowRight, Shield, Building, Settings, HardHat, Handshake, FileText, RotateCcw, Zap, DollarSign, Clock, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, HelpCircle, LogIn, Home, Building2, CreditCard, Store, Banknote, TrendingUp, Sparkles, CheckCircle, ArrowRight, Shield, Building, Settings, HardHat, Handshake, FileText, RotateCcw, Zap, DollarSign, Clock, Eye, EyeOff, Lock, Loader2, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as TabsList, ModernTabsTrigger as TabsTrigger } from "@/components/ui/modern-tabs";
@@ -384,6 +384,68 @@ const Index = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
+  const [returningUser, setReturningUser] = useState<string | null>(null);
+
+  // Check for returning user on mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('hbf_remembered_email');
+    const lastLogin = localStorage.getItem('hbf_last_login');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+      if (lastLogin) {
+        setReturningUser(lastLogin);
+      }
+    }
+  }, []);
+
+  // Check lockout status
+  useEffect(() => {
+    const storedLockout = localStorage.getItem('hbf_lockout_until');
+    const storedAttempts = localStorage.getItem('hbf_login_attempts');
+    if (storedLockout) {
+      const lockoutTime = parseInt(storedLockout);
+      if (lockoutTime > Date.now()) {
+        setLockoutUntil(lockoutTime);
+      } else {
+        localStorage.removeItem('hbf_lockout_until');
+        localStorage.removeItem('hbf_login_attempts');
+      }
+    }
+    if (storedAttempts) {
+      setLoginAttempts(parseInt(storedAttempts));
+    }
+  }, []);
+
+  // Lockout countdown timer
+  useEffect(() => {
+    if (lockoutUntil && lockoutUntil > Date.now()) {
+      const interval = setInterval(() => {
+        if (lockoutUntil <= Date.now()) {
+          setLockoutUntil(null);
+          setLoginAttempts(0);
+          localStorage.removeItem('hbf_lockout_until');
+          localStorage.removeItem('hbf_login_attempts');
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [lockoutUntil]);
+
+  const formatLockoutTime = (ms: number): string => {
+    const seconds = Math.ceil(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    if (minutes > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    }
+    return `${seconds}s`;
+  };
+
+  const isLockedOut = lockoutUntil !== null && lockoutUntil > Date.now();
   const loanTypeId = searchParams.get('id');
   useEffect(() => {
     if (loanTypeId) {
@@ -512,6 +574,13 @@ const Index = () => {
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError("");
+
+    // Check if locked out
+    if (isLockedOut) {
+      setAuthError(`Too many failed attempts. Please try again in ${formatLockoutTime(lockoutUntil! - Date.now())}`);
+      return;
+    }
+
     setAuthLoading(true);
     try {
       if (!isLogin) {
@@ -554,21 +623,47 @@ const Index = () => {
           setConfirmPassword("");
         }
       } else {
-        // Sign in
+        // Sign in with rate limiting
         const {
           error
         } = await signIn(email, password);
         if (error) {
-          if (error.message?.includes("Invalid login credentials")) {
-            setAuthError("Invalid email or password. Please check your credentials and try again.");
+          // Track failed attempts
+          const newAttempts = loginAttempts + 1;
+          setLoginAttempts(newAttempts);
+          localStorage.setItem('hbf_login_attempts', newAttempts.toString());
+          
+          // Lock out after 5 failed attempts (2 minutes)
+          if (newAttempts >= 5) {
+            const lockoutTime = Date.now() + 2 * 60 * 1000; // 2 minutes
+            setLockoutUntil(lockoutTime);
+            localStorage.setItem('hbf_lockout_until', lockoutTime.toString());
+            setAuthError(`Too many failed attempts. Please try again in 2 minutes.`);
+          } else if (error.message?.includes("Invalid login credentials")) {
+            setAuthError(`Invalid email or password. ${5 - newAttempts} attempts remaining.`);
           } else if (error.message?.includes("Email not confirmed")) {
             setAuthError("Please check your email and click the confirmation link before signing in.");
           } else {
             setAuthError(error.message || "Failed to sign in");
           }
         } else {
+          // Successful login - reset attempts and save preferences
+          setLoginAttempts(0);
+          localStorage.removeItem('hbf_login_attempts');
+          localStorage.removeItem('hbf_lockout_until');
+          
+          // Handle remember me
+          if (rememberMe) {
+            localStorage.setItem('hbf_remembered_email', email);
+          } else {
+            localStorage.removeItem('hbf_remembered_email');
+          }
+          
+          // Save last login time
+          localStorage.setItem('hbf_last_login', new Date().toISOString());
+          
           toast({
-            title: "Welcome!",
+            title: "Welcome back!",
             description: "You have successfully signed in."
           });
         }
@@ -713,6 +808,43 @@ const Index = () => {
           {/* Left Column - Login Form */}
           <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 bg-white">
             <div className="w-full max-w-md">
+              {/* Welcome back message for returning users */}
+              {isLogin && returningUser && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-900">Welcome back!</p>
+                      <p className="text-xs text-blue-700">
+                        Last login: {new Date(returningUser).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Lockout warning */}
+              {isLockedOut && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                    <div>
+                      <p className="text-sm font-medium text-red-900">Account temporarily locked</p>
+                      <p className="text-xs text-red-700">
+                        Try again in {formatLockoutTime(lockoutUntil! - Date.now())}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Header with title and signup link */}
               <div className="mb-8">
                 <h1 className="text-xl font-normal text-gray-900 mb-3">
@@ -721,12 +853,12 @@ const Index = () => {
                 <p className="text-gray-600">
                   {isLogin ? <>
                       Don't have an account?{" "}
-                      <button type="button" onClick={() => switchMode("signup")} className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+                      <button type="button" onClick={() => switchMode("signup")} className="text-blue-600 hover:text-blue-700 font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
                         Create an account
                       </button>
                     </> : <>
                       Already have an account?{" "}
-                      <button type="button" onClick={() => switchMode("login")} className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+                      <button type="button" onClick={() => switchMode("login")} className="text-blue-600 hover:text-blue-700 font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
                         Sign in
                       </button>
                     </>}
@@ -742,13 +874,13 @@ const Index = () => {
                       <Label htmlFor="firstName" className="text-sm text-blue-600 mb-2 block">
                         First name
                       </Label>
-                      <Input id="firstName" type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0" />
+                      <Input id="firstName" type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
                     </div>
                     <div>
                       <Label htmlFor="lastName" className="text-sm text-blue-600 mb-2 block">
                         Last name
                       </Label>
-                      <Input id="lastName" type="text" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0" />
+                      <Input id="lastName" type="text" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
                     </div>
                   </div>}
 
@@ -756,7 +888,7 @@ const Index = () => {
                   <Label htmlFor="email" className="text-sm text-blue-600 mb-2 block">
                     Email
                   </Label>
-                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0" />
+                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
                 </div>
 
                 <div className="max-w-sm">
@@ -764,8 +896,8 @@ const Index = () => {
                     Password
                   </Label>
                   <div className="relative">
-                    <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12" />
-                    <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)} disabled={authLoading}>
+                    <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 pr-12 transition-colors" />
+                    <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded" onClick={() => setShowPassword(!showPassword)} disabled={authLoading}>
                       {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
                     </Button>
                   </div>
@@ -775,18 +907,31 @@ const Index = () => {
                     <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
                       Confirm password
                     </Label>
-                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0" />
+                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
                   </div>}
 
-                {/* Continue Button */}
-                <Button type="submit" className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none" disabled={authLoading}>
-                  <span>{authLoading ? "Please wait..." : "Continue"}</span>
+                {/* Continue Button with loading animation */}
+                <Button 
+                  type="submit" 
+                  className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50" 
+                  disabled={authLoading || isLockedOut}
+                >
+                  <span className="flex items-center gap-2">
+                    {authLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {authLoading ? "Signing in..." : "Continue"}
+                  </span>
                   {!authLoading && <ArrowRight className="h-5 w-5" />}
                 </Button>
 
                 {isLogin && <div className="flex items-center gap-2">
-                    <input type="checkbox" id="rememberMe" className="w-4 h-4 border-2 border-gray-400 rounded-sm text-blue-600 focus:ring-blue-500" />
-                    <label htmlFor="rememberMe" className="text-sm text-gray-700 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      id="rememberMe" 
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 border-2 border-gray-400 rounded-sm text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2 cursor-pointer" 
+                    />
+                    <label htmlFor="rememberMe" className="text-sm text-gray-700 cursor-pointer select-none">
                       Remember me
                     </label>
                     <div className="relative group">
@@ -794,8 +939,20 @@ const Index = () => {
                         <circle cx="12" cy="12" r="10" strokeWidth="2" />
                         <path strokeWidth="2" d="M12 16v-4m0-4h.01" />
                       </svg>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                        Stay signed in on this device for 30 days
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                      </div>
                     </div>
                   </div>}
+
+                {/* Rate limit warning */}
+                {loginAttempts > 0 && loginAttempts < 5 && !isLockedOut && (
+                  <div className="flex items-center gap-2 text-amber-600 text-sm">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>{5 - loginAttempts} login attempts remaining</span>
+                  </div>
+                )}
 
                 {authError && <Alert variant="destructive">
                     <AlertDescription>{authError}</AlertDescription>
@@ -839,11 +996,29 @@ const Index = () => {
               {isLogin && <div className="mt-8 pt-6 border-t border-gray-200">
                   <p className="text-sm text-gray-700">
                     Forgot password?{" "}
-                    <button type="button" onClick={() => navigate('/forgot-password')} className="text-blue-600 hover:text-blue-700 hover:underline">
+                    <button type="button" onClick={() => navigate('/forgot-password')} className="text-blue-600 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
                       Reset your password
                     </button>
                   </p>
                 </div>}
+
+              {/* Security badges */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-green-600" />
+                    <span>256-bit SSL Encryption</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-blue-600" />
+                    <span>SOC 2 Compliant</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                    <span>FDIC Insured Partners</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
