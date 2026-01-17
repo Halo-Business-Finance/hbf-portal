@@ -697,7 +697,7 @@ const Index = () => {
         {/* Header with logo */}
         <header className="px-6 py-4 border-b border-border/30">
           <div className="max-w-7xl mx-auto">
-            <span className="text-xl font-bold text-foreground tracking-tight">HBF</span>
+            <span className="text-xl font-bold text-foreground tracking-tight whitespace-nowrap">Halo Business Finance</span>
           </div>
         </header>
 
@@ -708,7 +708,7 @@ const Index = () => {
             <div className="w-full lg:w-[45%] px-6 sm:px-12 lg:px-16 py-12 lg:py-16">
               <div className="max-w-md">
                 <h1 className="text-3xl sm:text-4xl font-light text-foreground mb-2">
-                  Log in to HBF
+                  Log in to Halo Business Finance
                 </h1>
                 <p className="text-sm text-muted-foreground mb-8">
                   Don't have an account?{" "}
