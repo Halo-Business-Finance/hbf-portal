@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { auditService } from './auditService';
 
 export interface ApplicationStats {
   total: number;
@@ -42,6 +43,9 @@ class AdminService {
    */
   async getApplicationStats(): Promise<ApplicationStats> {
     try {
+      // Log admin dashboard access
+      await auditService.logAdminDashboardAccess('statistics');
+
       const { data, error } = await supabase.functions.invoke('admin-dashboard', {
         body: null
       });
@@ -69,6 +73,16 @@ class AdminService {
 
       if (error) throw error;
 
+      // Log application list access with filter info
+      await auditService.logAccess({
+        action: 'VIEW_LOAN_APPLICATIONS',
+        resourceType: 'loan_application',
+        details: {
+          filters,
+          resultCount: data.applications?.length || 0
+        }
+      });
+
       return data.applications;
     } catch (error) {
       console.error('Error fetching filtered applications:', error);
@@ -90,6 +104,12 @@ class AdminService {
       });
 
       if (error) throw error;
+
+      // Log status update
+      await auditService.logLoanApplicationAccess(applicationId, 'update', {
+        newStatus: status,
+        notes
+      });
 
       return data;
     } catch (error) {
@@ -127,6 +147,9 @@ class AdminService {
         throw new Error('Export failed');
       }
 
+      // Log data export
+      await auditService.logDataExport('applications', { ...filters } as Record<string, unknown>, 0); // Count unknown at this point
+
       return await response.blob();
     } catch (error) {
       console.error('Error exporting applications:', error);
@@ -139,6 +162,9 @@ class AdminService {
    */
   async getAnalytics(): Promise<Analytics> {
     try {
+      // Log analytics access
+      await auditService.logAdminDashboardAccess('analytics');
+
       const searchParams = new URLSearchParams();
       searchParams.append('action', 'analytics');
 
@@ -170,6 +196,16 @@ class AdminService {
 
       if (error) throw error;
 
+      // Log bulk application access
+      await auditService.logAccess({
+        action: 'VIEW_LOAN_APPLICATIONS',
+        resourceType: 'loan_application',
+        details: {
+          accessType: 'all_applications',
+          resultCount: data?.length || 0
+        }
+      });
+
       return data;
     } catch (error) {
       console.error('Error fetching all applications:', error);
@@ -192,6 +228,13 @@ class AdminService {
         .single();
 
       if (error) throw error;
+
+      // Log detailed application access
+      await auditService.logLoanApplicationAccess(applicationId, 'view', {
+        borrowerUserId: data?.user_id,
+        loanType: data?.loan_type,
+        status: data?.status
+      });
 
       return data;
     } catch (error) {
@@ -216,10 +259,74 @@ class AdminService {
 
       if (error) throw error;
 
+      // Log batch update
+      for (const appId of applicationIds) {
+        await auditService.logLoanApplicationAccess(appId, 'update', {
+          batchOperation: true,
+          newStatus: status,
+          notes,
+          totalInBatch: applicationIds.length
+        });
+      }
+
       return data;
     } catch (error) {
       console.error('Error batch updating applications:', error);
       throw new Error('Failed to batch update applications');
+    }
+  }
+
+  /**
+   * Get bank accounts for a specific user (admin access)
+   */
+  async getBorrowerBankAccounts(borrowerUserId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('bank_accounts')
+        .select('*')
+        .eq('user_id', borrowerUserId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Log bank account access - CRITICAL for compliance
+      await auditService.logBankAccountAccess(
+        data?.map(a => a.id) || [],
+        'list',
+        borrowerUserId
+      );
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching borrower bank accounts:', error);
+      throw new Error('Failed to fetch bank accounts');
+    }
+  }
+
+  /**
+   * Get masked bank accounts (for customer service)
+   */
+  async getBorrowerBankAccountsMasked(borrowerUserId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('bank_accounts_masked')
+        .select('*')
+        .eq('user_id', borrowerUserId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Log masked bank account access
+      await auditService.logBankAccountAccess(
+        data?.map(a => a.id) || [],
+        'masked',
+        borrowerUserId
+      );
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching masked bank accounts:', error);
+      throw new Error('Failed to fetch bank accounts');
     }
   }
 }
