@@ -17,7 +17,7 @@ export const FloatingSupportButton = ({ className }: FloatingSupportButtonProps)
       id: 'chat',
       label: 'Live Chat',
       icon: MessageCircle,
-      action: () => navigate('/support')
+      action: () => window.open('https://halobusinessfinance.com/technical-support', '_blank')
     },
     {
       id: 'call',
@@ -35,7 +35,7 @@ export const FloatingSupportButton = ({ className }: FloatingSupportButtonProps)
       id: 'faq',
       label: 'FAQ',
       icon: FileQuestion,
-      action: () => navigate('/support')
+      action: () => window.open('https://halobusinessfinance.com/technical-support', '_blank')
     }
   ];
 
