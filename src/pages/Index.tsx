@@ -913,14 +913,14 @@ const Index = () => {
                 {/* Continue Button with loading animation */}
                 <Button 
                   type="submit" 
-                  className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50" 
+                  className="max-w-xs h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium justify-between px-3 rounded-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50" 
                   disabled={authLoading || isLockedOut}
                 >
                   <span className="flex items-center gap-2">
                     {authLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                     {authLoading ? "Signing in..." : "Continue"}
                   </span>
-                  {!authLoading && <ArrowRight className="h-5 w-5" />}
+                  {!authLoading && <ArrowRight className="h-4 w-4" />}
                 </Button>
 
                 {isLogin && <div className="flex items-center gap-2">
