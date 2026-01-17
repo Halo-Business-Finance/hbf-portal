@@ -1,5 +1,4 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.52.1";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
@@ -7,6 +6,21 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Rate limit configurations per action
+const RATE_LIMITS: Record<string, { maxRequests: number; windowSeconds: number }> = {
+  'validate': { maxRequests: 30, windowSeconds: 60 },        // 30 per minute
+  'process': { maxRequests: 10, windowSeconds: 3600 },       // 10 per hour (submissions)
+  'updateStatus': { maxRequests: 100, windowSeconds: 60 },   // 100 per minute (admin)
+  'calculate-eligibility': { maxRequests: 20, windowSeconds: 60 }, // 20 per minute
+};
+
+interface RateLimitResult {
+  allowed: boolean;
+  remaining_requests: number;
+  reset_at: string;
+  current_count: number;
+}
 
 interface LoanApplicationData {
   loan_type: string;
@@ -31,7 +45,55 @@ interface ApplicationValidationResult {
   autoApprovalEligible: boolean;
 }
 
-serve(async (req) => {
+async function checkRateLimit(
+  supabase: any,
+  identifier: string,
+  endpoint: string,
+  config: { maxRequests: number; windowSeconds: number }
+): Promise<RateLimitResult> {
+  try {
+    const { data, error } = await supabase.rpc('check_rate_limit', {
+      _identifier: identifier,
+      _endpoint: endpoint,
+      _max_requests: config.maxRequests,
+      _window_seconds: config.windowSeconds
+    });
+
+    if (error) {
+      console.error('Rate limit check error:', error);
+      // Fail open - allow request if rate limiting fails
+      return { allowed: true, remaining_requests: 1, reset_at: new Date().toISOString(), current_count: 0 };
+    }
+
+    const result = data?.[0] || { allowed: true, remaining_requests: 1, reset_at: new Date().toISOString(), current_count: 0 };
+    return result;
+  } catch (error) {
+    console.error('Rate limit check exception:', error);
+    return { allowed: true, remaining_requests: 1, reset_at: new Date().toISOString(), current_count: 0 };
+  }
+}
+
+function createRateLimitResponse(resetAt: string, endpoint: string): Response {
+  const retryAfter = Math.ceil((new Date(resetAt).getTime() - Date.now()) / 1000);
+  return new Response(
+    JSON.stringify({ 
+      error: 'Rate limit exceeded',
+      message: `Too many requests for ${endpoint}. Please try again later.`,
+      retryAfter: retryAfter > 0 ? retryAfter : 60
+    }),
+    { 
+      status: 429, 
+      headers: { 
+        ...corsHeaders, 
+        'Content-Type': 'application/json',
+        'Retry-After': String(retryAfter > 0 ? retryAfter : 60),
+        'X-RateLimit-Reset': resetAt
+      } 
+    }
+  );
+}
+
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -53,8 +115,13 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || "https://zosgzkpfgaaadadezpxo.supabase.co";
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
+    // Get client IP for rate limiting
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const realIp = req.headers.get('x-real-ip');
+    const clientIp = forwardedFor?.split(',')[0]?.trim() || realIp || 'unknown';
+
     // Get user from token for authenticated requests
-    let userId = null;
+    let userId: string | null = null;
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
       const { data: { user }, error: userError } = await supabase.auth.getUser(token);
@@ -62,6 +129,9 @@ serve(async (req) => {
         userId = user.id;
       }
     }
+
+    // Rate limit identifier: prefer user ID, fall back to IP
+    const rateLimitIdentifier = userId || `ip:${clientIp}`;
 
     const requestSchema = z.object({
       action: z.enum(['validate', 'process', 'updateStatus', 'calculate-eligibility']),
@@ -100,31 +170,75 @@ serve(async (req) => {
 
     const { action, applicationData, applicationId } = validation.data;
 
+    // ========== SERVER-SIDE RATE LIMITING ==========
+    const rateLimitConfig = RATE_LIMITS[action] || { maxRequests: 60, windowSeconds: 60 };
+    const rateLimitResult = await checkRateLimit(
+      supabase,
+      rateLimitIdentifier,
+      `loan-application:${action}`,
+      rateLimitConfig
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`Rate limit exceeded for ${rateLimitIdentifier} on action ${action}`);
+      
+      // Log rate limit violation to audit
+      try {
+        await supabase.rpc('log_audit_event', {
+          _user_id: userId || '00000000-0000-0000-0000-000000000000',
+          _action: 'RATE_LIMIT_EXCEEDED',
+          _resource_type: 'loan_application',
+          _resource_id: null,
+          _ip_address: clientIp,
+          _user_agent: req.headers.get('user-agent'),
+          _details: {
+            endpoint: 'loan-application-processor',
+            action,
+            identifier: rateLimitIdentifier,
+            currentCount: rateLimitResult.current_count
+          }
+        });
+      } catch (auditError) {
+        console.error('Failed to log rate limit audit:', auditError);
+      }
+
+      return createRateLimitResponse(rateLimitResult.reset_at, action);
+    }
+
+    // Add rate limit headers to successful responses
+    const rateLimitHeaders = {
+      'X-RateLimit-Limit': String(rateLimitConfig.maxRequests),
+      'X-RateLimit-Remaining': String(rateLimitResult.remaining_requests),
+      'X-RateLimit-Reset': rateLimitResult.reset_at
+    };
+
+    console.log(`Rate limit check passed for ${rateLimitIdentifier}: ${rateLimitResult.remaining_requests} remaining`);
+
     switch (action) {
       case 'validate':
         if (!applicationData) {
           return new Response(
             JSON.stringify({ error: 'Application data is required' }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 400, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        return await validateApplication(applicationData);
+        return await validateApplication(applicationData, rateLimitHeaders);
       
       case 'process':
         if (!applicationData) {
           return new Response(
             JSON.stringify({ error: 'Application data is required' }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 400, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        return await processApplication(supabase, applicationData, userId);
+        return await processApplication(supabase, applicationData, userId, rateLimitHeaders);
       
       case 'updateStatus':
         // SECURITY: Verify admin role before allowing status updates
         if (!userId) {
           return new Response(
             JSON.stringify({ error: 'Authentication required' }),
-            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 401, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
           );
         }
         
@@ -135,27 +249,27 @@ serve(async (req) => {
           console.warn(`Unauthorized status update attempt by user ${userId}`);
           return new Response(
             JSON.stringify({ error: 'Admin access required to update application status' }),
-            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 403, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
           );
         }
         
         if (!applicationId || !applicationData?.status) {
           return new Response(
             JSON.stringify({ error: 'Application ID and status are required' }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 400, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
           );
         }
         
-        return await updateApplicationStatus(supabase, applicationId, applicationData.status, applicationData.notes);
+        return await updateApplicationStatus(supabase, applicationId, applicationData.status, applicationData.notes, rateLimitHeaders);
       
       case 'calculate-eligibility':
         if (!applicationData) {
           return new Response(
             JSON.stringify({ error: 'Application data is required' }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 400, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        return await calculateEligibility(applicationData);
+        return await calculateEligibility(applicationData, rateLimitHeaders);
 
       default:
         return new Response(
@@ -174,7 +288,7 @@ serve(async (req) => {
   }
 });
 
-async function validateApplication(applicationData: LoanApplicationData): Promise<Response> {
+async function validateApplication(applicationData: LoanApplicationData, rateLimitHeaders: Record<string, string>): Promise<Response> {
   const validation: ApplicationValidationResult = {
     isValid: true,
     errors: [],
@@ -252,11 +366,11 @@ async function validateApplication(applicationData: LoanApplicationData): Promis
 
   return new Response(
     JSON.stringify(validation),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
   );
 }
 
-async function processApplication(supabase: any, applicationData: LoanApplicationData, userId?: string): Promise<Response> {
+async function processApplication(supabase: any, applicationData: LoanApplicationData, userId: string | null, rateLimitHeaders: Record<string, string>): Promise<Response> {
   try {
     // Check if user is authenticated for application submission
     if (!userId) {
@@ -265,12 +379,12 @@ async function processApplication(supabase: any, applicationData: LoanApplicatio
           success: false, 
           message: 'Authentication required to submit application'
         }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // First validate the application
-    const validationResponse = await validateApplication(applicationData);
+    const validationResponse = await validateApplication(applicationData, rateLimitHeaders);
     const validation = await validationResponse.json();
 
     if (!validation.isValid) {
@@ -280,7 +394,7 @@ async function processApplication(supabase: any, applicationData: LoanApplicatio
           errors: validation.errors,
           message: 'Application validation failed'
         }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -328,7 +442,7 @@ async function processApplication(supabase: any, applicationData: LoanApplicatio
         autoApprovalEligible: validation.autoApprovalEligible,
         message: 'Application processed successfully'
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -340,7 +454,7 @@ async function processApplication(supabase: any, applicationData: LoanApplicatio
         message: 'Failed to process application',
         error: errorMessage 
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
@@ -349,7 +463,8 @@ async function updateApplicationStatus(
   supabase: any, 
   applicationId: string, 
   newStatus: string, 
-  notes?: string
+  notes?: string,
+  rateLimitHeaders?: Record<string, string>
 ): Promise<Response> {
   try {
     // First, fetch the current loan_details to merge safely
@@ -394,7 +509,7 @@ async function updateApplicationStatus(
         application: data,
         message: 'Application status updated successfully'
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...(rateLimitHeaders || {}), 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -406,12 +521,12 @@ async function updateApplicationStatus(
         message: 'Failed to update application status',
         error: errorMessage 
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...(rateLimitHeaders || {}), 'Content-Type': 'application/json' } }
     );
   }
 }
 
-async function calculateEligibility(applicationData: LoanApplicationData): Promise<Response> {
+async function calculateEligibility(applicationData: LoanApplicationData, rateLimitHeaders: Record<string, string>): Promise<Response> {
   const eligibility = {
     eligible: true,
     maxLoanAmount: 0,
@@ -474,7 +589,7 @@ async function calculateEligibility(applicationData: LoanApplicationData): Promi
 
   return new Response(
     JSON.stringify(eligibility),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...corsHeaders, ...rateLimitHeaders, 'Content-Type': 'application/json' } }
   );
 }
 
