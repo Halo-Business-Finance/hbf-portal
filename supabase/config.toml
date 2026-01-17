@@ -2,3 +2,24 @@ project_id = "zosgzkpfgaaadadezpxo"
 
 [functions.update_profile]
 verify_jwt = true
+
+[functions.audit-logger]
+verify_jwt = false
+
+[functions.admin-dashboard]
+verify_jwt = false
+
+[functions.health-check]
+verify_jwt = false
+
+[functions.ibm-database]
+verify_jwt = false
+
+[functions.loan-application-processor]
+verify_jwt = false
+
+[functions.notification-service]
+verify_jwt = false
+
+[functions.send-document-email]
+verify_jwt = false
