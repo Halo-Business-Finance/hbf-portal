@@ -1051,8 +1051,8 @@ const Index = () => {
           </div>
         </main>
 
-        {/* Footer bar */}
-        <footer className="h-1 bg-primary w-full" />
+        {/* Footer */}
+        <Footer />
       </div>
     );
   }
