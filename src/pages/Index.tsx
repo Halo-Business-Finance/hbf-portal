@@ -699,12 +699,12 @@ const Index = () => {
   if (!authenticated) {
     return <div className="min-h-screen bg-gray-100 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-black px-6 py-4">
           <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
               <span className="text-white font-bold text-sm">HBF</span>
             </div>
-            <span className="text-xl font-semibold text-gray-900">Halo Business Finance</span>
+            <span className="text-xl font-semibold text-white">Halo Business Finance</span>
           </a>
         </header>
 
