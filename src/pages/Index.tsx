@@ -707,7 +707,7 @@ const Index = () => {
             {/* Left side - Login form */}
             <div className="w-full lg:w-[45%] px-6 sm:px-12 lg:px-16 py-12 lg:py-16">
               <div className="max-w-md">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-light text-foreground mb-2 whitespace-nowrap">
+                <h1 className="text-base sm:text-lg lg:text-xl font-light text-foreground mb-2 whitespace-nowrap">
                   Log in to your account
                 </h1>
                 <p className="text-sm text-muted-foreground mb-8">
