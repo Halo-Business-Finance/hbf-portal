@@ -699,19 +699,19 @@ const Index = () => {
   if (!authenticated) {
     return <div className="min-h-screen bg-gray-100 flex flex-col">
         {/* Header */}
-        <header className="bg-black px-6 py-4">
+        <header className="bg-black px-4 sm:px-6 py-4">
           <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">HBF</span>
             </div>
-            <span className="text-xl font-semibold text-white">Halo Business Finance</span>
+            <span className="text-lg sm:text-xl font-semibold text-white">Halo Business Finance</span>
           </a>
         </header>
 
         {/* Main Content - Two Column Layout */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex flex-col lg:flex-row">
           {/* Left Column - Login Form */}
-          <div className="flex-1 flex items-center justify-center px-8 py-12 bg-white">
+          <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 bg-white">
             <div className="w-full max-w-md">
               {/* Header with title and signup link */}
               <div className="mb-8">
@@ -900,10 +900,10 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>© {new Date().getFullYear()} Halo Business Finance. All rights reserved.</span>
-            <div className="flex items-center gap-6">
+        <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
+            <span className="text-center sm:text-left">© {new Date().getFullYear()} Halo Business Finance. All rights reserved.</span>
+            <div className="flex items-center gap-4 sm:gap-6">
               <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Privacy Policy</a>
               <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Terms of Service</a>
               <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Support</a>
