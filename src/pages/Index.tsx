@@ -885,8 +885,7 @@ const Index = () => {
 
             {/* Center content */}
             <div className="relative z-10 text-center text-white px-12">
-              <p className="text-lg font-semibold tracking-wider mb-2 text-blue-200">Welcome to our Commercial Loan Marketplace</p>
-              <h1 className="text-2xl font-bold mb-4">HALO BUSINESS FINANCE</h1>
+              <h1 className="text-2xl font-bold mb-4">Welcome to our Commercial Loan Marketplace</h1>
               <div className="flex items-center justify-center gap-8 text-sm text-blue-200 mb-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5" />
