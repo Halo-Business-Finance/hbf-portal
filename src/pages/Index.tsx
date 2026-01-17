@@ -850,16 +850,13 @@ const Index = () => {
 
                     <div className="h-px bg-border my-6" />
 
-                    <p className="text-sm text-foreground">
-                      Forgot email?{" "}
-                      <button
-                        type="button"
-                        onClick={() => navigate('/forgot-password')}
-                        className="text-primary hover:underline"
-                      >
-                        Contact support
-                      </button>
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/forgot-password')}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
                   </form>
                 ) : (
                   <form onSubmit={handleAuthSubmit} className="space-y-6">
