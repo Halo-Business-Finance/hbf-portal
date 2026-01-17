@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_application_assignments: {
+        Row: {
+          admin_id: string
+          application_id: string
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          admin_id: string
+          application_id: string
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          admin_id?: string
+          application_id?: string
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_application_assignments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -857,7 +892,51 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      bank_accounts_masked: {
+        Row: {
+          account_name: string | null
+          account_number_masked: string | null
+          account_type: string | null
+          balance: number | null
+          created_at: string | null
+          currency: string | null
+          id: string | null
+          institution: string | null
+          is_business: boolean | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          account_name?: string | null
+          account_number_masked?: never
+          account_type?: string | null
+          balance?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string | null
+          institution?: string | null
+          is_business?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          account_name?: string | null
+          account_number_masked?: never
+          account_type?: string | null
+          balance?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string | null
+          institution?: string | null
+          is_business?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_old_crm_sync_logs: { Args: never; Returns: number }
@@ -891,6 +970,17 @@ export type Database = {
             }
             Returns: boolean
           }
+      has_role_or_higher: {
+        Args: {
+          _minimum_role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_assigned_to_user: {
+        Args: { _admin_id: string; _borrower_user_id: string }
+        Returns: boolean
+      }
       log_audit_event: {
         Args: {
           _action: string
@@ -914,7 +1004,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "customer_service"
+        | "underwriter"
+        | "super_admin"
       application_status:
         | "draft"
         | "submitted"
@@ -1057,7 +1153,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: [
+        "admin",
+        "moderator",
+        "user",
+        "customer_service",
+        "underwriter",
+        "super_admin",
+      ],
       application_status: [
         "draft",
         "submitted",
