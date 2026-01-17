@@ -829,7 +829,7 @@ const Index = () => {
                 {/* Continue Button */}
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none"
                   disabled={authLoading}
                 >
                   <span>{authLoading ? "Please wait..." : "Continue"}</span>
@@ -868,7 +868,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-gray-300 hover:bg-gray-50 justify-between px-4 text-blue-600 font-normal"
+                  className="w-full h-12 border-gray-300 hover:bg-gray-50 justify-between px-4 text-blue-600 font-normal rounded-none"
                   onClick={handleGoogleSignIn}
                   disabled={authLoading}
                 >
