@@ -310,33 +310,66 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="confirmPassword"
-            render={({ field }) => (
-              <FormItem className="max-w-sm">
-                <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
-                  Confirm new password
-                </Label>
-                <FormControl>
-                  <div className="relative">
-                    <Input 
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0 pr-12"
-                      {...field} 
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const newPassword = form.watch('newPassword');
+              const confirmPassword = field.value;
+              const showMatch = confirmPassword.length > 0;
+              const passwordsMatch = newPassword === confirmPassword;
+              
+              return (
+                <FormItem className="max-w-sm">
+                  <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
+                    Confirm new password
+                  </Label>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        className={`h-12 bg-white border-0 border-b-2 rounded-none focus:ring-0 px-0 pr-12 transition-colors ${
+                          showMatch 
+                            ? passwordsMatch 
+                              ? 'border-green-500 focus:border-green-500' 
+                              : 'border-red-400 focus:border-red-400'
+                            : 'border-gray-300 focus:border-blue-600'
+                        }`}
+                        {...field} 
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  {/* Password match indicator */}
+                  {showMatch && (
+                    <p className={`text-xs flex items-center gap-1.5 mt-2 transition-colors duration-200 ${
+                      passwordsMatch ? 'text-green-600' : 'text-red-500'
+                    }`}>
+                      {passwordsMatch ? (
+                        <>
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          Passwords match
+                        </>
+                      ) : (
+                        <>
+                          <div className="h-3.5 w-3.5 rounded-full border-2 border-red-400 flex items-center justify-center">
+                            <div className="h-1.5 w-1.5 bg-red-400 rounded-full" />
+                          </div>
+                          Passwords do not match
+                        </>
+                      )}
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
 
           <Button 
