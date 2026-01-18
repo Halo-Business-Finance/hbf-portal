@@ -1004,7 +1004,7 @@ const Index = () => {
             {/* Geometric shapes */}
             <div className="absolute inset-0">
               {/* Large circle - centered */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border-2 border-white/20" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border-2 border-white/20" />
               
               {/* Medium circle */}
               <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-white/10" />
