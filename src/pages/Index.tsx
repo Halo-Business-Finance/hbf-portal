@@ -983,7 +983,7 @@ const Index = () => {
                 </div>}
 
               {/* Security badges */}
-              <div className="mt-6 pt-4 border-t border-gray-200">
+              <div className="mt-6 pt-4 border-t border-gray-200 border-0 py-0 my-0">
                 <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
                   <div className="flex items-center gap-1.5">
                     <CheckCircle className="w-3.5 h-3.5 text-green-600" />
