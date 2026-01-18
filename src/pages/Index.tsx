@@ -1015,7 +1015,7 @@ const Index = () => {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                    <span>FDIC Insured Partners</span>
+                    <span>Licensed & Regulated Lending Partners</span>
                   </div>
                 </div>
               </div>
