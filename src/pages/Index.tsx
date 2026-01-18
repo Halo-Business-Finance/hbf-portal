@@ -802,7 +802,7 @@ const Index = () => {
         {/* Main Content - Two Column Layout */}
         <div className="flex-1 flex flex-col lg:flex-row">
           {/* Left Column - Login Form */}
-          <div className="flex-1 flex items-center justify-center px-4 sm:px-8 pt-8 pb-4 sm:pt-12 sm:pb-6 bg-white">
+          <div className="flex-1 flex items-center justify-center px-4 sm:px-8 pt-8 pb-2 sm:pt-12 sm:pb-3 bg-white">
             <div className="w-full max-w-md">
               {/* Welcome back message for returning users */}
               {isLogin && returningUser && <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
