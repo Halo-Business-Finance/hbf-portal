@@ -434,7 +434,6 @@ const Index = () => {
       return () => clearInterval(interval);
     }
   }, [lockoutUntil]);
-
   const formatLockoutTime = (ms: number): string => {
     const seconds = Math.ceil(ms / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -444,7 +443,6 @@ const Index = () => {
     }
     return `${seconds}s`;
   };
-
   const isLockedOut = lockoutUntil !== null && lockoutUntil > Date.now();
   const loanTypeId = searchParams.get('id');
   useEffect(() => {
@@ -580,7 +578,6 @@ const Index = () => {
       setAuthError(`Too many failed attempts. Please try again in ${formatLockoutTime(lockoutUntil! - Date.now())}`);
       return;
     }
-
     setAuthLoading(true);
     try {
       if (!isLogin) {
@@ -632,7 +629,7 @@ const Index = () => {
           const newAttempts = loginAttempts + 1;
           setLoginAttempts(newAttempts);
           localStorage.setItem('hbf_login_attempts', newAttempts.toString());
-          
+
           // Lock out after 5 failed attempts (2 minutes)
           if (newAttempts >= 5) {
             const lockoutTime = Date.now() + 2 * 60 * 1000; // 2 minutes
@@ -651,17 +648,16 @@ const Index = () => {
           setLoginAttempts(0);
           localStorage.removeItem('hbf_login_attempts');
           localStorage.removeItem('hbf_lockout_until');
-          
+
           // Handle remember me
           if (rememberMe) {
             localStorage.setItem('hbf_remembered_email', email);
           } else {
             localStorage.removeItem('hbf_remembered_email');
           }
-          
+
           // Save last login time
           localStorage.setItem('hbf_last_login', new Date().toISOString());
-          
           toast({
             title: "Welcome back!",
             description: "You have successfully signed in."
@@ -809,8 +805,7 @@ const Index = () => {
           <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 bg-white">
             <div className="w-full max-w-md">
               {/* Welcome back message for returning users */}
-              {isLogin && returningUser && (
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              {isLogin && returningUser && <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                       <CheckCircle className="w-5 h-5 text-blue-600" />
@@ -818,21 +813,19 @@ const Index = () => {
                     <div>
                       <p className="text-sm font-medium text-blue-900">Welcome back!</p>
                       <p className="text-xs text-blue-700">
-                        Last login: {new Date(returningUser).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: '2-digit'
-                        })}
+                        Last login: {new Date(returningUser).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit'
+                    })}
                       </p>
                     </div>
                   </div>
-                </div>
-              )}
+                </div>}
 
               {/* Lockout warning */}
-              {isLockedOut && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              {isLockedOut && <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-3">
                     <AlertTriangle className="w-5 h-5 text-red-600" />
                     <div>
@@ -842,8 +835,7 @@ const Index = () => {
                       </p>
                     </div>
                   </div>
-                </div>
-              )}
+                </div>}
 
               {/* Header with title and signup link */}
               <div className="mb-8">
@@ -911,11 +903,7 @@ const Index = () => {
                   </div>}
 
                 {/* Continue Button with loading animation */}
-                <Button 
-                  type="submit" 
-                  className="max-w-xs h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium justify-between px-3 rounded-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50" 
-                  disabled={authLoading || isLockedOut}
-                >
+                <Button type="submit" className="max-w-xs h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium justify-between px-3 rounded-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50" disabled={authLoading || isLockedOut}>
                   <span className="flex items-center gap-2">
                     {authLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                     {authLoading ? "Signing in..." : "Continue"}
@@ -924,13 +912,7 @@ const Index = () => {
                 </Button>
 
                 {isLogin && <div className="flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
-                      id="rememberMe" 
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 border-2 border-gray-400 rounded-sm text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2 cursor-pointer" 
-                    />
+                    <input type="checkbox" id="rememberMe" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-4 h-4 border-2 border-gray-400 rounded-sm text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2 cursor-pointer" />
                     <label htmlFor="rememberMe" className="text-sm text-gray-700 cursor-pointer select-none">
                       Remember me
                     </label>
@@ -947,12 +929,10 @@ const Index = () => {
                   </div>}
 
                 {/* Rate limit warning */}
-                {loginAttempts > 0 && loginAttempts < 5 && !isLockedOut && (
-                  <div className="flex items-center gap-2 text-amber-600 text-sm">
+                {loginAttempts > 0 && loginAttempts < 5 && !isLockedOut && <div className="flex items-center gap-2 text-amber-600 text-sm">
                     <AlertTriangle className="w-4 h-4" />
                     <span>{5 - loginAttempts} login attempts remaining</span>
-                  </div>
-                )}
+                  </div>}
 
                 {authError && <Alert variant="destructive">
                     <AlertDescription>{authError}</AlertDescription>
@@ -1013,10 +993,7 @@ const Index = () => {
                     <Lock className="w-3.5 h-3.5 text-green-600" />
                     <span>256-bit SSL Encryption</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-blue-600" />
-                    <span>SOC 2 Compliant</span>
-                  </div>
+                  
                 </div>
               </div>
             </div>
