@@ -940,7 +940,7 @@ const Index = () => {
               </form>
 
               {/* Alternative login section */}
-              <div className="mt-8 text-center">
+              <div className="mt-4 text-center">
                 <p className="text-sm text-blue-600 mb-3">Alternative login</p>
                 <div className="flex items-center justify-center gap-2 sm:gap-3">
                   <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleLinkedInSignIn} disabled={authLoading} title="Continue with LinkedIn">
