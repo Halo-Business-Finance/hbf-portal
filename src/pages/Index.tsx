@@ -1006,16 +1006,16 @@ const Index = () => {
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
                   <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                    <span>Licensed & Regulated Lending Partners</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-green-600" />
                     <span>256-bit SSL Encryption</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Shield className="w-3.5 h-3.5 text-blue-600" />
                     <span>SOC 2 Compliant</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                    <span>Licensed & Regulated Lending Partners</span>
                   </div>
                 </div>
               </div>
