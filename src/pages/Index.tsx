@@ -1014,7 +1014,7 @@ const Index = () => {
               
               
               {/* Dots pattern */}
-              <div className="absolute top-20 right-20 grid grid-cols-4 gap-4">
+              <div className="absolute top-10 right-10 grid grid-cols-4 gap-4">
                 {Array.from({
                 length: 16
               }).map((_, i) => <div key={i} className="w-2 h-2 rounded-full bg-white/30" />)}
