@@ -973,7 +973,7 @@ const Index = () => {
               </div>
 
               {/* Footer links */}
-              {isLogin && <div className="mt-4 pt-4 border-t border-gray-200 text-center my-0 py-0">
+              {isLogin && <div className="mt-4 text-center">
                   <p className="text-sm text-gray-700">
                     Forgot password?{" "}
                     <button type="button" onClick={() => navigate('/forgot-password')} className="text-blue-600 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
