@@ -858,7 +858,7 @@ const Index = () => {
               </div>
 
               {/* Separator line */}
-              <div className="border-t border-gray-200 mb-8" />
+              
 
               <form onSubmit={handleAuthSubmit} className="space-y-6">
                 {!isLogin && <div className="grid grid-cols-2 gap-4">
