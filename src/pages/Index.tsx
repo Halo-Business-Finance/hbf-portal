@@ -973,8 +973,8 @@ const Index = () => {
               </div>
 
               {/* Footer links */}
-              {isLogin && <div className="mt-4 text-center">
-                  <p className="text-sm text-gray-700">
+              {isLogin && <div className="mt-4 mb-0 pb-0 text-center">
+                  <p className="text-sm text-gray-700 mb-0 pb-0">
                     Forgot password?{" "}
                     <button type="button" onClick={() => navigate('/forgot-password')} className="text-blue-600 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
                       Reset your password
@@ -983,7 +983,7 @@ const Index = () => {
                 </div>}
 
               {/* Security badges */}
-              <div className="mt-6 pt-4 border-t border-0 border-white my-0 py-0">
+              <div className="mt-2 pt-0 border-0">
                 <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
                   <div className="flex items-center gap-1.5">
                     <CheckCircle className="w-3.5 h-3.5 text-green-600" />
