@@ -1095,7 +1095,7 @@ const Index = () => {
               <CardTitle className="text-2xl font-bold text-foreground mb-2">
                 Choose Your Financing Solution
               </CardTitle>
-              <CardDescription className="text-base text-slate-50">
+              <CardDescription className="text-base text-slate-600">
                 Select the loan type that best fits your business needs
               </CardDescription>
             </CardHeader>
