@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Home, FileText, Wallet, FolderOpen, CreditCard, Landmark, LogOut, Menu, LayoutDashboard, Shield } from 'lucide-react';
+import { FileText, Wallet, FolderOpen, CreditCard, Landmark, LogOut, Menu, LayoutDashboard, Shield } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { useUserRole } from '@/hooks/useUserRole';
