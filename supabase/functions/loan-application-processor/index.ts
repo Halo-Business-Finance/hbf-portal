@@ -466,6 +466,7 @@ async function updateApplicationStatus(
   notes?: string,
   rateLimitHeaders?: Record<string, string>
 ): Promise<Response> {
+  const safeRateLimitHeaders = rateLimitHeaders ?? {};
   try {
     // First, fetch the current loan_details to merge safely
     const { data: currentApp, error: fetchError } = await supabase
@@ -509,7 +510,7 @@ async function updateApplicationStatus(
         application: data,
         message: 'Application status updated successfully'
       }),
-      { headers: { ...corsHeaders, ...(rateLimitHeaders || {}), 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -521,7 +522,7 @@ async function updateApplicationStatus(
         message: 'Failed to update application status',
         error: errorMessage 
       }),
-      { status: 500, headers: { ...corsHeaders, ...(rateLimitHeaders || {}), 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }
