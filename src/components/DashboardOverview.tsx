@@ -67,6 +67,27 @@ export const DashboardOverview = () => {
       </Card>;
   }
   return <Card className="border-2 border-blue-950 bg-gradient-to-br from-blue-950 to-blue-900 shadow-lg hover:shadow-xl transition-all duration-200">
-      
+      <CardContent className="p-8">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-blue-100">
+              <Wallet className="h-5 w-5" />
+              <span className="text-sm font-medium uppercase tracking-wide">Total Balance</span>
+            </div>
+            <div className="text-3xl font-bold text-white">
+              {formatCurrency(totalBalance)}
+            </div>
+          </div>
+          <div className="space-y-2 text-right">
+            <div className="flex items-center gap-2 justify-end text-blue-100">
+              <TrendingUp className="h-5 w-5" />
+              <span className="text-sm font-medium uppercase tracking-wide">Average Credit Score</span>
+            </div>
+            <div className="text-3xl font-bold text-white">
+              {averageScore !== null ? averageScore : '--'}
+            </div>
+          </div>
+        </div>
+      </CardContent>
     </Card>;
 };
