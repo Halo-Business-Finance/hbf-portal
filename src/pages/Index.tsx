@@ -40,6 +40,9 @@ import { BankBalanceWidget } from '@/components/BankBalanceWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { Footer } from '@/components/Footer';
 import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts, SwipeableDashboard } from '@/components/dashboard';
+
+const MAX_LOGIN_ATTEMPTS = 5;
+
 const FundedLoansView = ({
   userId
 }: {
@@ -630,14 +633,14 @@ const Index = () => {
           setLoginAttempts(newAttempts);
           localStorage.setItem('hbf_login_attempts', newAttempts.toString());
 
-          // Lock out after 5 failed attempts (2 minutes)
-          if (newAttempts >= 5) {
+          // Lock out after MAX_LOGIN_ATTEMPTS failed attempts (2 minutes)
+          if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
             const lockoutTime = Date.now() + 2 * 60 * 1000; // 2 minutes
             setLockoutUntil(lockoutTime);
             localStorage.setItem('hbf_lockout_until', lockoutTime.toString());
             setAuthError(`Too many failed attempts. Please try again in 2 minutes.`);
           } else if (error.message?.includes("Invalid login credentials")) {
-            setAuthError(`Invalid email or password. ${5 - newAttempts} attempts remaining.`);
+            setAuthError(`Invalid email or password. ${MAX_LOGIN_ATTEMPTS - newAttempts} attempts remaining.`);
           } else if (error.message?.includes("Email not confirmed")) {
             setAuthError("Please check your email and click the confirmation link before signing in.");
           } else {
