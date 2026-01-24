@@ -98,22 +98,6 @@ export default function LoanflowDashboard() {
   }
 
   return (
-// inside the LoanflowDashboard component, before the return:
-  const [loading, setLoading] = useState(false);
-
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      // existing logic to load dashboard data, for example:
-      // const stats = await adminService.getDashboardStats();
-      // setStats(stats);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-// inside the LoanflowDashboard component, before the return:
   const [loading, setLoading] = useState(false);
 
   const loadDashboardData = async () => {
