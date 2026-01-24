@@ -1072,7 +1072,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 py-10 bg-white border-0">
         <main>
         {/* Dashboard for Authenticated Users */}
-        {authenticated && !selectedLoanType && <DashboardView />}
+        {!selectedLoanType && <DashboardView />}
 
         {/* Back Button */}
         {selectedLoanType && <div className="mb-8 animate-slide-up">
