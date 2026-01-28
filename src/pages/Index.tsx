@@ -1099,7 +1099,7 @@ const Index = () => {
         <footer className="bg-gray-100 border-t border-gray-200 px-4 sm:px-6 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-600">
             <span className="text-center sm:text-left">
-              © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
+              © {new Date().getFullYear()} Halo Business Finance. All Rights Reserved.
             </span>
             <div className="flex items-center gap-4 sm:gap-6">
               <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors hover:text-gray-900">Privacy</a>
