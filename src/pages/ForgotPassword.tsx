@@ -73,7 +73,7 @@ const ForgotPassword = () => {
       <Button 
         type="button"
         variant="outline"
-        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-none border-blue-800 text-blue-800 hover:bg-blue-50"
+        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-full border-blue-800 text-blue-800 hover:bg-blue-50"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-5 w-5" />
@@ -121,7 +121,7 @@ const ForgotPassword = () => {
 
           <Button 
             type="submit" 
-            className="max-w-sm h-12 bg-blue-800 hover:bg-blue-900 text-white text-base font-medium justify-between px-4 rounded-none w-full"
+            className="max-w-sm h-12 bg-blue-800 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-full w-full"
             disabled={isSubmitting}
           >
             <span>{isSubmitting ? "Sending..." : "Send Reset Link"}</span>
