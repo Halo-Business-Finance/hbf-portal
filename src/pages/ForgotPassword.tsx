@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, Lock } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
 const emailSchema = z.object({
@@ -55,12 +55,12 @@ const ForgotPassword = () => {
   };
 
   const renderSuccessState = () => (
-    <div className="w-full max-w-md">
+    <>
       <div className="mb-8">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
-        <h1 className="text-xl font-normal text-black mb-3 text-center">
+        <h1 className="text-2xl sm:text-3xl font-serif text-center text-black mb-4">
           Check your email
         </h1>
         <p className="text-black text-center">
@@ -68,49 +68,41 @@ const ForgotPassword = () => {
         </p>
       </div>
 
-      <div className="border-t border-gray-200 mb-8" />
-
       <Button 
         type="button"
         variant="outline"
-        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-full border-black text-black hover:bg-gray-50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full h-12 text-base font-medium justify-center rounded-full border-2 border-black text-black hover:bg-gray-50 transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-5 w-5" />
         Back to Login
       </Button>
-    </div>
+    </>
   );
 
   const renderFormState = () => (
-    <div className="w-full max-w-md">
-      <div className="mb-8">
-        <h1 className="text-xl font-normal text-black mb-3">
-          Reset your password
-        </h1>
-        <p className="text-black">
-          Enter your email address and we'll send you a link to reset your password.
-        </p>
-      </div>
-
-      <div className="border-t border-gray-200 mb-8" />
+    <>
+      {/* Title */}
+      <h1 className="text-2xl sm:text-3xl font-serif text-center text-black mb-4">
+        Reset your password
+      </h1>
+      <p className="text-black text-center mb-8">
+        Enter your email address and we'll send you a link to reset your password.
+      </p>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="max-w-sm">
-                <Label htmlFor="email" className="text-sm text-black mb-2 block">
-                  Email
-                </Label>
+              <FormItem>
                 <FormControl>
                   <Input 
                     id="email"
                     type="email" 
-                    placeholder="you@example.com"
-                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-800 focus:ring-0 px-0"
+                    placeholder="Email"
+                    className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors"
                     {...field} 
                   />
                 </FormControl>
@@ -121,33 +113,34 @@ const ForgotPassword = () => {
 
           <Button 
             type="submit" 
-            className="max-w-sm h-12 bg-blue-800 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-full w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg hover:shadow-blue-800/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            disabled={isSubmitting}
+            className="w-full h-12 bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 text-base font-medium rounded-full transition-all disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={isSubmitting || !form.watch('email')}
+            style={{
+              backgroundColor: form.watch('email') ? '#d71e28' : undefined,
+              color: form.watch('email') ? 'white' : undefined
+            }}
           >
-            <span>{isSubmitting ? "Sending..." : "Send Reset Link"}</span>
-            {!isSubmitting && <ArrowRight className="h-5 w-5" />}
+            {isSubmitting ? "Sending..." : "Send Reset Link"}
           </Button>
 
-          <div className="pt-6 border-t border-gray-200">
+          <div className="text-center pt-4">
             <button 
               type="button"
               onClick={() => navigate('/')}
-              className="text-sm text-black hover:text-gray-700"
+              className="inline-flex items-center gap-2 text-black hover:text-gray-700 text-sm font-medium hover:underline focus:outline-none"
             >
-              <span className="text-black hover:text-gray-700 hover:underline flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Back to Login
-              </span>
+              <ArrowLeft className="h-4 w-4" />
+              Back to Login
             </button>
           </div>
         </form>
       </Form>
-    </div>
+    </>
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Header */}
+    <div className="min-h-screen flex flex-col">
+      {/* Header Bar */}
       <header className="bg-black px-4 sm:px-6 py-4">
         <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
@@ -157,75 +150,33 @@ const ForgotPassword = () => {
         </a>
       </header>
 
-      {/* Main Content - Two Column Layout */}
-      <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Column - Form */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 bg-white">
+      {/* Main Content - Background Image with Centered Card */}
+      <div className="flex-1 flex items-center justify-center px-4 py-8 bg-cover bg-center bg-no-repeat relative" style={{
+        backgroundImage: `url('/login-background.jpg?v=2')`
+      }}>
+        {/* Overlay for better readability */}
+        <div className="absolute inset-0 bg-black/10" />
+        
+        {/* Reset Password Card */}
+        <div className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 sm:p-10">
           {emailSent ? renderSuccessState() : renderFormState()}
-        </div>
-
-        {/* Right Column - Decorative Geometric Shapes */}
-        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden items-center justify-center">
-          {/* Geometric shapes */}
-          <div className="absolute inset-0">
-            {/* Large circle - centered */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border-2 border-white/20" />
-            
-            {/* Medium circle */}
-            <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-white/10" />
-            
-            {/* Small filled circle */}
-            <div className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-blue-400/30" />
-            
-            {/* Dots pattern */}
-            <div className="absolute top-20 right-20 grid grid-cols-4 gap-4">
-              {Array.from({ length: 16 }).map((_, i) => (
-                <div key={i} className="w-2 h-2 rounded-full bg-white/30" />
-              ))}
-            </div>
-            
-            {/* Lines */}
-            <div className="absolute bottom-20 left-20 space-y-3">
-              <div className="w-32 h-0.5 bg-white/20" />
-              <div className="w-24 h-0.5 bg-white/20" />
-              <div className="w-16 h-0.5 bg-white/20" />
-            </div>
-          </div>
-
-          {/* Center content */}
-          <div className="relative z-10 text-center text-white px-12">
-            <p className="text-2xl font-bold tracking-wider mb-2 text-white">Welcome to our</p>
-            <h1 className="text-2xl font-bold mb-4 text-white">Commercial Loan Marketplace</h1>
-            <div className="flex items-center justify-center gap-8 text-sm text-white mb-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-white" />
-                <span>Fast Approval</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-white" />
-                <span>Low Rates</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-white" />
-                <span>Expert Support</span>
-              </div>
-            </div>
-            <h2 className="text-base font-medium drop-shadow-md text-white">Business Financing Made Simple</h2>
-          </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+      <footer className="bg-gray-100 border-t border-gray-200 px-4 sm:px-6 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-black">
           <span className="text-center sm:text-left">
-            © {new Date().getFullYear()} Halo Business Finance.
-            <span className="block sm:inline"> All rights reserved.</span>
+            © {new Date().getFullYear()} Halo Business Finance. All Rights Reserved.
           </span>
           <div className="flex items-center gap-4 sm:gap-6">
-            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy Policy</a>
-            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms of Service</a>
-            <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Support</a>
+            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Privacy</a>
+            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Terms</a>
+            <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Support</a>
+            <div className="flex items-center gap-1.5 text-black">
+              <Lock className="w-3.5 h-3.5" />
+              <span>Secured</span>
+            </div>
           </div>
         </div>
       </footer>
