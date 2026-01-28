@@ -397,7 +397,7 @@ const ChangePassword = () => {
 
       {/* Main Content - Background Image with Centered Card */}
       <div 
-        className="flex-1 flex items-center justify-center px-4 py-6 sm:py-8"
+        className="flex-1 flex items-center justify-center px-4 py-4 sm:py-8 overflow-hidden"
         style={{
           backgroundImage: 'url(/login-background.jpg?v=2)',
           backgroundSize: 'cover',
@@ -405,8 +405,12 @@ const ChangePassword = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 sm:p-10 mx-2 sm:mx-0">
-          {passwordUpdated ? renderSuccessState() : renderFormState()}
+        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col">
+          <div className="p-6 sm:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+            {passwordUpdated ? renderSuccessState() : renderFormState()}
+          </div>
+          {/* Scroll indicator gradient for mobile */}
+          <div className="h-4 bg-gradient-to-t from-white to-transparent pointer-events-none sm:hidden -mt-4 relative z-10 rounded-b-2xl" />
         </div>
       </div>
 
