@@ -355,7 +355,7 @@ const ChangePassword = () => {
 
           <Button 
             type="submit" 
-            className="max-w-sm h-12 bg-blue-800 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-full w-full"
+            className="max-w-sm h-12 bg-blue-800 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-full w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             disabled={isSubmitting}
           >
             <span>{isSubmitting ? "Updating..." : "Update Password"}</span>
