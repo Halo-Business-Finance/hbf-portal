@@ -997,7 +997,7 @@ const Index = () => {
               {/* Sign On Button */}
               <Button
                 type="submit"
-                className={`w-full h-12 text-base font-medium rounded-full transition-all disabled:opacity-50 ${
+                className={`w-full h-12 text-base font-medium rounded-full transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] ${
                   email && password 
                     ? 'bg-blue-800 hover:bg-blue-700 text-white' 
                     : 'bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800'
