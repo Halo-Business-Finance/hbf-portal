@@ -350,7 +350,7 @@ const ResetPassword = () => {
 
       {/* Main Content - Background Image with Centered Card */}
       <div 
-        className="flex-1 flex items-center justify-center px-4 py-8"
+        className="flex-1 flex items-center justify-center px-4 py-6 sm:py-8"
         style={{
           backgroundImage: 'url(/login-background.jpg?v=2)',
           backgroundSize: 'cover',
@@ -358,26 +358,25 @@ const ResetPassword = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 sm:p-10">
+        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 sm:p-10 mx-2 sm:mx-0">
           {renderContent()}
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-black">
-          <div className="flex items-center gap-2">
-            <Lock className="h-4 w-4 text-black" />
-            <span>Secured</span>
-          </div>
-          <span className="text-center sm:text-left">
-            © {new Date().getFullYear()} Halo Business Finance.
-            <span className="block sm:inline"> All rights reserved.</span>
+      <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm text-black">
+          <span className="text-center sm:text-left order-2 sm:order-1">
+            © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
           </span>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy Policy</a>
-            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms of Service</a>
+          <div className="flex items-center gap-3 sm:gap-6 order-1 sm:order-2">
+            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy</a>
+            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms</a>
             <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Support</a>
+            <div className="flex items-center gap-1">
+              <Lock className="h-3 w-3 sm:h-4 sm:w-4 text-black" />
+              <span>Secured</span>
+            </div>
           </div>
         </div>
       </footer>
