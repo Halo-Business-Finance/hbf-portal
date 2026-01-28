@@ -73,7 +73,7 @@ const ForgotPassword = () => {
       <Button 
         type="button"
         variant="outline"
-        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-none border-gray-300"
+        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-none border-blue-800 text-blue-800 hover:bg-blue-50"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-5 w-5" />
@@ -102,7 +102,7 @@ const ForgotPassword = () => {
             name="email"
             render={({ field }) => (
               <FormItem className="max-w-sm">
-                <Label htmlFor="email" className="text-sm text-blue-600 mb-2 block">
+                <Label htmlFor="email" className="text-sm text-blue-800 mb-2 block">
                   Email
                 </Label>
                 <FormControl>
@@ -110,7 +110,7 @@ const ForgotPassword = () => {
                     id="email"
                     type="email" 
                     placeholder="you@example.com"
-                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-800 focus:ring-0 px-0"
                     {...field} 
                   />
                 </FormControl>
@@ -121,7 +121,7 @@ const ForgotPassword = () => {
 
           <Button 
             type="submit" 
-            className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none w-full"
+            className="max-w-sm h-12 bg-blue-800 hover:bg-blue-900 text-white text-base font-medium justify-between px-4 rounded-none w-full"
             disabled={isSubmitting}
           >
             <span>{isSubmitting ? "Sending..." : "Send Reset Link"}</span>
@@ -134,7 +134,7 @@ const ForgotPassword = () => {
               onClick={() => navigate('/')}
               className="text-sm text-gray-700 hover:text-gray-900"
             >
-              <span className="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2">
+              <span className="text-blue-800 hover:text-blue-900 hover:underline flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Login
               </span>
