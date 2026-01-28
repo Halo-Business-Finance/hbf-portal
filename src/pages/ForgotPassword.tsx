@@ -73,7 +73,7 @@ const ForgotPassword = () => {
       <Button 
         type="button"
         variant="outline"
-        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-full border-blue-800 text-blue-800 hover:bg-blue-50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-full border-blue-800 text-blue-800 hover:bg-blue-50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-5 w-5" />
