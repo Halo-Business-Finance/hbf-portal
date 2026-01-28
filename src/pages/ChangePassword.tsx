@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { ArrowLeft, ArrowRight, CheckCircle, Eye, EyeOff, Lock } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { useScrollBounce } from '@/hooks/useScrollBounce';
 
 // Rate limiting configuration
 const RATE_LIMIT = { maxAttempts: 3, windowMs: 300000, lockoutMs: 600000 }; // 10 min lockout
@@ -54,6 +55,7 @@ const ChangePassword = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAllPasswords, setShowAllPasswords] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const { onScroll, bounceClass } = useScrollBounce();
   
   // Rate limiting
   const rateLimitRef = useRef<RateLimitEntry | null>(null);
@@ -405,8 +407,11 @@ const ChangePassword = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col">
-          <div className="p-6 sm:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className={`w-full max-w-lg bg-white rounded-2xl shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col ${bounceClass}`}>
+          <div 
+            className="p-6 sm:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent overscroll-contain"
+            onScroll={onScroll}
+          >
             {passwordUpdated ? renderSuccessState() : renderFormState()}
           </div>
           {/* Scroll indicator gradient for mobile */}
