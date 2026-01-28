@@ -879,7 +879,7 @@ const Index = () => {
               {/* Password Input */}
               <div className="relative">
                 <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border border-gray-300 rounded-full px-5 pr-16 focus:border-gray-500 focus:ring-0 transition-colors" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-purple-700 hover:text-purple-900 text-sm font-medium focus:outline-none focus:underline" disabled={authLoading}>
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-black hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline" disabled={authLoading}>
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
@@ -951,12 +951,12 @@ const Index = () => {
               <div className="text-center text-sm text-black pt-2">
                 {isLogin ? <>
                     Don't have an account?{" "}
-                    <button type="button" onClick={() => switchMode("signup")} className="text-purple-700 hover:text-purple-900 font-medium hover:underline focus:outline-none">
+                    <button type="button" onClick={() => switchMode("signup")} className="text-black hover:text-gray-700 font-medium hover:underline focus:outline-none">
                       Create one
                     </button>
                   </> : <>
                     Already have an account?{" "}
-                    <button type="button" onClick={() => switchMode("login")} className="text-purple-700 hover:text-purple-900 font-medium hover:underline focus:outline-none">
+                    <button type="button" onClick={() => switchMode("login")} className="text-black hover:text-gray-700 font-medium hover:underline focus:outline-none">
                       Sign in
                     </button>
                   </>}
@@ -965,7 +965,7 @@ const Index = () => {
 
             {/* Forgot Password Link */}
             {isLogin && <div className="mt-8 text-center">
-                <button type="button" onClick={() => navigate('/forgot-password')} className="inline-flex items-center gap-2 text-purple-700 hover:text-purple-900 text-sm font-medium hover:underline focus:outline-none">
+                <button type="button" onClick={() => navigate('/forgot-password')} className="inline-flex items-center gap-2 text-black hover:text-gray-700 text-sm font-medium hover:underline focus:outline-none">
                   <ArrowRight className="w-4 h-4" />
                   Forgot email or password?
                 </button>
