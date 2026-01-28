@@ -815,7 +815,7 @@ const Index = () => {
         <div 
           className="flex-1 flex items-center justify-center px-4 py-8 bg-cover bg-center bg-no-repeat relative"
           style={{
-            backgroundImage: `url('/login-background.jpg')`,
+            backgroundImage: `url('/login-background.jpg?v=2')`,
           }}
         >
           {/* Overlay for better readability */}
