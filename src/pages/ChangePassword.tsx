@@ -174,7 +174,7 @@ const ChangePassword = () => {
       <Button 
         type="button"
         variant="outline"
-        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-none border-gray-300"
+        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-full border-blue-800 text-blue-800 hover:bg-blue-50"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-5 w-5" />
@@ -219,14 +219,14 @@ const ChangePassword = () => {
             name="currentPassword"
             render={({ field }) => (
               <FormItem className="max-w-sm">
-                <Label htmlFor="currentPassword" className="text-sm text-blue-600 mb-2 block">
+                <Label htmlFor="currentPassword" className="text-sm text-blue-800 mb-2 block">
                   Current password
                 </Label>
                 <FormControl>
                   <Input 
                     id="currentPassword"
                     type={showAllPasswords ? "text" : "password"}
-                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-800 focus:ring-0 px-0"
                     {...field} 
                   />
                 </FormControl>
@@ -243,14 +243,14 @@ const ChangePassword = () => {
               const requirements = getPasswordRequirements(field.value);
               return (
                 <FormItem className="max-w-sm">
-                  <Label htmlFor="newPassword" className="text-sm text-blue-600 mb-2 block">
+                  <Label htmlFor="newPassword" className="text-sm text-blue-800 mb-2 block">
                     New password
                   </Label>
                   <FormControl>
                     <Input 
                       id="newPassword"
                       type={showAllPasswords ? "text" : "password"}
-                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-800 focus:ring-0 px-0"
                       {...field} 
                     />
                   </FormControl>
@@ -310,7 +310,7 @@ const ChangePassword = () => {
               
               return (
                 <FormItem className="max-w-sm">
-                  <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
+                  <Label htmlFor="confirmPassword" className="text-sm text-blue-800 mb-2 block">
                     Confirm new password
                   </Label>
                   <FormControl>
@@ -322,7 +322,7 @@ const ChangePassword = () => {
                           ? passwordsMatch 
                             ? 'border-green-500 focus:border-green-500' 
                             : 'border-red-400 focus:border-red-400'
-                          : 'border-gray-300 focus:border-blue-600'
+                          : 'border-gray-300 focus:border-blue-800'
                       }`}
                       {...field} 
                     />
@@ -355,7 +355,7 @@ const ChangePassword = () => {
 
           <Button 
             type="submit" 
-            className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none w-full"
+            className="max-w-sm h-12 bg-blue-800 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-full w-full"
             disabled={isSubmitting}
           >
             <span>{isSubmitting ? "Updating..." : "Update Password"}</span>
@@ -368,7 +368,7 @@ const ChangePassword = () => {
               onClick={() => navigate('/')}
               className="text-sm text-gray-700 hover:text-gray-900"
             >
-              <span className="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2">
+              <span className="text-blue-800 hover:text-blue-900 hover:underline flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </span>
