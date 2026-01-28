@@ -1000,7 +1000,7 @@ const Index = () => {
                 className="w-full h-12 bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 text-base font-medium rounded-full transition-all disabled:opacity-50"
                 disabled={authLoading || isLockedOut || !email || !password}
                 style={{
-                  backgroundColor: email && password ? '#d71e28' : undefined,
+                  backgroundColor: email && password ? '#1e40af' : undefined,
                   color: email && password ? 'white' : undefined,
                 }}
               >
