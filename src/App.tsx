@@ -224,11 +224,9 @@ const App = () => (
                 </Layout>
               } />
               <Route path="/change-password" element={
-                <Layout>
-                  <ProtectedRoute>
-                    <ChangePassword />
-                  </ProtectedRoute>
-                </Layout>
+                <ProtectedRoute>
+                  <ChangePassword />
+                </ProtectedRoute>
               } />
               <Route path="/change-email" element={
                 <Layout>
