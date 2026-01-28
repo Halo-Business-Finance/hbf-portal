@@ -818,7 +818,7 @@ const Index = () => {
           {/* Login Card */}
           <div className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 sm:p-10">
             {/* Greeting */}
-            <h1 className="text-3xl sm:text-4xl font-serif text-center text-gray-900 mb-8">
+            <h1 className="text-3xl sm:text-4xl font-serif text-center text-black mb-8">
               {getGreeting()}
             </h1>
 
@@ -892,7 +892,7 @@ const Index = () => {
               {isLogin && <div className="flex items-start gap-3">
                   <input type="checkbox" id="rememberMe" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-5 h-5 mt-0.5 border-2 border-gray-400 rounded text-purple-700 focus:ring-purple-500 focus:ring-2 focus:ring-offset-2 cursor-pointer" />
                   <div>
-                    <label htmlFor="rememberMe" className="text-sm text-gray-900 cursor-pointer select-none font-medium">
+                    <label htmlFor="rememberMe" className="text-sm text-black cursor-pointer select-none font-medium">
                       Save email
                     </label>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -929,7 +929,7 @@ const Index = () => {
 
               {/* Alternative Login Buttons */}
               <div className="space-y-3">
-                <Button type="button" variant="outline" className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2" onClick={handleGoogleSignIn} disabled={authLoading}>
+                <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2" onClick={handleGoogleSignIn} disabled={authLoading}>
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
                     <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
@@ -939,7 +939,7 @@ const Index = () => {
                   Continue with Google
                 </Button>
 
-                <Button type="button" variant="outline" className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2" onClick={handleLinkedInSignIn} disabled={authLoading}>
+                <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2" onClick={handleLinkedInSignIn} disabled={authLoading}>
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
@@ -948,7 +948,7 @@ const Index = () => {
               </div>
 
               {/* Sign up / Sign in toggle */}
-              <div className="text-center text-sm text-gray-600 pt-2">
+              <div className="text-center text-sm text-black pt-2">
                 {isLogin ? <>
                     Don't have an account?{" "}
                     <button type="button" onClick={() => switchMode("signup")} className="text-purple-700 hover:text-purple-900 font-medium hover:underline focus:outline-none">
