@@ -789,286 +789,331 @@ const Index = () => {
     resetForm();
   };
 
-  // Show auth forms for unauthenticated users - IBM-style login
+  // Time-based greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  // Show auth forms for unauthenticated users - Wells Fargo style
   if (!authenticated) {
-    return <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* Header */}
-        <header className="bg-black px-4 sm:px-6 py-4">
-          <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-sm">HBF</span>
+    return (
+      <div className="min-h-screen flex flex-col">
+        {/* Header Bar */}
+        <header className="bg-[#d71e28] px-4 sm:px-6 py-3 flex items-center justify-between">
+          <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <div className="w-8 h-8 bg-white rounded flex items-center justify-center flex-shrink-0">
+              <span className="text-[#d71e28] font-bold text-sm">HBF</span>
             </div>
             <span className="text-lg sm:text-xl font-semibold text-white">Halo Business Finance</span>
           </a>
         </header>
 
-        {/* Main Content - Two Column Layout */}
-        <div className="flex-1 flex flex-col lg:flex-row">
-          {/* Left Column - Login Form */}
-          <div className="flex-1 flex items-center justify-center px-4 sm:px-8 pt-8 pb-2 sm:pt-12 sm:pb-3 bg-white">
-            <div className="w-full max-w-md">
-              {/* Welcome back message for returning users */}
-              {isLogin && returningUser && <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-blue-900">Welcome back!</p>
-                      <p className="text-xs text-blue-700">
-                        Last login: {new Date(returningUser).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit'
-                    })}
-                      </p>
-                    </div>
-                  </div>
-                </div>}
+        {/* Main Content - Background Image with Centered Card */}
+        <div 
+          className="flex-1 flex items-center justify-center px-4 py-8 bg-cover bg-center bg-no-repeat relative"
+          style={{
+            backgroundImage: `url('/login-background.jpg')`,
+          }}
+        >
+          {/* Overlay for better readability */}
+          <div className="absolute inset-0 bg-black/10" />
+          
+          {/* Login Card */}
+          <div className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 sm:p-10">
+            {/* Greeting */}
+            <h1 className="text-3xl sm:text-4xl font-serif text-center text-gray-900 mb-8">
+              {getGreeting()}
+            </h1>
 
-              {/* Lockout warning */}
-              {isLockedOut && <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                    <div>
-                      <p className="text-sm font-medium text-red-900">Account temporarily locked</p>
-                      <p className="text-xs text-red-700">
-                        Try again in {formatLockoutTime(lockoutUntil! - Date.now())}
-                      </p>
-                    </div>
+            {/* Welcome back message for returning users */}
+            {isLogin && returningUser && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-blue-600" />
                   </div>
-                </div>}
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Welcome back!</p>
+                    <p className="text-xs text-blue-700">
+                      Last login: {new Date(returningUser).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
-              {/* Header with title and signup link */}
-              <div className="mb-8">
-                <h1 className="text-xl font-normal text-gray-900 mb-3">
-                  {isLogin ? "Log in to your account" : "Create your account"}
-                </h1>
-                <p className="text-gray-600">
-                  {isLogin ? <>
-                      Don't have an account?{" "}
-                      <button type="button" onClick={() => switchMode("signup")} className="text-blue-600 hover:text-blue-700 font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
-                        Create an account
-                      </button>
-                    </> : <>
-                      Already have an account?{" "}
-                      <button type="button" onClick={() => switchMode("login")} className="text-blue-600 hover:text-blue-700 font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
-                        Sign in
-                      </button>
-                    </>}
-                </p>
+            {/* Lockout warning */}
+            {isLockedOut && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                  <div>
+                    <p className="text-sm font-medium text-red-900">Account temporarily locked</p>
+                    <p className="text-xs text-red-700">
+                      Try again in {formatLockoutTime(lockoutUntil! - Date.now())}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleAuthSubmit} className="space-y-5">
+              {!isLogin && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      placeholder="First name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                      disabled={authLoading || isLockedOut}
+                      className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      placeholder="Last name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                      disabled={authLoading || isLockedOut}
+                      className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Email/Username Input */}
+              <div className="relative">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={authLoading || isLockedOut}
+                  className="h-12 bg-white border border-gray-300 rounded-full px-5 pr-12 focus:border-gray-500 focus:ring-0 transition-colors"
+                />
+                {email && (
+                  <button
+                    type="button"
+                    onClick={() => setEmail("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                    tabIndex={-1}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
+                      <path strokeWidth="1.5" d="M15 9l-6 6m0-6l6 6" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
-              {/* Separator line */}
-              
+              {/* Password Input */}
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={authLoading || isLockedOut}
+                  className="h-12 bg-white border border-gray-300 rounded-full px-5 pr-16 focus:border-gray-500 focus:ring-0 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-purple-700 hover:text-purple-900 text-sm font-medium focus:outline-none focus:underline"
+                  disabled={authLoading}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
 
-              <form onSubmit={handleAuthSubmit} className="space-y-6">
-                {!isLogin && <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName" className="text-sm text-blue-600 mb-2 block">
-                        First name
-                      </Label>
-                      <Input id="firstName" type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName" className="text-sm text-blue-600 mb-2 block">
-                        Last name
-                      </Label>
-                      <Input id="lastName" type="text" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
-                    </div>
-                  </div>}
-
-                <div className="max-w-sm">
-                  <Label htmlFor="email" className="text-sm text-blue-600 mb-2 block">
-                    Email
-                  </Label>
-                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
+              {!isLogin && (
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={authLoading || isLockedOut}
+                    className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors"
+                  />
                 </div>
+              )}
 
-                <div className="max-w-sm">
-                  <Label htmlFor="password" className="text-sm text-blue-600 mb-2 block">
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 pr-12 transition-colors" />
-                    <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded" onClick={() => setShowPassword(!showPassword)} disabled={authLoading}>
-                      {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
-                    </Button>
+              {/* Remember Me Checkbox */}
+              {isLogin && (
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-5 h-5 mt-0.5 border-2 border-gray-400 rounded text-purple-700 focus:ring-purple-500 focus:ring-2 focus:ring-offset-2 cursor-pointer"
+                  />
+                  <div>
+                    <label htmlFor="rememberMe" className="text-sm text-gray-900 cursor-pointer select-none font-medium">
+                      Save email
+                    </label>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      To help keep your account secure, save your email only on devices that aren't used by other people.
+                    </p>
                   </div>
                 </div>
+              )}
 
-                {!isLogin && <div className="max-w-sm">
-                    <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
-                      Confirm password
-                    </Label>
-                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 px-0 transition-colors" />
-                  </div>}
+              {/* Rate limit warning */}
+              {loginAttempts > 0 && loginAttempts < 5 && !isLockedOut && (
+                <div className="flex items-center gap-2 text-amber-600 text-sm">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>{5 - loginAttempts} login attempts remaining</span>
+                </div>
+              )}
 
-                {/* Continue Button with loading animation */}
-                <Button type="submit" className="max-w-xs h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium justify-between px-3 rounded-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50" disabled={authLoading || isLockedOut}>
-                  <span className="flex items-center gap-2">
-                    {authLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {authLoading ? "Signing in..." : "Continue"}
+              {authError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{authError}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Sign On Button */}
+              <Button
+                type="submit"
+                className="w-full h-12 bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 text-base font-medium rounded-full transition-all disabled:opacity-50"
+                disabled={authLoading || isLockedOut || !email || !password}
+                style={{
+                  backgroundColor: email && password ? '#d71e28' : undefined,
+                  color: email && password ? 'white' : undefined,
+                }}
+              >
+                {authLoading ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Signing in...
                   </span>
-                  {!authLoading && <ArrowRight className="h-4 w-4" />}
+                ) : (
+                  isLogin ? "Sign on" : "Create account"
+                )}
+              </Button>
+
+              {/* Divider */}
+              <div className="text-center text-gray-500 text-sm">
+                or
+              </div>
+
+              {/* Alternative Login Buttons */}
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  onClick={handleGoogleSignIn}
+                  disabled={authLoading}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
+                    <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
+                    <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
+                    <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
+                  </svg>
+                  Continue with Google
                 </Button>
 
-                {isLogin && <div className="flex items-center gap-2">
-                    <input type="checkbox" id="rememberMe" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-4 h-4 border-2 border-gray-400 rounded-sm text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2 cursor-pointer" />
-                    <label htmlFor="rememberMe" className="text-sm text-gray-700 cursor-pointer select-none">
-                      Remember me
-                    </label>
-                    <div className="relative group">
-                      <svg className="w-4 h-4 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                        <path strokeWidth="2" d="M12 16v-4m0-4h.01" />
-                      </svg>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                        Stay signed in on this device for 30 days
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
-                      </div>
-                    </div>
-                  </div>}
-
-                {/* Rate limit warning */}
-                {loginAttempts > 0 && loginAttempts < 5 && !isLockedOut && <div className="flex items-center gap-2 text-amber-600 text-sm">
-                    <AlertTriangle className="w-4 h-4" />
-                    <span>{5 - loginAttempts} login attempts remaining</span>
-                  </div>}
-
-                {authError && <Alert variant="destructive">
-                    <AlertDescription>{authError}</AlertDescription>
-                  </Alert>}
-              </form>
-
-              {/* Alternative login section */}
-              <div className="mt-4 text-center">
-                <p className="text-sm text-blue-600 mb-3">Alternative login</p>
-                <div className="flex items-center justify-center gap-2 sm:gap-3">
-                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleLinkedInSignIn} disabled={authLoading} title="Continue with LinkedIn">
-                    <svg className="w-6 h-6 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="#0A66C2">
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                    </svg>
-                  </Button>
-                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleGoogleSignIn} disabled={authLoading} title="Continue with Google">
-                    <svg className="w-6 h-6 sm:w-5 sm:h-5" viewBox="0 0 24 24">
-                      <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
-                      <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
-                      <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
-                      <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
-                    </svg>
-                  </Button>
-                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleAppleSignIn} disabled={authLoading} title="Continue with Apple">
-                    <svg className="w-6 h-6 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 384 512">
-                      <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-                    </svg>
-                  </Button>
-                  <Button type="button" variant="outline" className="h-14 w-14 sm:h-12 sm:w-12 border-gray-300 hover:bg-gray-50 active:bg-gray-100 p-0 rounded-none flex items-center justify-center touch-manipulation" onClick={handleMicrosoftSignIn} disabled={authLoading} title="Continue with Microsoft">
-                    <svg className="w-6 h-6 sm:w-5 sm:h-5" viewBox="0 0 24 24">
-                      <path fill="#F25022" d="M1 1h10v10H1z" />
-                      <path fill="#00A4EF" d="M1 13h10v10H1z" />
-                      <path fill="#7FBA00" d="M13 1h10v10H13z" />
-                      <path fill="#FFB900" d="M13 13h10v10H13z" />
-                    </svg>
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  onClick={handleLinkedInSignIn}
+                  disabled={authLoading}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                  Continue with LinkedIn
+                </Button>
               </div>
 
-              {/* Footer links */}
-              {isLogin && <div className="mt-4 mb-0 pb-0 text-center">
-                  <p className="text-sm text-gray-700 mb-0 pb-0">
-                    Forgot password?{" "}
-                    <button type="button" onClick={() => navigate('/forgot-password')} className="text-blue-600 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">
-                      Reset your password
+              {/* Sign up / Sign in toggle */}
+              <div className="text-center text-sm text-gray-600 pt-2">
+                {isLogin ? (
+                  <>
+                    Don't have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => switchMode("signup")}
+                      className="text-purple-700 hover:text-purple-900 font-medium hover:underline focus:outline-none"
+                    >
+                      Create one
                     </button>
-                  </p>
-                </div>}
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => switchMode("login")}
+                      className="text-purple-700 hover:text-purple-900 font-medium hover:underline focus:outline-none"
+                    >
+                      Sign in
+                    </button>
+                  </>
+                )}
+              </div>
+            </form>
 
-              {/* Security badges */}
-              <div className="mt-2 pt-0 border-0">
-                <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                    <span>Licensed & Regulated Lending Partners</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-green-600" />
-                    <span>256-bit SSL Encryption</span>
-                  </div>
-                  
-                </div>
+            {/* Forgot Password Link */}
+            {isLogin && (
+              <div className="mt-8 text-center">
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  className="inline-flex items-center gap-2 text-purple-700 hover:text-purple-900 text-sm font-medium hover:underline focus:outline-none"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                  Forgot email or password?
+                </button>
               </div>
-            </div>
-          </div>
-
-          {/* Right Column - Decorative Geometric Shapes */}
-          <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden items-center justify-center">
-            {/* Geometric shapes */}
-            <div className="absolute inset-0">
-              {/* Large circle - centered */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border-2 border-white/20" />
-              
-              {/* Medium circle */}
-              <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-white/10" />
-              
-              {/* Small filled circle */}
-              <div className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-blue-400/30" />
-              
-              
-              {/* Dots pattern */}
-              <div className="absolute top-10 right-10 grid grid-cols-4 gap-4">
-                {Array.from({
-                length: 16
-              }).map((_, i) => <div key={i} className="w-2 h-2 rounded-full bg-white/30" />)}
-              </div>
-              
-              {/* Lines */}
-              <div className="absolute bottom-20 left-20 space-y-3">
-                <div className="w-32 h-0.5 bg-white/20" />
-                <div className="w-24 h-0.5 bg-white/20" />
-                <div className="w-16 h-0.5 bg-white/20" />
-              </div>
-            </div>
-
-            {/* Center content */}
-            <div className="relative z-10 text-center text-white px-12 -mt-16">
-              <p className="text-2xl font-bold tracking-wider mb-2 text-white">Welcome to our</p>
-              <h1 className="text-2xl font-bold mb-4 text-white">Commercial Loan Marketplace</h1>
-              <div className="flex items-center justify-center gap-8 text-sm text-white mb-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-white" />
-                  <span>Fast Approval</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-white" />
-                  <span>Low Rates</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-white" />
-                  <span>Expert Support</span>
-                </div>
-              </div>
-              <h2 className="text-base font-medium drop-shadow-md text-white">Business Financing Made Simple</h2>
-            </div>
+            )}
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
-            <span className="text-center sm:text-left text-black">
-              © {new Date().getFullYear()} Halo Business Finance.
-              <span className="block sm:inline"> All rights reserved.</span>
+        <footer className="bg-gray-100 border-t border-gray-200 px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-600">
+            <span className="text-center sm:text-left">
+              © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
             </span>
             <div className="flex items-center gap-4 sm:gap-6">
-              <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Privacy Policy</a>
-              <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Terms of Service</a>
-              <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Support</a>
+              <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors hover:text-gray-900">Privacy</a>
+              <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors hover:text-gray-900">Terms</a>
+              <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors hover:text-gray-900">Support</a>
+              <div className="flex items-center gap-1.5 text-gray-500">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Secured</span>
+              </div>
             </div>
           </div>
         </footer>
-      </div>;
+      </div>
+    );
   }
   return <Layout>
       <div className="min-h-screen bg-background">
