@@ -937,7 +937,7 @@ const Index = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none focus:underline"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-800 hover:text-blue-900 text-sm font-medium focus:outline-none focus:underline"
                   disabled={authLoading}
                 >
                   {showPassword ? "Hide" : "Show"}
@@ -967,7 +967,7 @@ const Index = () => {
                     id="rememberMe"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-5 h-5 mt-0.5 border-2 border-gray-400 rounded text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2 cursor-pointer"
+                    className="w-5 h-5 mt-0.5 border-2 border-gray-400 rounded text-blue-800 focus:ring-blue-700 focus:ring-2 focus:ring-offset-2 cursor-pointer"
                   />
                   <div>
                     <label htmlFor="rememberMe" className="text-sm text-gray-900 cursor-pointer select-none font-medium">
@@ -1088,7 +1088,7 @@ const Index = () => {
                     <button
                       type="button"
                       onClick={() => switchMode("signup")}
-                      className="text-blue-600 hover:text-blue-800 font-medium hover:underline focus:outline-none"
+                      className="text-blue-800 hover:text-blue-900 font-medium hover:underline focus:outline-none"
                     >
                       Create one
                     </button>
@@ -1099,7 +1099,7 @@ const Index = () => {
                     <button
                       type="button"
                       onClick={() => switchMode("login")}
-                      className="text-blue-600 hover:text-blue-800 font-medium hover:underline focus:outline-none"
+                      className="text-blue-800 hover:text-blue-900 font-medium hover:underline focus:outline-none"
                     >
                       Sign in
                     </button>
@@ -1114,7 +1114,7 @@ const Index = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline focus:outline-none"
+                  className="inline-flex items-center gap-2 text-blue-800 hover:text-blue-900 text-sm font-medium hover:underline focus:outline-none"
                 >
                   <ArrowRight className="w-4 h-4" />
                   Forgot email or password?
