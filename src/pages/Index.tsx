@@ -997,12 +997,12 @@ const Index = () => {
               {/* Sign On Button */}
               <Button
                 type="submit"
-                className="w-full h-12 bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 text-base font-medium rounded-full transition-all disabled:opacity-50"
+                className={`w-full h-12 text-base font-medium rounded-full transition-all disabled:opacity-50 ${
+                  email && password 
+                    ? 'bg-blue-800 hover:bg-blue-700 text-white' 
+                    : 'bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800'
+                }`}
                 disabled={authLoading || isLockedOut || !email || !password}
-                style={{
-                  backgroundColor: email && password ? '#1e40af' : undefined,
-                  color: email && password ? 'white' : undefined,
-                }}
               >
                 {authLoading ? (
                   <span className="flex items-center gap-2 justify-center">
