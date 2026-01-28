@@ -997,7 +997,7 @@ const Index = () => {
               {/* Sign On Button */}
               <Button
                 type="submit"
-                className={`w-full h-12 text-base font-medium rounded-full transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg ${
+                className={`w-full h-12 text-base font-medium rounded-full transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                   email && password 
                     ? 'bg-blue-800 hover:bg-blue-700 text-white hover:shadow-blue-800/30' 
                     : 'bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800'
@@ -1024,7 +1024,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={handleGoogleSignIn}
                   disabled={authLoading}
                 >
@@ -1040,7 +1040,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={handleAppleSignIn}
                   disabled={authLoading}
                 >
@@ -1053,7 +1053,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={handleMicrosoftSignIn}
                   disabled={authLoading}
                 >
@@ -1069,7 +1069,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={handleLinkedInSignIn}
                   disabled={authLoading}
                 >
