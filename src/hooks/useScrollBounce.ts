@@ -6,6 +6,17 @@ interface UseScrollBounceReturn {
   scrollRef: React.RefObject<HTMLDivElement>;
 }
 
+// Trigger subtle haptic feedback if supported
+const triggerHaptic = (duration: number = 10) => {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(duration);
+    } catch {
+      // Vibration API not available or blocked
+    }
+  }
+};
+
 export function useScrollBounce(): UseScrollBounceReturn {
   const [bounceClass, setBounceClass] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -25,12 +36,14 @@ export function useScrollBounce(): UseScrollBounceReturn {
       clearTimeout(bounceTimeout.current);
     }
 
-    // Apply bounce effect when hitting scroll limits
+    // Apply bounce effect and haptic feedback when hitting scroll limits
     if (isAtTop && scrollingUp && lastScrollTop.current > 0) {
       setBounceClass('animate-bounce-top');
+      triggerHaptic(15); // Subtle vibration for top bounce
       bounceTimeout.current = setTimeout(() => setBounceClass(''), 300);
     } else if (isAtBottom && scrollingDown && lastScrollTop.current + clientHeight < scrollHeight - 1) {
       setBounceClass('animate-bounce-bottom');
+      triggerHaptic(15); // Subtle vibration for bottom bounce
       bounceTimeout.current = setTimeout(() => setBounceClass(''), 300);
     }
 
