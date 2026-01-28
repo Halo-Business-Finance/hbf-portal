@@ -1024,7 +1024,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
                   onClick={handleGoogleSignIn}
                   disabled={authLoading}
                 >
@@ -1040,7 +1040,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
                   onClick={handleAppleSignIn}
                   disabled={authLoading}
                 >
@@ -1053,7 +1053,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
                   onClick={handleMicrosoftSignIn}
                   disabled={authLoading}
                 >
@@ -1069,7 +1069,7 @@ const Index = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full h-12 border-2 border-gray-900 rounded-full text-gray-900 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md"
                   onClick={handleLinkedInSignIn}
                   disabled={authLoading}
                 >
