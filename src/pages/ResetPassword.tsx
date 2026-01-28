@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { ArrowRight, CheckCircle, Eye, EyeOff, Lock } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { useScrollBounce } from '@/hooks/useScrollBounce';
 
 const passwordSchema = z.object({
   newPassword: z.string().min(6, "Password must be at least 6 characters"),
@@ -46,6 +47,7 @@ const ResetPassword = () => {
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const [isValidSession, setIsValidSession] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { onScroll, bounceClass } = useScrollBounce();
 
   useEffect(() => {
     // Check if user has a valid recovery session
@@ -358,8 +360,11 @@ const ResetPassword = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col">
-          <div className="p-6 sm:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className={`w-full max-w-lg bg-white rounded-2xl shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col ${bounceClass}`}>
+          <div 
+            className="p-6 sm:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent overscroll-contain"
+            onScroll={onScroll}
+          >
             {renderContent()}
           </div>
           {/* Scroll indicator gradient for mobile */}
