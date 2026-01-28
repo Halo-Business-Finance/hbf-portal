@@ -60,10 +60,10 @@ const ForgotPassword = () => {
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
-        <h1 className="text-xl font-normal text-gray-900 mb-3 text-center">
+        <h1 className="text-xl font-normal text-black mb-3 text-center">
           Check your email
         </h1>
-        <p className="text-gray-600 text-center">
+        <p className="text-black text-center">
           We've sent a password reset link to your email address. Please check your inbox and follow the instructions.
         </p>
       </div>
@@ -73,7 +73,7 @@ const ForgotPassword = () => {
       <Button 
         type="button"
         variant="outline"
-        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-full border-blue-800 text-blue-800 hover:bg-blue-50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-full border-black text-black hover:bg-gray-50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-5 w-5" />
@@ -85,10 +85,10 @@ const ForgotPassword = () => {
   const renderFormState = () => (
     <div className="w-full max-w-md">
       <div className="mb-8">
-        <h1 className="text-xl font-normal text-gray-900 mb-3">
+        <h1 className="text-xl font-normal text-black mb-3">
           Reset your password
         </h1>
-        <p className="text-gray-600">
+        <p className="text-black">
           Enter your email address and we'll send you a link to reset your password.
         </p>
       </div>
@@ -102,7 +102,7 @@ const ForgotPassword = () => {
             name="email"
             render={({ field }) => (
               <FormItem className="max-w-sm">
-                <Label htmlFor="email" className="text-sm text-blue-800 mb-2 block">
+                <Label htmlFor="email" className="text-sm text-black mb-2 block">
                   Email
                 </Label>
                 <FormControl>
@@ -132,9 +132,9 @@ const ForgotPassword = () => {
             <button 
               type="button"
               onClick={() => navigate('/')}
-              className="text-sm text-gray-700 hover:text-gray-900"
+              className="text-sm text-black hover:text-gray-700"
             >
-              <span className="text-blue-800 hover:text-blue-900 hover:underline flex items-center gap-2">
+              <span className="text-black hover:text-gray-700 hover:underline flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Login
               </span>
@@ -217,15 +217,15 @@ const ForgotPassword = () => {
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-black">
           <span className="text-center sm:text-left">
             © {new Date().getFullYear()} Halo Business Finance.
             <span className="block sm:inline"> All rights reserved.</span>
           </span>
           <div className="flex items-center gap-4 sm:gap-6">
-            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Privacy Policy</a>
-            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Terms of Service</a>
-            <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Support</a>
+            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy Policy</a>
+            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms of Service</a>
+            <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Support</a>
           </div>
         </div>
       </footer>
