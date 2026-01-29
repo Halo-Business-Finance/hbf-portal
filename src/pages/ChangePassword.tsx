@@ -397,25 +397,21 @@ const ChangePassword = () => {
         </a>
       </header>
 
-      {/* Main Content - Background Image with Centered Card */}
-      <div 
-        className="flex-1 flex items-center justify-center px-4 py-4 sm:py-8 overflow-hidden"
-        style={{
-          backgroundImage: 'url(/login-background.jpg?v=2)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className={`w-full max-w-lg bg-white rounded-2xl shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col ${bounceClass}`}>
+      {/* Main Content - Background Image with Centered Card (hidden on mobile) */}
+      <div className="flex-1 flex items-center justify-center px-4 py-4 sm:py-8 overflow-hidden bg-white md:bg-cover md:bg-center md:bg-no-repeat md:bg-[url('/login-background.jpg?v=2')]">
+        {/* Overlay for better readability - hidden on mobile */}
+        <div className="absolute inset-0 bg-black/10 hidden md:block" />
+        
+        {/* Change Password Card - no shadow on mobile for cleaner look */}
+        <div className={`relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col ${bounceClass}`}>
           <div 
-            className="p-6 sm:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent overscroll-contain"
+            className="p-6 sm:p-8 md:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent overscroll-contain"
             onScroll={onScroll}
           >
             {passwordUpdated ? renderSuccessState() : renderFormState()}
           </div>
           {/* Scroll indicator gradient for mobile */}
-          <div className="h-4 bg-gradient-to-t from-white to-transparent pointer-events-none sm:hidden -mt-4 relative z-10 rounded-b-2xl" />
+          <div className="h-4 bg-gradient-to-t from-white to-transparent pointer-events-none sm:hidden -mt-4 relative z-10 md:rounded-b-2xl" />
         </div>
       </div>
 
