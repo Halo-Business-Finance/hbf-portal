@@ -989,17 +989,17 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-gray-100 border-t border-gray-200 px-4 sm:px-6 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-black">
-            <span className="text-center sm:text-left">
-              © {new Date().getFullYear()} Halo Business Finance. All Rights Reserved.
+        <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm text-black">
+            <span className="text-center sm:text-left order-2 sm:order-1">
+              © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
             </span>
-            <div className="flex items-center gap-4 sm:gap-6">
-              <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Privacy</a>
-              <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Terms</a>
-              <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:underline transition-colors text-black">Support</a>
-              <div className="flex items-center gap-1.5 text-black">
-                <Lock className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-3 sm:gap-6 order-1 sm:order-2">
+              <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy</a>
+              <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms</a>
+              <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Support</a>
+              <div className="flex items-center gap-1">
+                <Lock className="h-3 w-3 sm:h-4 sm:w-4 text-black" />
                 <span>Secured</span>
               </div>
             </div>
