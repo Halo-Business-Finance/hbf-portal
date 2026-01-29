@@ -151,7 +151,12 @@ const ForgotPassword = () => {
       </header>
 
       {/* Main Content - Background Image with Centered Card (hidden on mobile) */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 bg-white md:bg-cover md:bg-center md:bg-no-repeat relative md:bg-[url('/login-background.jpg?v=2')]">
+      <div className="flex-1 flex items-center justify-center px-4 py-8 bg-white relative">
+        {/* Background image - only on md and above */}
+        <div 
+          className="absolute inset-0 hidden md:block bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/login-background.jpg?v=2')" }}
+        />
         {/* Overlay for better readability - hidden on mobile */}
         <div className="absolute inset-0 bg-black/10 hidden md:block" />
         
