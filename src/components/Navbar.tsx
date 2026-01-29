@@ -159,16 +159,16 @@ const Navbar = () => {
   }
   return <header className="sticky top-0 z-50">
       {/* Top Bar - Dark Navy */}
-      <div className="min-h-[48px] md:min-h-[56px] flex items-center justify-center px-3 sm:px-4 lg:px-6 py-2 bg-black text-white relative">
-        {/* Centered Logo */}
-        <div className="cursor-pointer absolute left-1/2 -translate-x-1/2" onClick={handleLogoClick}>
+      <div className="min-h-[48px] md:min-h-[56px] flex items-center justify-center sm:justify-between px-3 sm:px-4 lg:px-6 py-2 bg-black text-white relative">
+        {/* Logo - Centered on mobile, left-aligned on desktop */}
+        <div className="cursor-pointer absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0" onClick={handleLogoClick}>
           <span className="text-white font-bold text-base sm:text-xl lg:text-2xl tracking-wide uppercase whitespace-nowrap">
             HALO BUSINESS FINANCE
           </span>
         </div>
 
-        <div className="absolute right-3 sm:right-4 lg:right-6 flex items-center gap-1 sm:gap-2 lg:gap-4">
-          {/* Search Icon */}
+        {/* Right Side Actions */}
+        <div className="absolute right-3 sm:right-4 lg:right-6 sm:static flex items-center gap-1 sm:gap-2 lg:gap-4">
           {/* Search Icon */}
           {authenticated && <Popover open={searchOpen} onOpenChange={setSearchOpen}>
               <PopoverTrigger asChild>
