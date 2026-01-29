@@ -800,11 +800,12 @@ const Index = () => {
     return <div className="min-h-screen flex flex-col">
         {/* Header Bar */}
         <header className="bg-black px-4 sm:px-6 py-4">
-          <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
+          <a href="https://halobusinessfinance.com" className="flex items-center justify-center sm:justify-start gap-2 hover:opacity-80 transition-opacity">
+            {/* HBF Icon - Hidden on mobile */}
+            <div className="hidden sm:flex w-8 h-8 bg-blue-600 rounded items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">HBF</span>
             </div>
-            <span className="text-lg sm:text-xl font-semibold text-white">Halo Business Finance</span>
+            <span className="text-base sm:text-xl font-semibold text-white uppercase tracking-wide">Halo Business Finance</span>
           </a>
         </header>
 
