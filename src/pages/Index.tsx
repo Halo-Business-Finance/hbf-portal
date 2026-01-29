@@ -808,15 +808,13 @@ const Index = () => {
           </a>
         </header>
 
-        {/* Main Content - Background Image with Centered Card */}
-        <div className="flex-1 flex items-center justify-center px-4 py-8 bg-cover bg-center bg-no-repeat relative" style={{
-        backgroundImage: `url('/login-background.jpg?v=2')`
-      }}>
-          {/* Overlay for better readability */}
-          <div className="absolute inset-0 bg-black/10" />
+        {/* Main Content - Background Image with Centered Card (hidden on mobile) */}
+        <div className="flex-1 flex items-center justify-center px-4 py-8 bg-white md:bg-cover md:bg-center md:bg-no-repeat relative md:bg-[url('/login-background.jpg?v=2')]">
+          {/* Overlay for better readability - hidden on mobile */}
+          <div className="absolute inset-0 bg-black/10 hidden md:block" />
           
-          {/* Login Card */}
-          <div className="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 sm:p-10">
+          {/* Login Card - no shadow on mobile for cleaner look */}
+          <div className="relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl p-6 sm:p-8 md:p-10">
             {/* Greeting */}
             <h1 className="text-3xl sm:text-4xl font-serif text-center text-black mb-8">
               {getGreeting()}
