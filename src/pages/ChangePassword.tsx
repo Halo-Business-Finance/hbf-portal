@@ -198,18 +198,20 @@ const ChangePassword = () => {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" aria-label="Change password form">
           {/* Show all passwords toggle */}
           <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => setShowAllPasswords(!showAllPasswords)}
-              className="flex items-center gap-2 text-sm text-black hover:text-gray-700 transition-colors"
+              className="flex items-center gap-2 text-sm text-black hover:text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1"
+              aria-pressed={showAllPasswords}
+              aria-label={showAllPasswords ? 'Hide all passwords' : 'Show all passwords'}
             >
               {showAllPasswords ? (
-                <EyeOff className="h-4 w-4" />
+                <EyeOff className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4" aria-hidden="true" />
               )}
               {showAllPasswords ? 'Hide all passwords' : 'Show all passwords'}
             </button>
@@ -227,6 +229,11 @@ const ChangePassword = () => {
                   <Input 
                     id="currentPassword"
                     type={showAllPasswords ? "text" : "password"}
+                    aria-label="Current password"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "currentPassword-error" : undefined}
+                    autoComplete="current-password"
                     className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
                       fieldState.error 
                         ? 'border-red-500 focus:border-red-500' 
@@ -236,7 +243,7 @@ const ChangePassword = () => {
                     {...field} 
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="currentPassword-error" />
               </FormItem>
             )}
           />
