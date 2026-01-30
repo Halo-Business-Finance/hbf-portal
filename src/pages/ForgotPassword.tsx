@@ -95,14 +95,18 @@ const ForgotPassword = () => {
           <FormField
             control={form.control}
             name="email"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <FormControl>
                   <Input 
                     id="email"
                     type="email" 
                     placeholder="Email"
-                    className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
+                    className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
+                      fieldState.error 
+                        ? 'border-red-500 focus:border-red-500' 
+                        : 'border-gray-300 focus:border-gray-400'
+                    }`}
                     {...field} 
                   />
                 </FormControl>
