@@ -403,6 +403,31 @@ const Index = () => {
     }
   }, []);
 
+  // iOS Safari can auto-focus/autofill an input on load which triggers a page zoom.
+  // Minimal safeguard: blur any focused form field and reset scroll position after auth loads.
+  useEffect(() => {
+    if (loading || authenticated) return;
+    const ua = navigator.userAgent ?? '';
+    const isIOS = /iP(hone|od|ad)/.test(ua);
+    if (!isIOS) return;
+
+    const resetViewport = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      const el = document.activeElement as HTMLElement | null;
+      if (!el) return;
+      const tag = el.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+        el.blur();
+      }
+    };
+
+    requestAnimationFrame(() => {
+      resetViewport();
+      // Some iOS versions apply focus/zoom a moment later (e.g., after autofill).
+      setTimeout(resetViewport, 250);
+    });
+  }, [authenticated, loading]);
+
   // Check lockout status
   useEffect(() => {
     const storedLockout = localStorage.getItem('hbf_lockout_until');
@@ -797,7 +822,7 @@ const Index = () => {
 
   // Show auth forms for unauthenticated users - Wells Fargo style
   if (!authenticated) {
-    return <div className="min-h-screen flex flex-col">
+    return <div className="min-h-screen flex flex-col overflow-x-hidden" style={{ touchAction: 'pan-y' }}>
         {/* Header Bar */}
         <header className="bg-black px-4 sm:px-6 py-4">
           <div className="flex items-center justify-center">
