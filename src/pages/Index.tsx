@@ -877,7 +877,7 @@ const Index = () => {
               {/* Email/User ID Input with Save ID toggle */}
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-gray-100 border border-gray-200 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                  <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                   {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" tabIndex={-1}>
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
@@ -892,7 +892,7 @@ const Index = () => {
                     <button
                       type="button"
                       onClick={() => setRememberMe(!rememberMe)}
-                      className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors ${rememberMe ? 'bg-green-600' : 'bg-blue-400'}`}
+                      className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors ${rememberMe ? 'bg-green-600' : 'bg-blue-800'}`}
                       role="switch"
                       aria-checked={rememberMe}
                     >
@@ -915,14 +915,14 @@ const Index = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-gray-100 border border-gray-200 rounded-xl px-5 pr-16 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-16 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline" disabled={authLoading}>
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
 
               {!isLogin && <div className="relative">
-                  <Input id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-gray-100 border border-gray-200 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                  <Input id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 </div>}
 
               {/* Rate limit warning */}
