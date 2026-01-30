@@ -867,10 +867,10 @@ const Index = () => {
             <form onSubmit={handleAuthSubmit} className="space-y-5">
               {!isLogin && <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Input id="firstName" type="text" placeholder="First name" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors" />
+                    <Input id="firstName" type="text" placeholder="First name" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                   </div>
                   <div>
-                    <Input id="lastName" type="text" placeholder="Last name" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors" />
+                    <Input id="lastName" type="text" placeholder="Last name" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                   </div>
                 </div>}
 
