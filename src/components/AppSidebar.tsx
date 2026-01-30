@@ -166,7 +166,7 @@ export function AppSidebar() {
                   <TooltipTrigger asChild>
                     <SidebarMenuButton onClick={handleLogout} className={cn("flex items-center gap-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer", "text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive", open ? "px-3 w-full" : "p-2 justify-center w-auto")}>
                       <Lock className="h-5 w-5 flex-shrink-0 text-black" />
-                      {open && <span className="text-black">Sign Out</span>}
+                      {open && <span className="text-black font-bold">Sign Out</span>}
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   {!open && <TooltipContent side="right" className="bg-sidebar-accent text-sidebar-foreground border-sidebar-border">
