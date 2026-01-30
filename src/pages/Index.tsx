@@ -874,40 +874,55 @@ const Index = () => {
                   </div>
                 </div>}
 
-              {/* Email/Username Input */}
-              <div className="relative">
-                <Input id="email" type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border border-gray-300 rounded-full px-5 pr-12 focus:border-gray-500 focus:ring-0 transition-colors" />
-                {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" tabIndex={-1}>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
-                      <path strokeWidth="1.5" d="M15 9l-6 6m0-6l6 6" />
-                    </svg>
-                  </button>}
+              {/* Email/User ID Input with Save ID toggle */}
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-gray-100 border border-gray-200 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                  {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" tabIndex={-1}>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
+                        <path strokeWidth="1.5" d="M15 9l-6 6m0-6l6 6" />
+                      </svg>
+                    </button>}
+                </div>
+                
+                {/* Save ID Toggle - Bank of America style */}
+                {isLogin && <div className="flex flex-col items-end justify-center">
+                    <span className="text-sm font-medium text-gray-700 mb-1">Save ID</span>
+                    <button
+                      type="button"
+                      onClick={() => setRememberMe(!rememberMe)}
+                      className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors ${rememberMe ? 'bg-green-600' : 'bg-gray-400'}`}
+                      role="switch"
+                      aria-checked={rememberMe}
+                    >
+                      {/* Striped thumb */}
+                      <span className={`inline-flex h-6 w-8 transform items-center justify-center rounded-md bg-white shadow-md transition-transform ${rememberMe ? 'translate-x-11' : 'translate-x-1'}`}>
+                        {/* Vertical stripes */}
+                        <span className="flex gap-0.5">
+                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                        </span>
+                      </span>
+                      {/* YES/NO text */}
+                      <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'left-2 opacity-100' : 'left-2 opacity-0'}`}>YES</span>
+                      <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'right-2 opacity-0' : 'right-2 opacity-100'}`}>NO</span>
+                    </button>
+                  </div>}
               </div>
 
               {/* Password Input */}
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border border-gray-300 rounded-full px-5 pr-16 focus:border-gray-500 focus:ring-0 transition-colors" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-black hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline" disabled={authLoading}>
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-gray-100 border border-gray-200 rounded-xl px-5 pr-16 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline" disabled={authLoading}>
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
 
               {!isLogin && <div className="relative">
-                  <Input id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors" />
-                </div>}
-
-              {/* Remember Me Checkbox */}
-              {isLogin && <div className="flex items-start gap-3">
-                  <input type="checkbox" id="rememberMe" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-5 h-5 mt-0.5 border-2 border-gray-400 rounded text-purple-700 focus:ring-purple-500 focus:ring-2 focus:ring-offset-2 cursor-pointer" />
-                  <div>
-                    <label htmlFor="rememberMe" className="text-sm text-black cursor-pointer select-none font-medium">
-                      Save email
-                    </label>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      To help keep your account secure, save your email only on devices that aren't used by other people.
-                    </p>
-                  </div>
+                  <Input id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} className="h-14 bg-gray-100 border border-gray-200 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 </div>}
 
               {/* Rate limit warning */}
