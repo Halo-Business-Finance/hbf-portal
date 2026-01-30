@@ -113,13 +113,11 @@ const ForgotPassword = () => {
 
           <Button 
             type="submit" 
-            className="w-full h-12 bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 text-base font-medium rounded-full transition-all disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            variant="outline"
+            className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSubmitting || !form.watch('email')}
-            style={{
-              backgroundColor: form.watch('email') ? '#d71e28' : undefined,
-              color: form.watch('email') ? 'white' : undefined
-            }}
           >
+            <Lock className="h-5 w-5" />
             {isSubmitting ? "Sending..." : "Send Reset Link"}
           </Button>
 
