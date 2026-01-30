@@ -335,10 +335,9 @@ const Navbar = () => {
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div> : <Button onClick={() => navigate('/borrower-portal')} className="h-9 sm:h-8 px-3 sm:px-4 bg-transparent border border-primary text-white hover:bg-primary hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] rounded-full text-sm font-medium transition-all duration-300">
-              <Lock className="h-3.5 w-3.5 mr-1.5" />
-              <span className="hidden xs:inline">Sign In</span>
-              <span className="xs:hidden">Login</span>
+            </div> : <Button onClick={() => navigate('/borrower-portal')} className="h-9 sm:h-8 px-3 sm:px-4 bg-transparent border border-black text-black hover:bg-gray-100 rounded-full text-sm font-medium transition-all duration-300">
+              <Lock className="h-3.5 w-3.5 mr-1.5 text-black" />
+              <span>Sign In</span>
             </Button>}
         </div>
       </div>
