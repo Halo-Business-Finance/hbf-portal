@@ -1010,7 +1010,7 @@ const Index = () => {
                     <Loader2 className="h-5 w-5 animate-spin text-black" />
                     Signing in...
                   </span> : <>
-                    <Lock className="h-5 w-5 text-black" />
+                    <Lock className="h-5 w-5 text-black" strokeWidth={2.5} />
                     <span className="text-black font-bold">{isLogin ? "Sign In" : "Create account"}</span>
                   </>}
               </Button>
