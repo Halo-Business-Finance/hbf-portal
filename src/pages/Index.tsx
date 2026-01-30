@@ -937,8 +937,8 @@ const Index = () => {
 
               {/* Sign On Button */}
               <Button type="submit" className="w-full h-12 bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 text-base font-medium rounded-full transition-all disabled:opacity-50" disabled={authLoading || isLockedOut || !email || !password} style={{
-              backgroundColor: email && password ? '#d71e28' : undefined,
-              color: email && password ? 'white' : undefined
+              backgroundColor: email && password ? '#1e3a8a' : undefined,
+              color: email && password ? 'black' : undefined
             }}>
                 {authLoading ? <span className="flex items-center gap-2 justify-center">
                     <Loader2 className="h-5 w-5 animate-spin" />
