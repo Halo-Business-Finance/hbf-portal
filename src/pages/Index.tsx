@@ -940,7 +940,10 @@ const Index = () => {
                 {authLoading ? <span className="flex items-center gap-2 justify-center">
                     <Loader2 className="h-5 w-5 animate-spin" />
                     Signing in...
-                  </span> : isLogin ? "Log In" : "Create account"}
+                  </span> : <>
+                    <Lock className="h-5 w-5" />
+                    {isLogin ? "Log In" : "Create account"}
+                  </>}
               </Button>
 
               {/* Divider */}
