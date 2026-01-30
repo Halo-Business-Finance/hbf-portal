@@ -936,14 +936,11 @@ const Index = () => {
                 </Alert>}
 
               {/* Sign On Button */}
-              <Button type="submit" className="w-full h-12 bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 text-base font-medium rounded-full transition-all disabled:opacity-50" disabled={authLoading || isLockedOut || !email || !password} style={{
-              backgroundColor: email && password ? '#1e3a8a' : undefined,
-              color: email && password ? 'black' : undefined
-            }}>
+              <Button type="submit" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled={authLoading || isLockedOut || !email || !password}>
                 {authLoading ? <span className="flex items-center gap-2 justify-center">
                     <Loader2 className="h-5 w-5 animate-spin" />
                     Signing in...
-                  </span> : isLogin ? "Sign on" : "Create account"}
+                  </span> : isLogin ? "Log In" : "Create account"}
               </Button>
 
               {/* Divider */}
