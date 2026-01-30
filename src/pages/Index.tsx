@@ -892,7 +892,7 @@ const Index = () => {
                     <button
                       type="button"
                       onClick={() => setRememberMe(!rememberMe)}
-                      className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors ${rememberMe ? 'bg-green-600' : 'bg-gray-400'}`}
+                      className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors ${rememberMe ? 'bg-green-600' : 'bg-blue-400'}`}
                       role="switch"
                       aria-checked={rememberMe}
                     >
