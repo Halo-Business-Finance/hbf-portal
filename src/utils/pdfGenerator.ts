@@ -4,6 +4,17 @@
  * For production, consider using jsPDF or pdfmake
  */
 
+/**
+ * Escapes HTML special characters to prevent XSS attacks
+ * when inserting user-controlled content into HTML templates.
+ */
+function escapeHtml(text: string | null | undefined): string {
+  if (text === null || text === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
 interface ApplicationData {
   application_number: string;
   loan_type: string;
@@ -134,7 +145,7 @@ export const generateApplicationPDF = (application: ApplicationData) => {
       <div class="header">
         <h1>Halo Business Finance</h1>
         <p>Loan Application</p>
-        <p style="font-size: 14px; color: #999;">Application Number: ${application.application_number}</p>
+        <p style="font-size: 14px; color: #999;">Application Number: ${escapeHtml(application.application_number)}</p>
       </div>
 
       <div class="section">
@@ -142,12 +153,12 @@ export const generateApplicationPDF = (application: ApplicationData) => {
         <div class="field">
           <div class="field-label">Status:</div>
           <div class="field-value">
-            <span class="status status-${application.status}">${application.status.replace('_', ' ')}</span>
+            <span class="status status-${escapeHtml(application.status)}">${escapeHtml(application.status?.replace('_', ' '))}</span>
           </div>
         </div>
         <div class="field">
           <div class="field-label">Application Type:</div>
-          <div class="field-value">${getLoanTypeDisplay(application.loan_type)}</div>
+          <div class="field-value">${escapeHtml(getLoanTypeDisplay(application.loan_type))}</div>
         </div>
         <div class="field">
           <div class="field-label">Requested Amount:</div>
@@ -159,15 +170,15 @@ export const generateApplicationPDF = (application: ApplicationData) => {
         <h2>Applicant Information</h2>
         <div class="field">
           <div class="field-label">Name:</div>
-          <div class="field-value">${application.first_name} ${application.last_name}</div>
+          <div class="field-value">${escapeHtml(application.first_name)} ${escapeHtml(application.last_name)}</div>
         </div>
         <div class="field">
           <div class="field-label">Email:</div>
-          <div class="field-value">${application.email || 'N/A'}</div>
+          <div class="field-value">${escapeHtml(application.email) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="field-label">Phone:</div>
-          <div class="field-value">${application.phone || 'N/A'}</div>
+          <div class="field-value">${escapeHtml(application.phone) || 'N/A'}</div>
         </div>
       </div>
 
@@ -175,13 +186,13 @@ export const generateApplicationPDF = (application: ApplicationData) => {
         <h2>Business Information</h2>
         <div class="field">
           <div class="field-label">Business Name:</div>
-          <div class="field-value">${application.business_name}</div>
+          <div class="field-value">${escapeHtml(application.business_name)}</div>
         </div>
         <div class="field">
           <div class="field-label">Address:</div>
           <div class="field-value">
-            ${application.business_address}<br>
-            ${application.business_city}, ${application.business_state} ${application.business_zip}
+            ${escapeHtml(application.business_address)}<br>
+            ${escapeHtml(application.business_city)}, ${escapeHtml(application.business_state)} ${escapeHtml(application.business_zip)}
           </div>
         </div>
         <div class="field">
