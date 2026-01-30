@@ -408,12 +408,11 @@ const ChangePassword = () => {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="bg-black px-4 sm:px-6 py-4">
-        <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">HBF</span>
-          </div>
-          <span className="text-lg sm:text-xl font-semibold text-white">Halo Business Finance</span>
-        </a>
+        <div className="flex items-center justify-center">
+          <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <span className="text-xl sm:text-2xl font-semibold text-white uppercase tracking-wide">Halo Business Finance</span>
+          </a>
+        </div>
       </header>
 
       {/* Main Content - Background Image with Centered Card (hidden on mobile) */}
