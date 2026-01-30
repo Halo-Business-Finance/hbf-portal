@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { FileText, Wallet, FolderOpen, CreditCard, Landmark, LogOut, Menu, LayoutDashboard, Shield } from 'lucide-react';
+import { FileText, Wallet, FolderOpen, CreditCard, Landmark, Lock, Menu, LayoutDashboard, Shield } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -165,12 +165,12 @@ export function AppSidebar() {
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
                     <SidebarMenuButton onClick={handleLogout} className={cn("flex items-center gap-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer", "text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive", open ? "px-3 w-full" : "p-2 justify-center w-auto")}>
-                      <LogOut className="h-5 w-5 flex-shrink-0 text-white" />
-                      {open && <span className="text-white">Log Out</span>}
+                      <Lock className="h-5 w-5 flex-shrink-0 text-black" />
+                      {open && <span className="text-black">Sign Out</span>}
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   {!open && <TooltipContent side="right" className="bg-sidebar-accent text-sidebar-foreground border-sidebar-border">
-                      Log Out
+                      Sign Out
                     </TooltipContent>}
                 </Tooltip>
               </SidebarMenuItem>

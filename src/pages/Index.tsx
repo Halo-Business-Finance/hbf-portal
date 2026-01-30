@@ -1011,7 +1011,7 @@ const Index = () => {
                     Signing in...
                   </span> : <>
                     <Lock className="h-5 w-5" />
-                    {isLogin ? "Log In" : "Create account"}
+                    {isLogin ? "Sign In" : "Create account"}
                   </>}
               </Button>
 
