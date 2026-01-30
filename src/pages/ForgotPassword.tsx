@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, ArrowRight, CheckCircle, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, Lock, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
 const emailSchema = z.object({
@@ -127,7 +127,11 @@ const ForgotPassword = () => {
             disabled={isSubmitting || !form.watch('email')}
             aria-busy={isSubmitting}
           >
-            <Lock className="h-5 w-5" aria-hidden="true" />
+            {isSubmitting ? (
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Lock className="h-5 w-5" aria-hidden="true" />
+            )}
             {isSubmitting ? "Sending..." : "Send Reset Link"}
           </Button>
 

@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, ArrowRight, CheckCircle, Eye, EyeOff, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, Eye, EyeOff, Lock, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useScrollBounce } from '@/hooks/useScrollBounce';
 
@@ -378,8 +378,13 @@ const ChangePassword = () => {
             variant="outline"
             className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSubmitting || !hasNewPassword}
+            aria-busy={isSubmitting}
           >
-            <Lock className="h-5 w-5" />
+            {isSubmitting ? (
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Lock className="h-5 w-5" aria-hidden="true" />
+            )}
             <span>{isSubmitting ? "Updating..." : "Update Password"}</span>
           </Button>
 

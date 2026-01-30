@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Mail, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Mail, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -262,8 +262,16 @@ const ChangeEmail = () => {
                     type="submit"
                     className="w-full"
                     disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                   >
-                    {isSubmitting ? "Sending Verification..." : "Change Email Address"}
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" />
+                        Sending Verification...
+                      </>
+                    ) : (
+                      "Change Email Address"
+                    )}
                   </Button>
                 </div>
               </form>
