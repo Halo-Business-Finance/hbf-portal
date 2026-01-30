@@ -102,7 +102,7 @@ const ForgotPassword = () => {
                     id="email"
                     type="email" 
                     placeholder="Email"
-                    className="h-12 bg-white border border-gray-300 rounded-full px-5 focus:border-gray-500 focus:ring-0 transition-colors"
+                    className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
                     {...field} 
                   />
                 </FormControl>
