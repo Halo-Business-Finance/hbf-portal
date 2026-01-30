@@ -953,8 +953,8 @@ const Index = () => {
                 </button>
               </div>
 
-              {/* Save ID Toggle - moved below password */}
-              {isLogin && <div className="flex items-center justify-between">
+              {/* Save ID Toggle - stacked vertically */}
+              {isLogin && <div className="flex flex-col items-start gap-1">
                   <span id="save-id-label" className="text-sm font-medium text-gray-700">Save ID</span>
                   <button
                     type="button"
