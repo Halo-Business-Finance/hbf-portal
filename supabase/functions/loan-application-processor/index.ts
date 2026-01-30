@@ -510,7 +510,7 @@ async function updateApplicationStatus(
         success: true,
         application: data,
         message: 'Application status updated successfully'
-      { headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
+      }),
       { headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
@@ -520,9 +520,8 @@ async function updateApplicationStatus(
     return new Response(
       JSON.stringify({ 
         success: false, 
-        message: 'Failed to update application status',
-        error: errorMessage 
-      { status: 500, headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
+        message: 'Failed to update application status'
+      }),
       { status: 500, headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
