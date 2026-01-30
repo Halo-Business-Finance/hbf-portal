@@ -358,15 +358,12 @@ const ChangePassword = () => {
 
           <Button 
             type="submit" 
-            className={`w-full h-12 text-base font-medium justify-between px-6 rounded-full transition-all duration-200 hover:shadow-md ${
-              hasNewPassword 
-                ? 'bg-[#d71e28] hover:bg-[#b91920] text-white' 
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
+            variant="outline"
+            className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSubmitting || !hasNewPassword}
           >
+            <Lock className="h-5 w-5" />
             <span>{isSubmitting ? "Updating..." : "Update Password"}</span>
-            {!isSubmitting && <ArrowRight className="h-5 w-5" />}
           </Button>
 
           <div className="text-center">
