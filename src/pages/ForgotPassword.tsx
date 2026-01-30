@@ -91,7 +91,7 @@ const ForgotPassword = () => {
       </p>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5" aria-label="Password reset request form">
           <FormField
             control={form.control}
             name="email"
@@ -102,6 +102,11 @@ const ForgotPassword = () => {
                     id="email"
                     type="email" 
                     placeholder="Email"
+                    aria-label="Email address"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "email-error" : undefined}
+                    autoComplete="email"
                     className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
                       fieldState.error 
                         ? 'border-red-500 focus:border-red-500' 
@@ -110,7 +115,7 @@ const ForgotPassword = () => {
                     {...field} 
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="email-error" />
               </FormItem>
             )}
           />
@@ -120,8 +125,9 @@ const ForgotPassword = () => {
             variant="outline"
             className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSubmitting || !form.watch('email')}
+            aria-busy={isSubmitting}
           >
-            <Lock className="h-5 w-5" />
+            <Lock className="h-5 w-5" aria-hidden="true" />
             {isSubmitting ? "Sending..." : "Send Reset Link"}
           </Button>
 
@@ -129,9 +135,9 @@ const ForgotPassword = () => {
             <button 
               type="button"
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 text-black hover:text-gray-700 text-sm font-medium hover:underline focus:outline-none"
+              className="inline-flex items-center gap-2 text-black hover:text-gray-700 text-sm font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Back to Login
             </button>
           </div>

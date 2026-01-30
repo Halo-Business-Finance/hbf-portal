@@ -182,7 +182,7 @@ const ChangeEmail = () => {
             </Alert>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Change email form">
                 <FormField
                   control={form.control}
                   name="currentEmail"
@@ -194,6 +194,8 @@ const ChangeEmail = () => {
                           {...field}
                           type="email"
                           readOnly
+                          aria-label="Current email address (read-only)"
+                          aria-readonly="true"
                           className="h-14 bg-muted/50 border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
                         />
                       </FormControl>
@@ -212,6 +214,11 @@ const ChangeEmail = () => {
                           {...field}
                           type="email"
                           placeholder="Enter new email address"
+                          aria-label="New email address"
+                          aria-required="true"
+                          aria-invalid={!!fieldState.error}
+                          aria-describedby={fieldState.error ? "newEmail-error" : undefined}
+                          autoComplete="email"
                           className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
                             fieldState.error 
                               ? 'border-red-500 focus:border-red-500' 
@@ -219,7 +226,7 @@ const ChangeEmail = () => {
                           }`}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage id="newEmail-error" />
                     </FormItem>
                   )}
                 />
@@ -234,6 +241,11 @@ const ChangeEmail = () => {
                           {...field}
                           type="email"
                           placeholder="Confirm new email address"
+                          aria-label="Confirm new email address"
+                          aria-required="true"
+                          aria-invalid={!!fieldState.error}
+                          aria-describedby={fieldState.error ? "confirmEmail-error" : undefined}
+                          autoComplete="email"
                           className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
                             fieldState.error 
                               ? 'border-red-500 focus:border-red-500' 
@@ -241,7 +253,7 @@ const ChangeEmail = () => {
                           }`}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage id="confirmEmail-error" />
                     </FormItem>
                   )}
                 />
