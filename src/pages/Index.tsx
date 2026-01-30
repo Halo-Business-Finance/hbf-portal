@@ -957,7 +957,7 @@ const Index = () => {
                   <button
                     type="button"
                     onClick={() => setRememberMe(!rememberMe)}
-                    className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-green-600' : 'bg-blue-800'}`}
+                    className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-blue-600' : 'bg-blue-800'}`}
                     role="switch"
                     aria-checked={rememberMe}
                     aria-labelledby="save-id-label"
