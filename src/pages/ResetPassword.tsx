@@ -210,7 +210,7 @@ const ResetPassword = () => {
                     <Input 
                       id="newPassword"
                       type={showAllPasswords ? "text" : "password"}
-                      className="h-12 bg-white border border-gray-300 rounded-full px-4 focus:border-black focus:ring-1 focus:ring-black transition-all"
+                      className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
                       placeholder="Enter new password"
                       {...field} 
                     />
@@ -277,12 +277,12 @@ const ResetPassword = () => {
                     <Input 
                       id="confirmPassword"
                       type={showAllPasswords ? "text" : "password"}
-                      className={`h-12 bg-white border rounded-full px-4 transition-all ${
+                      className={`h-14 bg-white border rounded-xl px-5 transition-colors placeholder:text-gray-400 text-gray-700 ${
                         showMatch 
                           ? passwordsMatch 
-                            ? 'border-green-500 focus:border-green-500 focus:ring-1 focus:ring-green-500' 
-                            : 'border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-400'
-                          : 'border-gray-300 focus:border-black focus:ring-1 focus:ring-black'
+                            ? 'border-green-500 focus:border-green-500 focus:ring-0' 
+                            : 'border-red-400 focus:border-red-400 focus:ring-0'
+                          : 'border-gray-300 focus:border-gray-400 focus:ring-0'
                       }`}
                       placeholder="Confirm new password"
                       {...field} 
