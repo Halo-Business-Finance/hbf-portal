@@ -218,7 +218,7 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="currentPassword"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <Label htmlFor="currentPassword" className="text-sm text-black mb-2 block">
                   Current password
@@ -227,7 +227,11 @@ const ChangePassword = () => {
                   <Input 
                     id="currentPassword"
                     type={showAllPasswords ? "text" : "password"}
-                    className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
+                    className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
+                      fieldState.error 
+                        ? 'border-red-500 focus:border-red-500' 
+                        : 'border-gray-300 focus:border-gray-400'
+                    }`}
                     placeholder="Enter current password"
                     {...field} 
                   />
@@ -240,7 +244,7 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="newPassword"
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               const strength = getPasswordStrength(field.value);
               const requirements = getPasswordRequirements(field.value);
               return (
@@ -252,7 +256,11 @@ const ChangePassword = () => {
                     <Input 
                       id="newPassword"
                       type={showAllPasswords ? "text" : "password"}
-                      className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
+                      className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
+                        fieldState.error 
+                          ? 'border-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:border-gray-400'
+                      }`}
                       placeholder="Enter new password"
                       {...field} 
                     />
@@ -305,7 +313,7 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="confirmPassword"
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               const confirmPassword = field.value;
               const showMatch = confirmPassword.length > 0;
               const passwordsMatch = newPassword === confirmPassword;
@@ -319,19 +327,21 @@ const ChangePassword = () => {
                     <Input 
                       id="confirmPassword"
                       type={showAllPasswords ? "text" : "password"}
-                      className={`h-14 bg-white border rounded-xl px-5 transition-colors placeholder:text-gray-400 text-gray-700 ${
-                        showMatch 
-                          ? passwordsMatch 
-                            ? 'border-green-500 focus:border-green-500 focus:ring-0' 
-                            : 'border-red-400 focus:border-red-400 focus:ring-0'
-                          : 'border-gray-300 focus:border-gray-400 focus:ring-0'
+                      className={`h-14 bg-white border rounded-xl px-5 transition-colors placeholder:text-gray-400 text-gray-700 focus:ring-0 ${
+                        fieldState.error
+                          ? 'border-red-500 focus:border-red-500'
+                          : showMatch 
+                            ? passwordsMatch 
+                              ? 'border-green-500 focus:border-green-500' 
+                              : 'border-red-400 focus:border-red-400'
+                            : 'border-gray-300 focus:border-gray-400'
                       }`}
                       placeholder="Confirm new password"
                       {...field} 
                     />
                   </FormControl>
                   {/* Password match indicator */}
-                  {showMatch && (
+                  {showMatch && !fieldState.error && (
                     <p className={`text-xs flex items-center gap-1.5 mt-2 transition-colors duration-200 ${
                       passwordsMatch ? 'text-green-600' : 'text-red-500'
                     }`}>
