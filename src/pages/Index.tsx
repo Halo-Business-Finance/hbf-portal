@@ -898,62 +898,33 @@ const Index = () => {
                   </div>
                 </div>}
 
-              {/* Email/User ID Input with Save ID toggle */}
-              <div className="flex gap-3">
-                <div className="relative flex-1">
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="User ID" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    required 
-                    disabled={authLoading || isLockedOut} 
-                    aria-label="Email address or User ID"
-                    aria-required="true"
-                    autoComplete="email"
-                    className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" 
-                  />
-                  {email && <button 
-                    type="button" 
-                    onClick={() => setEmail("")} 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" 
-                    tabIndex={-1}
-                    aria-label="Clear email field"
-                  >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
-                        <path strokeWidth="1.5" d="M15 9l-6 6m0-6l6 6" />
-                      </svg>
-                    </button>}
-                </div>
-                
-                {/* Save ID Toggle - Bank of America style */}
-                {isLogin && <div className="flex flex-col items-end justify-center">
-                    <span id="save-id-label" className="text-sm font-medium text-gray-700 mb-1">Save ID</span>
-                    <button
-                      type="button"
-                      onClick={() => setRememberMe(!rememberMe)}
-                      className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-green-600' : 'bg-blue-800'}`}
-                      role="switch"
-                      aria-checked={rememberMe}
-                      aria-labelledby="save-id-label"
-                    >
-                      {/* Striped thumb */}
-                      <span className={`inline-flex h-6 w-8 transform items-center justify-center rounded-md bg-white shadow-md transition-transform ${rememberMe ? 'translate-x-11' : 'translate-x-1'}`} aria-hidden="true">
-                        {/* Vertical stripes */}
-                        <span className="flex gap-0.5">
-                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                          <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                        </span>
-                      </span>
-                      {/* YES/NO text */}
-                      <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'left-2 opacity-100' : 'left-2 opacity-0'}`} aria-hidden="true">YES</span>
-                      <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'right-2 opacity-0' : 'right-2 opacity-100'}`} aria-hidden="true">NO</span>
-                    </button>
-                  </div>}
+              {/* Email/User ID Input */}
+              <div className="relative">
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="User ID" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  required 
+                  disabled={authLoading || isLockedOut} 
+                  aria-label="Email address or User ID"
+                  aria-required="true"
+                  autoComplete="email"
+                  className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" 
+                />
+                {email && <button 
+                  type="button" 
+                  onClick={() => setEmail("")} 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" 
+                  tabIndex={-1}
+                  aria-label="Clear email field"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
+                      <path strokeWidth="1.5" d="M15 9l-6 6m0-6l6 6" />
+                    </svg>
+                  </button>}
               </div>
 
               {/* Password Input */}
@@ -981,6 +952,33 @@ const Index = () => {
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
+
+              {/* Save ID Toggle - moved below password */}
+              {isLogin && <div className="flex items-center justify-between">
+                  <span id="save-id-label" className="text-sm font-medium text-gray-700">Save ID</span>
+                  <button
+                    type="button"
+                    onClick={() => setRememberMe(!rememberMe)}
+                    className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-green-600' : 'bg-blue-800'}`}
+                    role="switch"
+                    aria-checked={rememberMe}
+                    aria-labelledby="save-id-label"
+                  >
+                    {/* Striped thumb */}
+                    <span className={`inline-flex h-6 w-8 transform items-center justify-center rounded-md bg-white shadow-md transition-transform ${rememberMe ? 'translate-x-11' : 'translate-x-1'}`} aria-hidden="true">
+                      {/* Vertical stripes */}
+                      <span className="flex gap-0.5">
+                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
+                      </span>
+                    </span>
+                    {/* YES/NO text */}
+                    <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'left-2 opacity-100' : 'left-2 opacity-0'}`} aria-hidden="true">YES</span>
+                    <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'right-2 opacity-0' : 'right-2 opacity-100'}`} aria-hidden="true">NO</span>
+                  </button>
+                </div>}
 
               {!isLogin && <div className="relative">
                   <Input 
