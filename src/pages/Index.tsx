@@ -878,7 +878,7 @@ const Index = () => {
   }
   return <Layout>
       <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto py-10 bg-white border-0 px-0">
+        <div className="max-w-7xl mx-auto bg-white border-0 px-0 py-0">
         <main>
         {/* Dashboard for Authenticated Users */}
         {!selectedLoanType && <DashboardView />}
