@@ -179,12 +179,8 @@ const Navbar = () => {
   return <header className="sticky top-0 z-50">
       {/* Top Bar - Thin white bar like US Bank */}
       <div className="h-8 bg-white border-b border-border hidden md:block">
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 sm:px-6 lg:px-8">
-          <span className="text-sm text-blue-950 font-extrabold">Commercial Loan Marketplace </span>
-          <button className="flex items-center gap-2 text-sm hover:underline text-blue-950 font-extrabold">
-            <Grid3X3 className="h-4 w-4" />
-            Business tools
-          </button>
+        <div className="max-w-7xl mx-auto h-full flex items-center px-4 sm:px-6 lg:px-8">
+          <span className="text-sm text-blue-950 font-extrabold">Commercial Loan Marketplace</span>
         </div>
       </div>
 
@@ -457,6 +453,12 @@ const Navbar = () => {
         {/* Products & offers */}
         <button onClick={() => navigate('/support')} className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
           Products & offers
+        </button>
+
+        {/* Business tools */}
+        <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
+          <Grid3X3 className="h-4 w-4" />
+          Business tools
         </button>
         </div>
       </div>
