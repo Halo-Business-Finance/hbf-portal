@@ -251,10 +251,23 @@ const Navbar = () => {
           Dashboard
         </button>
 
-        {/* Applications */}
-        <button onClick={() => navigate('/loan-applications')} className={cn("px-4 py-2 text-sm font-medium transition-colors hover:text-primary", isActiveRoute('/loan-applications') ? "text-primary" : "text-foreground")}>
-          Loan Applications
-        </button>
+        {/* Applications Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
+              Loan Applications
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
+            <DropdownMenuItem onClick={() => navigate('/loan-applications')} className="cursor-pointer py-2.5">
+              View All Applications
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?new=true')} className="cursor-pointer py-2.5">
+              Start New Application
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Accounts Dropdown */}
         <DropdownMenu>
