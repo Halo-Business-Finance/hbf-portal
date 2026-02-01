@@ -232,7 +232,7 @@ export const EnterpriseDashboard = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         {/* Quick Action Buttons - US Bank Style Pills */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:flex lg:flex-wrap lg:items-center lg:justify-end gap-2 md:gap-3">
-          {quickActions.map((action, index) => <Button key={index} variant="default" size="sm" className="rounded-full px-3 sm:px-4 py-2 h-9 font-medium bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm justify-center" onClick={action.action}>
+          {quickActions.map((action, index) => <Button key={index} variant="default" size="sm" className="rounded-full px-3 sm:px-4 py-2 h-9 font-medium bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm justify-center transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95" onClick={action.action}>
               {action.label}
               {action.chevron && <ChevronRight className="w-4 h-4 ml-1 hidden sm:inline" />}
             </Button>)}
