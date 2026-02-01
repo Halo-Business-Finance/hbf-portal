@@ -180,7 +180,7 @@ const Navbar = () => {
       {/* Top Bar - Thin white bar like US Bank */}
       <div className="h-8 bg-white border-b border-border hidden md:flex items-center justify-between px-6">
         <span className="text-sm text-blue-950 font-extrabold">Commercial Loan Marketplace </span>
-        <button className="flex items-center gap-2 text-primary font-semibold text-sm hover:underline">
+        <button className="flex items-center gap-2 text-sm hover:underline text-blue-950 font-extrabold">
           <Grid3X3 className="h-4 w-4" />
           Business tools
         </button>
@@ -190,8 +190,7 @@ const Navbar = () => {
       <div className="h-14 md:h-16 bg-white border-b border-border flex items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <div className="cursor-pointer flex-shrink-0" onClick={handleLogoClick}>
-          <span className="text-primary font-bold text-lg md:text-xl tracking-tight">
-            <span className="text-red-600">halo</span>business
+          <span className="font-bold text-lg md:text-xl tracking-tight text-black">HHalo Business Finance  
           </span>
         </div>
 
