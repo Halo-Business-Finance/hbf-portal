@@ -249,6 +249,57 @@ const Navbar = () => {
           Dashboard
         </button>
 
+        {/* Loan Programs Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
+              Loan Programs
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56 bg-white border shadow-xl">
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_7a')} className="cursor-pointer py-2.5">
+              SBA 7(a) Loan
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_504')} className="cursor-pointer py-2.5">
+              SBA 504 Loan
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_express')} className="cursor-pointer py-2.5">
+              SBA Express Loan
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=term_loan')} className="cursor-pointer py-2.5">
+              Term Loan
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=bridge_loan')} className="cursor-pointer py-2.5">
+              Bridge Loan
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=conventional')} className="cursor-pointer py-2.5">
+              Conventional Loan
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=working_capital')} className="cursor-pointer py-2.5">
+              Working Capital
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=business_loc')} className="cursor-pointer py-2.5">
+              Business Line of Credit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=equipment')} className="cursor-pointer py-2.5">
+              Equipment Financing
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=invoice_factoring')} className="cursor-pointer py-2.5">
+              Invoice Factoring
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=refinance')} className="cursor-pointer py-2.5">
+              Refinance
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=usda_bi')} className="cursor-pointer py-2.5">
+              USDA B&I Loan
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {/* Applications Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -299,58 +350,6 @@ const Navbar = () => {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate('/my-documents?upload=true')} className="cursor-pointer py-2.5">
               Upload Documents
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-
-        {/* Loan Programs Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-              Loan Programs
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_7a')} className="cursor-pointer py-2.5">
-              SBA 7(a) Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_504')} className="cursor-pointer py-2.5">
-              SBA 504 Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_express')} className="cursor-pointer py-2.5">
-              SBA Express Loan
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=term_loan')} className="cursor-pointer py-2.5">
-              Term Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=bridge_loan')} className="cursor-pointer py-2.5">
-              Bridge Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=conventional')} className="cursor-pointer py-2.5">
-              Conventional Loan
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=working_capital')} className="cursor-pointer py-2.5">
-              Working Capital
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=business_loc')} className="cursor-pointer py-2.5">
-              Business Line of Credit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=equipment')} className="cursor-pointer py-2.5">
-              Equipment Financing
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=invoice_factoring')} className="cursor-pointer py-2.5">
-              Invoice Factoring
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=refinance')} className="cursor-pointer py-2.5">
-              Refinance
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=usda_bi')} className="cursor-pointer py-2.5">
-              USDA B&I Loan
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
