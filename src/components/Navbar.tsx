@@ -315,7 +315,7 @@ const Navbar = () => {
 
         {/* Products & offers */}
         <button onClick={() => navigate('/support')} className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-          Products & offers
+          Loan Programs 
         </button>
 
         {/* Business tools */}
