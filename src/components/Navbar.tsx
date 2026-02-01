@@ -1,25 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Input } from '@/components/ui/input';
-import { LogOut, FileText, Bell, Search, ChevronDown, Grid3X3, HelpCircle } from 'lucide-react';
+import { LogOut, FileText, Bell, ChevronDown, Grid3X3, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { LoanCalculatorDialog } from '@/components/LoanCalculatorDialog';
 import { userNotificationService, Notification } from '@/services/userNotificationService';
 import { formatDistanceToNow } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-interface SearchResult {
-  id: string;
-  type: 'application' | 'document';
-  title: string;
-  subtitle: string;
-  url: string;
-}
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,10 +24,6 @@ const Navbar = () => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [searching, setSearching] = useState(false);
   useEffect(() => {
     if (authenticated) {
       loadNotifications();
@@ -47,73 +33,6 @@ const Navbar = () => {
       return unsubscribe;
     }
   }, [authenticated]);
-  useEffect(() => {
-    if (!searchQuery.trim() || !authenticated) {
-      setSearchResults([]);
-      return;
-    }
-    const searchTimeout = setTimeout(async () => {
-      await performSearch(searchQuery);
-    }, 300);
-    return () => clearTimeout(searchTimeout);
-  }, [searchQuery, authenticated]);
-  const sanitizeSearchQuery = (query: string): string => {
-    const limited = query.slice(0, 100);
-    const escapedBackslashes = limited.replace(/\\/g, '\\\\');
-    const escapedWildcards = escapedBackslashes.replace(/[%_]/g, '\\$&');
-    return escapedWildcards.replace(/[(),.'"\[\]{}|\\^$*+?]/g, '');
-  };
-  const performSearch = async (query: string) => {
-    if (!query.trim()) return;
-    setSearching(true);
-    try {
-      const results: SearchResult[] = [];
-      const sanitizedQuery = sanitizeSearchQuery(query);
-      if (!sanitizedQuery) {
-        setSearchResults([]);
-        setSearching(false);
-        return;
-      }
-      const {
-        data: applications
-      } = await supabase.from('loan_applications').select('id, application_number, business_name, first_name, last_name, loan_type, status').or(`business_name.ilike.%${sanitizedQuery}%,first_name.ilike.%${sanitizedQuery}%,last_name.ilike.%${sanitizedQuery}%,application_number.ilike.%${sanitizedQuery}%`).limit(5);
-      if (applications) {
-        applications.forEach(app => {
-          results.push({
-            id: app.id,
-            type: 'application',
-            title: app.business_name || `${app.first_name} ${app.last_name}`,
-            subtitle: `#${app.application_number} · ${app.loan_type} · ${app.status}`,
-            url: isAdmin() ? `/admin/applications/${app.id}` : '/loan-applications'
-          });
-        });
-      }
-      const {
-        data: documents
-      } = await supabase.from('borrower_documents').select('id, file_name, document_category, uploaded_at').ilike('file_name', `%${sanitizedQuery}%`).eq('is_latest_version', true).limit(5);
-      if (documents) {
-        documents.forEach(doc => {
-          results.push({
-            id: doc.id,
-            type: 'document',
-            title: doc.file_name,
-            subtitle: `${doc.document_category} · ${new Date(doc.uploaded_at).toLocaleDateString()}`,
-            url: '/my-documents'
-          });
-        });
-      }
-      setSearchResults(results);
-    } catch (error) {
-      console.error('Error searching:', error);
-    } finally {
-      setSearching(false);
-    }
-  };
-  const handleSearchSelect = (result: SearchResult) => {
-    navigate(result.url);
-    setSearchOpen(false);
-    setSearchQuery('');
-  };
   const loadNotifications = async () => {
     try {
       const count = await userNotificationService.getUnreadCount();
@@ -177,74 +96,19 @@ const Navbar = () => {
       </header>;
   }
   return <header className="sticky top-0 z-50">
-      {/* Top Bar - Thin white bar like US Bank */}
-      <div className="h-8 bg-white border-b border-border hidden md:block">
-        <div className="max-w-7xl mx-auto h-full flex items-center px-4 sm:px-6 lg:px-8">
-          <span className="text-sm text-blue-950 font-extrabold">Commercial Loan Marketplace</span>
-        </div>
-      </div>
-
       {/* Main Header Bar */}
       <div className="h-14 md:h-16 bg-white border-b border-border">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <div className="cursor-pointer flex-shrink-0" onClick={handleLogoClick}>
-          <span className="font-bold text-lg md:text-xl tracking-tight text-black">HALO BUSINESS FINANCE    
-          </span>
-        </div>
-
-        {/* Center Search Bar */}
-        <div className="hidden md:flex flex-1 max-w-md mx-8">
-          <Popover open={searchOpen} onOpenChange={setSearchOpen}>
-            <PopoverTrigger asChild>
-              <div className="relative w-full">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 bg-primary rounded-full p-1.5">
-                  <Search className="h-3.5 w-3.5 text-white" />
-                </div>
-                <Input placeholder="How can we help you?" className="pl-12 pr-4 h-10 border-border rounded-full bg-muted/30" value={searchQuery} onChange={e => {
-                setSearchQuery(e.target.value);
-                setSearchOpen(true);
-              }} onFocus={() => setSearchOpen(true)} />
-              </div>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0 bg-white border shadow-xl" align="center">
-              <Command shouldFilter={false}>
-                <CommandList className="max-h-[300px]">
-                  <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
-                    {searching ? 'Searching...' : searchQuery ? 'No results found.' : 'Type to search...'}
-                  </CommandEmpty>
-                  {searchResults.length > 0 && <>
-                      {searchResults.filter(r => r.type === 'application').length > 0 && <CommandGroup heading="Applications">
-                          {searchResults.filter(r => r.type === 'application').map(result => <CommandItem key={result.id} onSelect={() => handleSearchSelect(result)} className="cursor-pointer py-3">
-                              <FileText className="mr-3 h-4 w-4 text-primary" />
-                              <div className="flex flex-col">
-                                <span className="font-medium">{result.title}</span>
-                                <span className="text-xs text-muted-foreground">{result.subtitle}</span>
-                              </div>
-                            </CommandItem>)}
-                        </CommandGroup>}
-                      {searchResults.filter(r => r.type === 'document').length > 0 && <CommandGroup heading="Documents">
-                          {searchResults.filter(r => r.type === 'document').map(result => <CommandItem key={result.id} onSelect={() => handleSearchSelect(result)} className="cursor-pointer py-3">
-                              <FileText className="mr-3 h-4 w-4 text-accent" />
-                              <div className="flex flex-col">
-                                <span className="font-medium">{result.title}</span>
-                                <span className="text-xs text-muted-foreground">{result.subtitle}</span>
-                              </div>
-                            </CommandItem>)}
-                        </CommandGroup>}
-                    </>}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+        {/* Logo and Commercial Loan Marketplace */}
+        <div className="flex items-center gap-6">
+          <div className="cursor-pointer flex-shrink-0" onClick={handleLogoClick}>
+            <span className="font-bold text-lg md:text-xl tracking-tight text-black">HALO BUSINESS FINANCE</span>
+          </div>
+          <span className="hidden md:inline text-sm text-blue-950 font-extrabold">Commercial Loan Marketplace</span>
         </div>
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Mobile Search */}
-          <Button variant="ghost" size="icon" className="md:hidden h-9 w-9" onClick={() => setSearchOpen(true)}>
-            <Search className="h-5 w-5" />
-          </Button>
 
           {/* Notifications */}
           <DropdownMenu>
