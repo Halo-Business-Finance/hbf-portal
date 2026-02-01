@@ -192,7 +192,7 @@ export const EnterpriseDashboard = ({
   return <div>
       {/* Welcome Banner - Full Width US Bank Style */}
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 text-primary-foreground">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-[50px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-[30px]">
           <h1 className="text-2xl md:text-3xl font-bold mb-1">
             Welcome back, {firstName || 'there'}.
           </h1>
@@ -273,9 +273,9 @@ export const EnterpriseDashboard = ({
                     <div className="flex items-center gap-3">
                       {getStatusBadge(app.status)}
                       <Button variant="outline" size="sm" className="rounded-full text-xs" onClick={e => {
-                  e.stopPropagation();
-                  navigate(`/loan-applications?id=${app.id}`);
-                }}>
+                    e.stopPropagation();
+                    navigate(`/loan-applications?id=${app.id}`);
+                  }}>
                         View details
                         <ChevronRight className="w-3 h-3 ml-1" />
                       </Button>
@@ -363,10 +363,10 @@ export const EnterpriseDashboard = ({
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(app.updated_at).toLocaleDateString('en-US', {
-                      month: '2-digit',
-                      day: '2-digit',
-                      year: 'numeric'
-                    })}
+                        month: '2-digit',
+                        day: '2-digit',
+                        year: 'numeric'
+                      })}
                         </p>
                       </div>
                     </div>
@@ -403,5 +403,4 @@ export const EnterpriseDashboard = ({
       </div>
       </div>
     </div>;
-
 };
