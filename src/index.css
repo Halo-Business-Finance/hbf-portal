@@ -12,7 +12,7 @@
 @layer base {
   :root {
     /* Halo Business Finance - Professional Dark Navy Theme */
-    --background: 0 0% 98%;
+    --background: 0 0% 100%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -101,7 +101,7 @@
 
   .dark {
     /* Dark mode is the same as root for Halo theme */
-    --background: 222 47% 6%;
+    --background: 0 0% 100%;
     --foreground: 0 0% 100%;
 
     --card: 222 40% 10%;
