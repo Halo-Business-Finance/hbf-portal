@@ -3,18 +3,17 @@ import Navbar from './Navbar';
 import { BottomNav } from '@/components/BottomNav';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Footer } from '@/components/Footer';
-
 interface LayoutProps {
   children: ReactNode;
 }
-
-const Layout = ({ children }: LayoutProps) => {
-  return (
-    <div className="min-h-screen w-full bg-background flex flex-col">
+const Layout = ({
+  children
+}: LayoutProps) => {
+  return <div className="min-h-screen w-full bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Breadcrumbs />
-        <main className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-20 md:pb-8 bg-white">
+        <main className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-20 md:pb-8 bg-white py-0">
           <div className="animate-fade-in">
             {children}
           </div>
@@ -22,8 +21,6 @@ const Layout = ({ children }: LayoutProps) => {
         <Footer />
       </div>
       <BottomNav />
-    </div>
-  );
+    </div>;
 };
-
 export default Layout;
