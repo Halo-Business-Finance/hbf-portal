@@ -410,7 +410,7 @@ export const EnterpriseDashboard = ({
                   No recent activity
                 </p> : applications.slice(0, 5).map(app => <div key={app.id} className="flex items-center justify-between py-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/30 -mx-2 px-2 rounded transition-colors" onClick={() => navigate(`/loan-applications?id=${app.id}`)}>
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-white", app.status === 'approved' || app.status === 'funded' ? "bg-green-100" : app.status === 'rejected' ? "bg-red-100" : "bg-blue-100")}>
+                      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0", app.status === 'approved' || app.status === 'funded' ? "bg-green-100" : app.status === 'rejected' ? "bg-red-100" : "bg-transparent")}>
                         {app.status === 'approved' || app.status === 'funded' ? <CheckCircle className="w-4 h-4 text-green-600" /> : app.status === 'rejected' ? <AlertCircle className="w-4 h-4 text-red-600" /> : <Clock className="w-4 h-4 text-blue-600" />}
                       </div>
                       <div className="min-w-0">
