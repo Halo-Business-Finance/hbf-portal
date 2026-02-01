@@ -184,8 +184,8 @@ export const EnterpriseDashboard = ({ onNewApplication }: EnterpriseDashboardPro
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner - US Bank Style */}
-      <div className="bg-primary rounded-lg p-6 md:p-8 text-primary-foreground">
+      {/* Welcome Banner - Full Width US Bank Style */}
+      <div className="bg-primary -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6 md:py-8 text-primary-foreground">
         <h1 className="text-2xl md:text-3xl font-bold mb-1">
           Welcome back, {firstName || 'there'}.
         </h1>
