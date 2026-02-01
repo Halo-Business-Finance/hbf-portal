@@ -189,27 +189,31 @@ export const EnterpriseDashboard = ({
         </div>
       </div>;
   }
-  return <div className="space-y-6">
+  return <div>
       {/* Welcome Banner - Full Width US Bank Style */}
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6 md:py-[50px] bg-blue-950 text-primary-foreground">
-        <h1 className="text-2xl md:text-3xl font-bold mb-1">
-          Welcome back, {firstName || 'there'}.
-        </h1>
-        <p className="text-primary-foreground/80 text-sm md:text-base">
-          We look forward to helping you today.
-        </p>
+      <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 text-primary-foreground">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-[50px]">
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">
+            Welcome back, {firstName || 'there'}.
+          </h1>
+          <p className="text-primary-foreground/80 text-sm md:text-base">
+            We look forward to helping you today.
+          </p>
+        </div>
       </div>
 
-      {/* Quick Action Buttons - US Bank Style Pills */}
-      <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
-        {quickActions.map((action, index) => <Button key={index} variant="default" size="sm" className="rounded-full px-4 py-2 h-9 font-medium bg-primary hover:bg-primary/90 text-primary-foreground" onClick={action.action}>
-            {action.label}
-            {action.chevron && <ChevronRight className="w-4 h-4 ml-1" />}
-          </Button>)}
-      </div>
+      {/* Content with padding */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+        {/* Quick Action Buttons - US Bank Style Pills */}
+        <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
+          {quickActions.map((action, index) => <Button key={index} variant="default" size="sm" className="rounded-full px-4 py-2 h-9 font-medium bg-primary hover:bg-primary/90 text-primary-foreground" onClick={action.action}>
+              {action.label}
+              {action.chevron && <ChevronRight className="w-4 h-4 ml-1" />}
+            </Button>)}
+        </div>
 
-      {/* Main Content Grid - US Bank Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content Grid - US Bank Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Loan Applications (like Accounts section) */}
         <div className="lg:col-span-2 space-y-4">
           {/* Section Header */}
@@ -397,5 +401,7 @@ export const EnterpriseDashboard = ({
           </Card>
         </div>
       </div>
+      </div>
     </div>;
+
 };

@@ -13,7 +13,7 @@ const Layout = ({
       <Navbar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Breadcrumbs />
-        <main className="flex-1 overflow-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-20 md:pb-8 bg-white lg:px-0 py-0">
+        <main className="flex-1 overflow-auto pb-20 md:pb-8 bg-white">
           <div className="animate-fade-in">
             {children}
           </div>
