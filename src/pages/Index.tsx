@@ -152,17 +152,15 @@ const FundedLoansView = ({
 const DashboardView = () => {
   const navigate = useNavigate();
   const [showLoanSelector, setShowLoanSelector] = useState(false);
-  const { user } = useAuth();
-  
+  const {
+    user
+  } = useAuth();
   useEffect(() => {
     const checkFirstTimeUser = async () => {
       if (!user) return;
-      
-      const { data: applications } = await supabase
-        .from('loan_applications')
-        .select('id')
-        .eq('user_id', user.id);
-      
+      const {
+        data: applications
+      } = await supabase.from('loan_applications').select('id').eq('user_id', user.id);
       const hasSeenSelector = localStorage.getItem('hbf_loan_selector_seen');
       if ((!applications || applications.length === 0) && !hasSeenSelector) {
         setShowLoanSelector(true);
@@ -170,23 +168,15 @@ const DashboardView = () => {
     };
     checkFirstTimeUser();
   }, [user]);
-  
   const handleLoanTypeSelect = (id: number) => {
     localStorage.setItem('hbf_loan_selector_seen', 'true');
   };
-
   const handleNewApplication = () => {
     setShowLoanSelector(true);
   };
-
-  return (
-    <div className="space-y-4 sm:space-y-5 mb-12">
+  return <div className="space-y-4 sm:space-y-5 mb-12">
       {/* Loan Type Selector for first-time borrowers */}
-      <LoanTypeSelector 
-        open={showLoanSelector} 
-        onClose={() => setShowLoanSelector(false)}
-        onSelect={handleLoanTypeSelect}
-      />
+      <LoanTypeSelector open={showLoanSelector} onClose={() => setShowLoanSelector(false)} onSelect={handleLoanTypeSelect} />
 
       {/* Onboarding Guide for new users */}
       <OnboardingGuide userId={user?.id} />
@@ -196,8 +186,7 @@ const DashboardView = () => {
 
       {/* Floating Support Button */}
       <FloatingSupportButton />
-    </div>
-  );
+    </div>;
 };
 const Index = () => {
   const [selectedLoanType, setSelectedLoanType] = useState<number | null>(null);
@@ -249,9 +238,12 @@ const Index = () => {
     const ua = navigator.userAgent ?? '';
     const isIOS = /iP(hone|od|ad)/.test(ua);
     if (!isIOS) return;
-
     const resetViewport = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto'
+      });
       const el = document.activeElement as HTMLElement | null;
       if (!el) return;
       const tag = el.tagName;
@@ -259,7 +251,6 @@ const Index = () => {
         el.blur();
       }
     };
-
     requestAnimationFrame(() => {
       resetViewport();
       // Some iOS versions apply focus/zoom a moment later (e.g., after autofill).
@@ -661,7 +652,9 @@ const Index = () => {
 
   // Show auth forms for unauthenticated users - Wells Fargo style
   if (!authenticated) {
-    return <div className="min-h-screen flex flex-col overflow-x-hidden" style={{ touchAction: 'pan-y' }}>
+    return <div className="min-h-screen flex flex-col overflow-x-hidden" style={{
+      touchAction: 'pan-y'
+    }}>
         {/* Header Bar */}
         <header className="bg-black px-4 sm:px-6 py-4">
           <div className="flex items-center justify-center">
@@ -672,17 +665,13 @@ const Index = () => {
         </header>
 
         {/* Main Content - Background Image with Centered Card (hidden on mobile) */}
-        <div 
-          className="flex-1 flex items-center justify-center px-4 py-8 bg-white relative"
-          style={{
-            backgroundImage: 'none',
-          }}
-        >
+        <div className="flex-1 flex items-center justify-center px-4 py-8 bg-white relative" style={{
+        backgroundImage: 'none'
+      }}>
           {/* Background image - only on md and above */}
-          <div 
-            className="absolute inset-0 hidden md:block bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/login-background.jpg?v=2')" }}
-          />
+          <div className="absolute inset-0 hidden md:block bg-cover bg-center bg-no-repeat" style={{
+          backgroundImage: "url('/login-background.jpg?v=2')"
+        }} />
           {/* Overlay for better readability - hidden on mobile */}
           <div className="absolute inset-0 bg-black/10 hidden md:block" />
           
@@ -729,59 +718,17 @@ const Index = () => {
             <form onSubmit={handleAuthSubmit} className="space-y-5" aria-label={isLogin ? "Sign in form" : "Create account form"}>
               {!isLogin && <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Input 
-                      id="firstName" 
-                      type="text" 
-                      placeholder="First name" 
-                      value={firstName} 
-                      onChange={e => setFirstName(e.target.value)} 
-                      required 
-                      disabled={authLoading || isLockedOut} 
-                      aria-label="First name"
-                      aria-required="true"
-                      autoComplete="given-name"
-                      className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" 
-                    />
+                    <Input id="firstName" type="text" placeholder="First name" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="First name" aria-required="true" autoComplete="given-name" className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                   </div>
                   <div>
-                    <Input 
-                      id="lastName" 
-                      type="text" 
-                      placeholder="Last name" 
-                      value={lastName} 
-                      onChange={e => setLastName(e.target.value)} 
-                      required 
-                      disabled={authLoading || isLockedOut} 
-                      aria-label="Last name"
-                      aria-required="true"
-                      autoComplete="family-name"
-                      className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" 
-                    />
+                    <Input id="lastName" type="text" placeholder="Last name" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Last name" aria-required="true" autoComplete="family-name" className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                   </div>
                 </div>}
 
               {/* Email/User ID Input */}
               <div className="relative">
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="User ID" 
-                  value={email} 
-                  onChange={e => setEmail(e.target.value)} 
-                  required 
-                  disabled={authLoading || isLockedOut} 
-                  aria-label="Email address or User ID"
-                  aria-required="true"
-                  autoComplete="email"
-                  className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" 
-                />
-                {email && <button 
-                  type="button" 
-                  onClick={() => setEmail("")} 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" 
-                  tabIndex={-1}
-                  aria-label="Clear email field"
-                >
+                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" tabIndex={-1} aria-label="Clear email field">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
                       <path strokeWidth="1.5" d="M15 9l-6 6m0-6l6 6" />
@@ -791,26 +738,8 @@ const Index = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <Input 
-                  id="password" 
-                  type={showPassword ? "text" : "password"} 
-                  placeholder="Password" 
-                  value={password} 
-                  onChange={e => setPassword(e.target.value)} 
-                  required 
-                  disabled={authLoading || isLockedOut} 
-                  aria-label="Password"
-                  aria-required="true"
-                  autoComplete={isLogin ? "current-password" : "new-password"}
-                  className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-16 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" 
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)} 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1" 
-                  disabled={authLoading}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Password" aria-required="true" autoComplete={isLogin ? "current-password" : "new-password"} className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-16 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1" disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
@@ -818,14 +747,7 @@ const Index = () => {
               {/* Save ID Toggle - stacked vertically */}
               {isLogin && <div className="flex flex-col items-start gap-1">
                   <span id="save-id-label" className="text-sm font-medium text-gray-700">Save User ID</span>
-                  <button
-                    type="button"
-                    onClick={() => setRememberMe(!rememberMe)}
-                    className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-blue-600' : 'bg-blue-800'}`}
-                    role="switch"
-                    aria-checked={rememberMe}
-                    aria-labelledby="save-id-label"
-                  >
+                  <button type="button" onClick={() => setRememberMe(!rememberMe)} className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-blue-600' : 'bg-blue-800'}`} role="switch" aria-checked={rememberMe} aria-labelledby="save-id-label">
                     {/* Striped thumb */}
                     <span className={`inline-flex h-6 w-8 transform items-center justify-center rounded-md bg-white shadow-md transition-transform ${rememberMe ? 'translate-x-11' : 'translate-x-1'}`} aria-hidden="true">
                       {/* Vertical stripes */}
@@ -843,19 +765,7 @@ const Index = () => {
                 </div>}
 
               {!isLogin && <div className="relative">
-                  <Input 
-                    id="confirmPassword" 
-                    type="password" 
-                    placeholder="Confirm password" 
-                    value={confirmPassword} 
-                    onChange={e => setConfirmPassword(e.target.value)} 
-                    required 
-                    disabled={authLoading || isLockedOut} 
-                    aria-label="Confirm password"
-                    aria-required="true"
-                    autoComplete="new-password"
-                    className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" 
-                  />
+                  <Input id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Confirm password" aria-required="true" autoComplete="new-password" className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 </div>}
 
               {/* Rate limit warning */}
@@ -898,17 +808,17 @@ const Index = () => {
 
                 <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleAppleSignIn} disabled={authLoading} aria-label="Sign in with Apple">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black" aria-hidden="true">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                   </svg>
                   Continue with Apple
                 </Button>
 
                 <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleMicrosoftSignIn} disabled={authLoading} aria-label="Sign in with Microsoft">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="#F25022" d="M1 1h10v10H1z"/>
-                    <path fill="#00A4EF" d="M1 13h10v10H1z"/>
-                    <path fill="#7FBA00" d="M13 1h10v10H13z"/>
-                    <path fill="#FFB900" d="M13 13h10v10H13z"/>
+                    <path fill="#F25022" d="M1 1h10v10H1z" />
+                    <path fill="#00A4EF" d="M1 13h10v10H1z" />
+                    <path fill="#7FBA00" d="M13 1h10v10H13z" />
+                    <path fill="#FFB900" d="M13 13h10v10H13z" />
                   </svg>
                   Continue with Microsoft
                 </Button>
@@ -968,7 +878,7 @@ const Index = () => {
   }
   return <Layout>
       <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-6 py-10 bg-white border-0">
+        <div className="max-w-7xl mx-auto py-10 bg-white border-0 px-0">
         <main>
         {/* Dashboard for Authenticated Users */}
         {!selectedLoanType && <DashboardView />}
