@@ -306,23 +306,6 @@ const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Tools Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-              Tools
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/loan-calculator')} className="cursor-pointer py-2.5">
-              Loan Calculator
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/credit-score-simulator')} className="cursor-pointer py-2.5">
-              Credit Simulator
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
 
         {/* Loan Programs Dropdown */}
         <DropdownMenu>
