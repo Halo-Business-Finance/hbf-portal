@@ -276,14 +276,11 @@ const Navbar = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/bank-accounts')} className="cursor-pointer py-2.5">
-              Bank Accounts
+            <DropdownMenuItem onClick={() => navigate('/bank-accounts?type=business')} className="cursor-pointer py-2.5">
+              Business Accounts
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/existing-loans')} className="cursor-pointer py-2.5">
-              Existing Loans
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/credit-reports')} className="cursor-pointer py-2.5">
-              Credit Reports
+            <DropdownMenuItem onClick={() => navigate('/bank-accounts?type=personal')} className="cursor-pointer py-2.5">
+              Personal Accounts
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
