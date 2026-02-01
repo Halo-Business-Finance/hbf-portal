@@ -99,11 +99,9 @@ const Navbar = () => {
       <div className="h-14 md:h-16 bg-white border-b border-border">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo and Commercial Loan Marketplace */}
-        <div className="flex items-center gap-2 md:gap-4">
-          <div className="cursor-pointer flex-shrink-0" onClick={handleLogoClick}>
-            <span className="font-bold text-base md:text-xl tracking-tight text-black">HALO BUSINESS FINANCE</span>
-          </div>
-          <span className="text-[10px] md:text-sm text-primary font-bold tracking-wide uppercase">NATIONWIDE COMMERCIAL LOAN MARKETPLACE</span>
+        <div className="flex flex-col cursor-pointer" onClick={handleLogoClick}>
+          <span className="font-bold text-base md:text-xl tracking-tight text-black">HALO BUSINESS FINANCE</span>
+          <span className="text-[8px] md:text-xs text-primary font-bold tracking-wide uppercase">NATIONWIDE COMMERCIAL LOAN MARKETPLACE</span>
         </div>
 
         {/* Right Actions */}
