@@ -345,10 +345,10 @@ export const EnterpriseDashboard = ({
           {/* Cash Flow Widget - US Bank Style */}
           <Card className="border border-border">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <CardTitle className="text-lg font-bold">Loan applications</CardTitle>
                 <Select value={loanWidgetDays} onValueChange={setLoanWidgetDays}>
-                  <SelectTrigger className="w-[130px] h-8 text-xs">
+                  <SelectTrigger className="w-full sm:w-[130px] h-8 text-xs">
                     <SelectValue placeholder="Select days" />
                   </SelectTrigger>
                   <SelectContent>
