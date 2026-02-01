@@ -7,3 +7,4 @@ export { EstimatedTimeline } from './EstimatedTimeline';
 export { DashboardCharts } from './DashboardCharts';
 export { SwipeableDashboard } from './SwipeableDashboard';
 export { LoanTypeSelector } from './LoanTypeSelector';
+export { EnterpriseDashboard } from './EnterpriseDashboard';

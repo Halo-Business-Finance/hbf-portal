@@ -39,7 +39,7 @@ import { CreditScoreWidget } from '@/components/CreditScoreWidget';
 import { BankBalanceWidget } from '@/components/BankBalanceWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { Footer } from '@/components/Footer';
-import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts, SwipeableDashboard, LoanTypeSelector } from '@/components/dashboard';
+import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts, SwipeableDashboard, LoanTypeSelector, EnterpriseDashboard } from '@/components/dashboard';
 const MAX_LOGIN_ATTEMPTS = 5;
 const FundedLoansView = ({
   userId
@@ -151,123 +151,36 @@ const FundedLoansView = ({
 };
 const DashboardView = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalApplications: 0,
-    approvedAmount: 0,
-    pendingReview: 0,
-    successRate: 0
-  });
-  const [activeTab, setActiveTab] = useState('applications');
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [showLoanSelector, setShowLoanSelector] = useState(false);
-  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
-  const {
-    user
-  } = useAuth();
-  const [firstName, setFirstName] = useState<string | null>(null);
+  const { user } = useAuth();
   
   useEffect(() => {
-    const fetchStats = async () => {
+    const checkFirstTimeUser = async () => {
       if (!user) return;
-
-      // Fetch user's first name from profile
-      const {
-        data: profile
-      } = await supabase.from('profiles').select('first_name').eq('id', user.id).maybeSingle();
-      setFirstName(profile?.first_name ?? null);
-      const {
-        data: applications
-      } = await supabase.from('loan_applications').select('*').eq('user_id', user.id);
       
-      if (applications) {
-        const total = applications.length;
-        const approved = applications.filter(app => app.status === 'approved').length;
-        const pending = applications.filter(app => app.status === 'under_review' || app.status === 'submitted').length;
-        const approvedSum = applications.filter(app => app.status === 'approved').reduce((sum, app) => sum + (app.amount_requested || 0), 0);
-        setStats({
-          totalApplications: total,
-          approvedAmount: approvedSum,
-          pendingReview: pending,
-          successRate: total > 0 ? Math.round(approved / total * 100) : 0
-        });
-        
-        // Show loan selector for first-time users with no applications
-        const hasSeenSelector = localStorage.getItem('hbf_loan_selector_seen');
-        if (total === 0 && !hasSeenSelector) {
-          setShowLoanSelector(true);
-        }
+      const { data: applications } = await supabase
+        .from('loan_applications')
+        .select('id')
+        .eq('user_id', user.id);
+      
+      const hasSeenSelector = localStorage.getItem('hbf_loan_selector_seen');
+      if ((!applications || applications.length === 0) && !hasSeenSelector) {
+        setShowLoanSelector(true);
       }
-      setHasCheckedApplications(true);
     };
-    fetchStats();
+    checkFirstTimeUser();
   }, [user]);
   
   const handleLoanTypeSelect = (id: number) => {
-    // Mark selector as seen when user selects a loan type
     localStorage.setItem('hbf_loan_selector_seen', 'true');
   };
 
-  const handleMetricClick = (filter: string) => {
-    setStatusFilter(filter);
-    setActiveTab('applications');
+  const handleNewApplication = () => {
+    setShowLoanSelector(true);
   };
-  // Define dashboard sections for swipeable navigation on mobile
-  const dashboardSections = [{
-    id: 'overview',
-    label: 'Overview',
-    content: <div className="space-y-4">
-          <QuickActions />
-          <DashboardOverview />
-          <DashboardCharts userId={user?.id} />
-        </div>
-  }, {
-    id: 'progress',
-    label: 'Progress',
-    content: <div className="space-y-4">
-          <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-          <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-          <DocumentChecklist userId={user?.id} />
-        </div>
-  }, {
-    id: 'financial',
-    label: 'Financial',
-    content: <div className="space-y-4">
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-foreground">Bank Accounts</h2>
-            <BankBalanceWidget />
-          </div>
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-foreground">Credit Scores</h2>
-            <CreditScoreWidget />
-          </div>
-        </div>
-  }, {
-    id: 'applications',
-    label: 'Applications',
-    content: <div className="space-y-4">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
-              <p className="stat-label">Total<br />Applications</p>
-              <p className="stat-value">{stats.totalApplications}</p>
-            </div>
-            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-              <p className="stat-label">Approved<br />Amount</p>
-              <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
-            </div>
-            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
-              <p className="stat-label">Pending<br />Review</p>
-              <p className="stat-value">{stats.pendingReview}</p>
-            </div>
-            <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-              <p className="stat-label">Success Rate</p>
-              <p className="stat-value">{stats.successRate}%</p>
-            </div>
-          </div>
-          <ApplicationsList statusFilter={statusFilter} />
-        </div>
-  }];
-  return <div className="space-y-4 sm:space-y-5 mb-12">
+
+  return (
+    <div className="space-y-4 sm:space-y-5 mb-12">
       {/* Loan Type Selector for first-time borrowers */}
       <LoanTypeSelector 
         open={showLoanSelector} 
@@ -278,112 +191,13 @@ const DashboardView = () => {
       {/* Onboarding Guide for new users */}
       <OnboardingGuide userId={user?.id} />
 
-      {/* Header with bottom separator */}
-      <div className="border-none rounded-none">
-        <div className="flex-1">
-          {firstName && <h2 className="text-lg sm:text-xl font-bold mb-3 text-black">
-              Welcome, {firstName}
-            </h2>}
-          <p className="text-sm sm:text-base mb-4 text-black">
-            Manage your loan applications and track your progress here
-          </p>
-        </div>
-      </div>
-
-      {/* Mobile Swipeable Dashboard */}
-      <SwipeableDashboard sections={dashboardSections} />
-
-      {/* Desktop Layout - Hidden on mobile */}
-      <div className="hidden md:block space-y-4 sm:space-y-5">
-        {/* Quick Actions */}
-        <QuickActions />
-
-        {/* Overview Card */}
-        <DashboardOverview />
-
-        {/* Dashboard Charts */}
-        <DashboardCharts userId={user?.id} />
-
-        {/* Progress & Timeline Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <ApplicationProgressTracker currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-          <EstimatedTimeline currentStatus={stats.pendingReview > 0 ? 'under_review' : stats.totalApplications > 0 ? 'submitted' : 'draft'} />
-          <DocumentChecklist userId={user?.id} />
-        </div>
-
-        {/* Bank Accounts & Credit Scores Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-foreground">Bank Accounts</h2>
-            <BankBalanceWidget />
-          </div>
-          
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-foreground">Credit Scores</h2>
-            <CreditScoreWidget />
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('all')}>
-            <p className="stat-label">Total<br />Applications</p>
-            <p className="stat-value">{stats.totalApplications}</p>
-          </div>
-
-          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-            <p className="stat-label">Approved<br />Amount</p>
-            <p className="stat-value">${stats.approvedAmount.toLocaleString()}</p>
-          </div>
-
-          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('pending')}>
-            <p className="stat-label">Pending<br />Review</p>
-            <p className="stat-value">{stats.pendingReview}</p>
-          </div>
-
-          <div className="dashboard-stat-card cursor-pointer" onClick={() => handleMetricClick('approved')}>
-            <p className="stat-label">Success Rate</p>
-            <p className="stat-value">{stats.successRate}%</p>
-          </div>
-        </div>
-
-        {/* Tabs Section */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          
-
-          <TabsContent value="applications" className="mt-6">
-            {statusFilter && <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-blue-900 text-white">
-                    Filter: {statusFilter === 'all' ? 'All Applications' : statusFilter === 'pending' ? 'Pending Review' : statusFilter === 'approved' ? 'Approved/Funded' : statusFilter}
-                  </Badge>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => setStatusFilter(null)} className="text-blue-900 hover:text-blue-700">
-                  Clear Filter
-                </Button>
-              </div>}
-            <ApplicationsList statusFilter={statusFilter} />
-          </TabsContent>
-
-          <TabsContent value="activity" className="mt-6">
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Clock className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Recent Activity</h3>
-                <p className="text-muted-foreground">Your recent application activity will appear here</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="loans" className="mt-6">
-            <FundedLoansView userId={user?.id} />
-          </TabsContent>
-        </Tabs>
-      </div>
+      {/* Enterprise Dashboard */}
+      <EnterpriseDashboard onNewApplication={handleNewApplication} />
 
       {/* Floating Support Button */}
       <FloatingSupportButton />
-    </div>;
+    </div>
+  );
 };
 const Index = () => {
   const [selectedLoanType, setSelectedLoanType] = useState<number | null>(null);
