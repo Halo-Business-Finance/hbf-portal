@@ -388,7 +388,7 @@ const Navbar = () => {
       <div className="h-12 bg-white border-b border-border hidden md:block">
         <div className="max-w-7xl mx-auto h-full flex items-center px-4 sm:px-6 lg:px-8 gap-1">
         {/* Dashboard */}
-        <button onClick={() => navigate('/')} className={cn("px-4 py-2 text-sm font-medium transition-colors text-blue-700", isActiveRoute('/') ? "text-primary" : "text-foreground")}>
+        <button onClick={() => navigate('/')} className={cn("pl-0 pr-4 py-2 text-sm font-medium transition-colors text-blue-700", isActiveRoute('/') ? "text-primary" : "text-foreground")}>
           Dashboard
         </button>
 
