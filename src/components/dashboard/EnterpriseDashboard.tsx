@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clock, CheckCircle, AlertCircle, Building2, MoreHorizontal, Plus, Link2, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,11 +37,16 @@ export const EnterpriseDashboard = ({
   const [firstName, setFirstName] = useState<string | null>(null);
   const [applications, setApplications] = useState<LoanApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loanWidgetDays, setLoanWidgetDays] = useState<string>('30');
   const [stats, setStats] = useState({
     totalPipeline: 0,
     approved: 0,
     pending: 0,
     drafts: 0,
+    fundedAmount: 0,
+    pendingAmount: 0
+  });
+  const [filteredStats, setFilteredStats] = useState({
     fundedAmount: 0,
     pendingAmount: 0
   });
@@ -44,6 +56,25 @@ export const EnterpriseDashboard = ({
       fetchDashboardData();
     }
   }, [user]);
+
+  // Calculate filtered stats based on selected days
+  useEffect(() => {
+    const days = parseInt(loanWidgetDays);
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    const filteredApps = applications.filter(app => 
+      new Date(app.created_at) >= cutoffDate
+    );
+
+    const approved = filteredApps.filter(a => a.status === 'approved' || a.status === 'funded');
+    const pending = filteredApps.filter(a => a.status === 'submitted' || a.status === 'under_review');
+
+    setFilteredStats({
+      fundedAmount: approved.reduce((sum, a) => sum + (a.amount_requested || 0), 0),
+      pendingAmount: pending.reduce((sum, a) => sum + (a.amount_requested || 0), 0)
+    });
+  }, [loanWidgetDays, applications]);
   const fetchDashboardData = async () => {
     if (!user) return;
     try {
@@ -319,7 +350,21 @@ export const EnterpriseDashboard = ({
           {/* Cash Flow Widget - US Bank Style */}
           <Card className="border border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold">Loan applications</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-bold">Loan applications</CardTitle>
+                <Select value={loanWidgetDays} onValueChange={setLoanWidgetDays}>
+                  <SelectTrigger className="w-[130px] h-8 text-xs">
+                    <SelectValue placeholder="Select days" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="30">Last 30 days</SelectItem>
+                    <SelectItem value="60">Last 60 days</SelectItem>
+                    <SelectItem value="90">Last 90 days</SelectItem>
+                    <SelectItem value="180">Last 180 days</SelectItem>
+                    <SelectItem value="360">Last 360 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -327,13 +372,13 @@ export const EnterpriseDashboard = ({
                   <p className="text-sm text-muted-foreground">Approved</p>
                   <p className="text-xl font-bold text-green-600 flex items-center gap-1">
                     <TrendingUp className="w-4 h-4" />
-                    +{formatCurrency(stats.fundedAmount)}
+                    +{formatCurrency(filteredStats.fundedAmount)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Pending</p>
                   <p className="text-xl font-bold text-foreground">
-                    {formatCurrency(stats.pendingAmount)}
+                    {formatCurrency(filteredStats.pendingAmount)}
                   </p>
                 </div>
               </div>
