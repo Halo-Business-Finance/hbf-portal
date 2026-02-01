@@ -48,7 +48,10 @@ export const EnterpriseDashboard = ({
   });
   const [filteredStats, setFilteredStats] = useState({
     fundedAmount: 0,
-    pendingAmount: 0
+    pendingAmount: 0,
+    approvedCount: 0,
+    pendingCount: 0,
+    totalCount: 0
   });
   const [lastLogin, setLastLogin] = useState<string | null>(null);
   useEffect(() => {
@@ -72,7 +75,10 @@ export const EnterpriseDashboard = ({
 
     setFilteredStats({
       fundedAmount: approved.reduce((sum, a) => sum + (a.amount_requested || 0), 0),
-      pendingAmount: pending.reduce((sum, a) => sum + (a.amount_requested || 0), 0)
+      pendingAmount: pending.reduce((sum, a) => sum + (a.amount_requested || 0), 0),
+      approvedCount: approved.length,
+      pendingCount: pending.length,
+      totalCount: filteredApps.length
     });
   }, [loanWidgetDays, applications]);
   const fetchDashboardData = async () => {
@@ -367,16 +373,32 @@ export const EnterpriseDashboard = ({
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs font-medium">
+                  {filteredStats.totalCount} application{filteredStats.totalCount !== 1 ? 's' : ''}
+                </Badge>
+                <span>in selected period</span>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Approved</p>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                    Approved
+                    <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
+                      {filteredStats.approvedCount}
+                    </Badge>
+                  </p>
                   <p className="text-xl font-bold text-green-600 flex items-center gap-1">
                     <TrendingUp className="w-4 h-4" />
                     +{formatCurrency(filteredStats.fundedAmount)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Pending</p>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                    Pending
+                    <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
+                      {filteredStats.pendingCount}
+                    </Badge>
+                  </p>
                   <p className="text-xl font-bold text-foreground">
                     {formatCurrency(filteredStats.pendingAmount)}
                   </p>
