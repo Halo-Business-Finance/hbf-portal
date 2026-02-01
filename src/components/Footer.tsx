@@ -2,7 +2,7 @@ export const Footer = () => {
   return (
     <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-3 mb-16 md:mb-0">
       <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-2 md:gap-4">
-        <span className="text-sm text-muted-foreground text-center">
+        <span className="text-sm text-muted-foreground text-center whitespace-nowrap">
           © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
         </span>
         <div className="flex items-center gap-4 md:gap-6">
