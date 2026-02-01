@@ -383,7 +383,7 @@ const Navbar = () => {
       {/* Sub Navigation Bar */}
       <div className="h-12 bg-white border-b border-border hidden md:flex items-center px-6 gap-1">
         {/* Dashboard */}
-        <button onClick={() => navigate('/')} className={cn("px-4 py-2 text-sm font-medium transition-colors hover:text-primary", isActiveRoute('/') ? "text-primary" : "text-foreground")}>
+        <button onClick={() => navigate('/')} className={cn("px-4 py-2 text-sm font-medium transition-colors text-blue-700", isActiveRoute('/') ? "text-primary" : "text-foreground")}>
           Dashboard
         </button>
 
