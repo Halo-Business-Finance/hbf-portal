@@ -275,28 +275,28 @@ export const EnterpriseDashboard = ({
             </Card> : <div className="space-y-4">
               {applications.slice(0, 3).map(app => <Card key={app.id} className="border border-border hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/loan-applications?id=${app.id}`)}>
                   <CardContent className="p-4 md:p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-8 rounded flex items-center justify-center bg-white">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-8 sm:w-12 sm:h-8 rounded flex items-center justify-center bg-white flex-shrink-0">
                           <Building2 className="w-5 h-5 text-primary" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-foreground">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-foreground truncate">
                             {app.business_name || 'New Application'} ...{app.application_number?.slice(-4) || '0000'}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground truncate">
                             {getLoanTypeDisplay(app.loan_type)} • {app.application_number || 'Draft'}
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="flex items-center justify-between sm:justify-end sm:text-right flex-shrink-0 pl-13 sm:pl-0">
                         <p className="font-bold text-foreground text-lg">
                           {formatCurrency(app.amount_requested || 0)}
                         </p>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground inline" />
+                        <ChevronRight className="w-5 h-5 text-muted-foreground ml-2" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                       {getStatusBadge(app.status)}
                       <Button variant="outline" size="sm" className="rounded-full text-xs" onClick={e => {
                     e.stopPropagation();
