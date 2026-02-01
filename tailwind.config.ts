@@ -20,7 +20,7 @@ export default {
     	extend: {
     		fontFamily: {
     			sans: [
-    				'Plus Jakarta Sans',
+    				'Open Sans',
     				'ui-sans-serif',
     				'system-ui',
     				'sans-serif',
@@ -37,6 +37,7 @@ export default {
     				'sans-serif'
     			],
     			serif: [
+    				'Source Serif Pro',
     				'ui-serif',
     				'Georgia',
     				'Cambria',
@@ -45,6 +46,7 @@ export default {
     				'serif'
     			],
     			mono: [
+    				'IBM Plex Mono',
     				'ui-monospace',
     				'SFMono-Regular',
     				'Menlo',
