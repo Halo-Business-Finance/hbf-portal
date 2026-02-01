@@ -9,7 +9,6 @@ import { LoanCalculatorDialog } from '@/components/LoanCalculatorDialog';
 import { userNotificationService, Notification } from '@/services/userNotificationService';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
-
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -141,8 +140,8 @@ const Navbar = () => {
                         <p className="text-xs text-muted-foreground line-clamp-2">{notification.message}</p>
                         <p className="text-xs text-muted-foreground/70">
                           {formatDistanceToNow(new Date(notification.created_at), {
-                      addSuffix: true
-                    })}
+                        addSuffix: true
+                      })}
                         </p>
                       </div>
                     </DropdownMenuItem>)}
@@ -254,7 +253,7 @@ const Navbar = () => {
 
         {/* Applications */}
         <button onClick={() => navigate('/loan-applications')} className={cn("px-4 py-2 text-sm font-medium transition-colors hover:text-primary", isActiveRoute('/loan-applications') ? "text-primary" : "text-foreground")}>
-          Applications
+          Loan Applications
         </button>
 
         {/* Accounts Dropdown */}
