@@ -231,7 +231,7 @@ export const EnterpriseDashboard = ({
       {/* Content with padding */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         {/* Quick Action Buttons - US Bank Style Pills */}
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end gap-2 md:gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:flex lg:flex-wrap lg:items-center lg:justify-end gap-2 md:gap-3">
           {quickActions.map((action, index) => <Button key={index} variant="default" size="sm" className="rounded-full px-3 sm:px-4 py-2 h-9 font-medium bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm justify-center" onClick={action.action}>
               {action.label}
               {action.chevron && <ChevronRight className="w-4 h-4 ml-1 hidden sm:inline" />}
