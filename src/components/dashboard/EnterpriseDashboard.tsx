@@ -257,8 +257,9 @@ export const EnterpriseDashboard = ({
           </div>
 
           {/* Pipeline Summary Row */}
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-3 text-sm">
             <span className="text-muted-foreground font-medium">Active applications</span>
+            <span className="h-4 w-px bg-border" aria-hidden="true" />
             <span className="font-bold text-foreground">{formatCurrency(stats.totalPipeline)}</span>
           </div>
 
