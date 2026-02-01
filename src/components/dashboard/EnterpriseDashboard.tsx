@@ -319,7 +319,7 @@ export const EnterpriseDashboard = ({
           {/* Cash Flow Widget - US Bank Style */}
           <Card className="border border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold">Pipeline last 30 days</CardTitle>
+              <CardTitle className="text-lg font-bold">Loan Applications in the last 30 days</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
