@@ -215,7 +215,7 @@ export const EnterpriseDashboard = ({
           {/* Section Header */}
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-foreground">Loan Applications</h2>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 text-black">
               <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm" onClick={() => navigate('/loan-applications')}>
                 <FileText className="w-4 h-4 mr-1" />
                 Customize application list
