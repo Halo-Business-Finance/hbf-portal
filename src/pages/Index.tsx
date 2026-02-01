@@ -39,7 +39,7 @@ import { CreditScoreWidget } from '@/components/CreditScoreWidget';
 import { BankBalanceWidget } from '@/components/BankBalanceWidget';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { Footer } from '@/components/Footer';
-import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts, SwipeableDashboard } from '@/components/dashboard';
+import { ApplicationProgressTracker, QuickActions, OnboardingGuide, FloatingSupportButton, DocumentChecklist, EstimatedTimeline, DashboardCharts, SwipeableDashboard, LoanTypeSelector } from '@/components/dashboard';
 const MAX_LOGIN_ATTEMPTS = 5;
 const FundedLoansView = ({
   userId
@@ -150,6 +150,7 @@ const FundedLoansView = ({
     </div>;
 };
 const DashboardView = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalApplications: 0,
     approvedAmount: 0,
@@ -158,10 +159,13 @@ const DashboardView = () => {
   });
   const [activeTab, setActiveTab] = useState('applications');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [showLoanSelector, setShowLoanSelector] = useState(false);
+  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const {
     user
   } = useAuth();
   const [firstName, setFirstName] = useState<string | null>(null);
+  
   useEffect(() => {
     const fetchStats = async () => {
       if (!user) return;
@@ -174,6 +178,7 @@ const DashboardView = () => {
       const {
         data: applications
       } = await supabase.from('loan_applications').select('*').eq('user_id', user.id);
+      
       if (applications) {
         const total = applications.length;
         const approved = applications.filter(app => app.status === 'approved').length;
@@ -185,10 +190,23 @@ const DashboardView = () => {
           pendingReview: pending,
           successRate: total > 0 ? Math.round(approved / total * 100) : 0
         });
+        
+        // Show loan selector for first-time users with no applications
+        const hasSeenSelector = localStorage.getItem('hbf_loan_selector_seen');
+        if (total === 0 && !hasSeenSelector) {
+          setShowLoanSelector(true);
+        }
       }
+      setHasCheckedApplications(true);
     };
     fetchStats();
   }, [user]);
+  
+  const handleLoanTypeSelect = (id: number) => {
+    // Mark selector as seen when user selects a loan type
+    localStorage.setItem('hbf_loan_selector_seen', 'true');
+  };
+
   const handleMetricClick = (filter: string) => {
     setStatusFilter(filter);
     setActiveTab('applications');
@@ -250,6 +268,13 @@ const DashboardView = () => {
         </div>
   }];
   return <div className="space-y-4 sm:space-y-5 mb-12">
+      {/* Loan Type Selector for first-time borrowers */}
+      <LoanTypeSelector 
+        open={showLoanSelector} 
+        onClose={() => setShowLoanSelector(false)}
+        onSelect={handleLoanTypeSelect}
+      />
+
       {/* Onboarding Guide for new users */}
       <OnboardingGuide userId={user?.id} />
 
