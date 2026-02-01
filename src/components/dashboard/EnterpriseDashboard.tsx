@@ -192,7 +192,7 @@ export const EnterpriseDashboard = ({
   return <div>
       {/* Welcome Banner - Full Width US Bank Style */}
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 text-primary-foreground">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-[30px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-[30px] lg:px-[34px]">
           <h1 className="text-2xl md:text-3xl font-bold mb-1">
             Welcome back, {firstName || 'there'}.
           </h1>
