@@ -364,6 +364,13 @@ const Navbar = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-52 bg-white border shadow-xl">
+            <DropdownMenuItem onClick={() => navigate('/credit-reports?type=business')} className="cursor-pointer py-2.5">
+              Business Credit Reports
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/credit-reports?type=personal')} className="cursor-pointer py-2.5">
+              Personal Credit Reports
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate('/loan-calculator')} className="cursor-pointer py-2.5">
               Business Calculator
             </DropdownMenuItem>
