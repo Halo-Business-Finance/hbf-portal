@@ -3,13 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clock, CheckCircle, AlertCircle, Building2, MoreHorizontal, Plus, Link2, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -65,14 +59,9 @@ export const EnterpriseDashboard = ({
     const days = parseInt(loanWidgetDays);
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
-
-    const filteredApps = applications.filter(app => 
-      new Date(app.created_at) >= cutoffDate
-    );
-
+    const filteredApps = applications.filter(app => new Date(app.created_at) >= cutoffDate);
     const approved = filteredApps.filter(a => a.status === 'approved' || a.status === 'funded');
     const pending = filteredApps.filter(a => a.status === 'submitted' || a.status === 'under_review');
-
     setFilteredStats({
       fundedAmount: approved.reduce((sum, a) => sum + (a.amount_requested || 0), 0),
       pendingAmount: pending.reduce((sum, a) => sum + (a.amount_requested || 0), 0),
