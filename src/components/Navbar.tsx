@@ -190,7 +190,7 @@ const Navbar = () => {
       <div className="h-14 md:h-16 bg-white border-b border-border flex items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <div className="cursor-pointer flex-shrink-0" onClick={handleLogoClick}>
-          <span className="font-bold text-lg md:text-xl tracking-tight text-black">HHalo Business Finance  
+          <span className="font-bold text-lg md:text-xl tracking-tight text-black">HALO BUSINESS FINANCE    
           </span>
         </div>
 
