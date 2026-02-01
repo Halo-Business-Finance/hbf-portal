@@ -1,7 +1,6 @@
 export const Footer = () => {
-  return (
-    <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
+  return <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+      <div className="">
         <span className="text-center sm:text-left">
           © {new Date().getFullYear()} Halo Business Finance.
           <span className="block sm:inline"> All rights reserved.</span>
@@ -12,6 +11,5 @@ export const Footer = () => {
           <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Support</a>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
