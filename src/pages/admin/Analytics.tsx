@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
-import { BarChart3, TrendingUp, DollarSign, Users, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { BarChart3, TrendingUp, DollarSign, Users, FileText, CheckCircle, Clock, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { exportAnalyticsToCSV, exportAnalyticsToPDF } from '@/utils/analyticsExport';
 
 interface AnalyticsData {
   totalApplications: number;
@@ -151,12 +153,43 @@ const Analytics = () => {
     );
   }
 
+  const handleExportCSV = () => {
+    if (analytics) {
+      exportAnalyticsToCSV(analytics);
+      toast({
+        title: "Export Started",
+        description: "Your CSV report is being downloaded"
+      });
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (analytics) {
+      exportAnalyticsToPDF(analytics);
+      toast({
+        title: "Export Started",
+        description: "Your PDF report is being generated"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <PageHeader 
         title="Analytics & Reports" 
         subtitle="View detailed analytics and generate reports"
-      />
+      >
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!analytics}>
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
+          <Button size="sm" onClick={handleExportPDF} disabled={!analytics}>
+            <Download className="w-4 h-4 mr-2" />
+            Export PDF
+          </Button>
+        </div>
+      </PageHeader>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         {/* Key Metrics */}
