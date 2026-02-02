@@ -371,27 +371,27 @@ export const EnterpriseDashboard = ({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                  <div className="text-sm text-muted-foreground flex items-center gap-1.5">
                     Approved
                     <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
                       {filteredStats.approvedCount}
                     </Badge>
-                  </p>
-                  <p className="text-xl font-bold text-green-600 flex items-center gap-1">
+                  </div>
+                  <div className="text-xl font-bold text-green-600 flex items-center gap-1">
                     <TrendingUp className="w-4 h-4" />
                     +{formatCurrency(filteredStats.fundedAmount)}
-                  </p>
+                  </div>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                  <div className="text-sm text-muted-foreground flex items-center gap-1.5">
                     Pending
                     <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
                       {filteredStats.pendingCount}
                     </Badge>
-                  </p>
-                  <p className="text-xl font-bold text-foreground">
+                  </div>
+                  <div className="text-xl font-bold text-foreground">
                     {formatCurrency(filteredStats.pendingAmount)}
-                  </p>
+                  </div>
                 </div>
               </div>
               <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10" onClick={() => navigate('/loan-applications')}>
