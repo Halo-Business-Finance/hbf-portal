@@ -467,7 +467,6 @@ async function updateApplicationStatus(
   rateLimitHeaders?: Record<string, string>
 ): Promise<Response> {
   const safeRateLimitHeaders = rateLimitHeaders ?? {};
-  const safeRateLimitHeaders = rateLimitHeaders ?? {};
   try {
     // First, fetch the current loan_details to merge safely
     const { data: currentApp, error: fetchError } = await supabase
