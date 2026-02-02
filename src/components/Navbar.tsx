@@ -245,144 +245,174 @@ const Navbar = () => {
       <div className="h-12 bg-white border-b border-border hidden md:block">
         <div className="max-w-7xl mx-auto h-full flex items-center px-4 sm:px-6 lg:px-8 gap-1">
         {/* Dashboard */}
-        <button onClick={() => navigate('/')} className={cn("pl-0 pr-4 py-2 text-sm font-medium transition-colors text-blue-700", isActiveRoute('/') ? "text-primary" : "text-foreground")}>
-          Dashboard
-        </button>
+        <div className="relative h-full flex items-center">
+          <button onClick={() => navigate('/')} className={cn("pl-0 pr-4 py-2 text-sm font-medium transition-colors", isActiveRoute('/') ? "text-primary" : "text-foreground hover:text-primary")}>
+            Dashboard
+          </button>
+          {isActiveRoute('/') && (
+            <span className="absolute bottom-0 left-0 right-4 h-0.5 bg-primary rounded-full" />
+          )}
+        </div>
 
         {/* Loan Programs Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-              Select Loan Program
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_7a')} className="cursor-pointer py-2.5">
-              SBA 7(a) Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_504')} className="cursor-pointer py-2.5">
-              SBA 504 Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_express')} className="cursor-pointer py-2.5">
-              SBA Express Loan
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=term_loan')} className="cursor-pointer py-2.5">
-              Term Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=bridge_loan')} className="cursor-pointer py-2.5">
-              Bridge Loan
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=conventional')} className="cursor-pointer py-2.5">
-              Conventional Loan
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=working_capital')} className="cursor-pointer py-2.5">
-              Working Capital
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=business_loc')} className="cursor-pointer py-2.5">
-              Business Line of Credit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=equipment')} className="cursor-pointer py-2.5">
-              Equipment Financing
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=invoice_factoring')} className="cursor-pointer py-2.5">
-              Invoice Factoring
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=refinance')} className="cursor-pointer py-2.5">
-              Refinance
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?type=usda_bi')} className="cursor-pointer py-2.5">
-              USDA B&I Loan
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative h-full flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/loan-applications' && location.search.includes('type=') ? "text-primary" : "text-foreground hover:text-primary")}>
+                Select Loan Program
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56 bg-white border shadow-xl">
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_7a')} className="cursor-pointer py-2.5">
+                SBA 7(a) Loan
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_504')} className="cursor-pointer py-2.5">
+                SBA 504 Loan
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_express')} className="cursor-pointer py-2.5">
+                SBA Express Loan
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=term_loan')} className="cursor-pointer py-2.5">
+                Term Loan
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=bridge_loan')} className="cursor-pointer py-2.5">
+                Bridge Loan
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=conventional')} className="cursor-pointer py-2.5">
+                Conventional Loan
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=working_capital')} className="cursor-pointer py-2.5">
+                Working Capital
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=business_loc')} className="cursor-pointer py-2.5">
+                Business Line of Credit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=equipment')} className="cursor-pointer py-2.5">
+                Equipment Financing
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=invoice_factoring')} className="cursor-pointer py-2.5">
+                Invoice Factoring
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=refinance')} className="cursor-pointer py-2.5">
+                Refinance
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=usda_bi')} className="cursor-pointer py-2.5">
+                USDA B&I Loan
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {location.pathname === '/loan-applications' && location.search.includes('type=') && (
+            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
+          )}
+        </div>
 
         {/* Applications Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-              Loan Applications
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/loan-applications')} className="cursor-pointer py-2.5">
-              View All Applications
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/loan-applications?new=true')} className="cursor-pointer py-2.5">
-              Start New Application
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative h-full flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/loan-applications' && !location.search.includes('type=') ? "text-primary" : "text-foreground hover:text-primary")}>
+                Loan Applications
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
+              <DropdownMenuItem onClick={() => navigate('/loan-applications')} className="cursor-pointer py-2.5">
+                View All Applications
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/loan-applications?new=true')} className="cursor-pointer py-2.5">
+                Start New Application
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {location.pathname === '/loan-applications' && !location.search.includes('type=') && (
+            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
+          )}
+        </div>
 
         {/* Accounts Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-              Bank Accounts
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/bank-accounts?type=business')} className="cursor-pointer py-2.5">
-              Business Accounts
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/bank-accounts?type=personal')} className="cursor-pointer py-2.5">
-              Personal Accounts
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative h-full flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/bank-accounts' ? "text-primary" : "text-foreground hover:text-primary")}>
+                Bank Accounts
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
+              <DropdownMenuItem onClick={() => navigate('/bank-accounts?type=business')} className="cursor-pointer py-2.5">
+                Business Accounts
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/bank-accounts?type=personal')} className="cursor-pointer py-2.5">
+                Personal Accounts
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {location.pathname === '/bank-accounts' && (
+            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
+          )}
+        </div>
 
         {/* Documents Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-              Documents
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/my-documents')} className="cursor-pointer py-2.5">
-              My Documents
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/my-documents?upload=true')} className="cursor-pointer py-2.5">
-              Upload Documents
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative h-full flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/my-documents' || location.pathname === '/document-storage' ? "text-primary" : "text-foreground hover:text-primary")}>
+                Documents
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
+              <DropdownMenuItem onClick={() => navigate('/my-documents')} className="cursor-pointer py-2.5">
+                My Documents
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/my-documents?upload=true')} className="cursor-pointer py-2.5">
+                Upload Documents
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {(location.pathname === '/my-documents' || location.pathname === '/document-storage') && (
+            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
+          )}
+        </div>
 
         {/* Business Tools Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors">
-              <Grid3X3 className="h-4 w-4" />
-              Business Tools
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-52 bg-white border shadow-xl">
-            <DropdownMenuItem onClick={() => navigate('/credit-reports?type=business')} className="cursor-pointer py-2.5">
-              Business Credit Reports
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/credit-reports?type=personal')} className="cursor-pointer py-2.5">
-              Personal Credit Reports
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/loan-calculator')} className="cursor-pointer py-2.5">
-              Business Calculator
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/credit-score-simulator')} className="cursor-pointer py-2.5">
-              Credit Simulator
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/credit-reports')} className="cursor-pointer py-2.5">
-              Financial Reports
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative h-full flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={cn("flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors", (location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') ? "text-primary" : "text-foreground hover:text-primary")}>
+                <Grid3X3 className="h-4 w-4" />
+                Business Tools
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-52 bg-white border shadow-xl">
+              <DropdownMenuItem onClick={() => navigate('/credit-reports?type=business')} className="cursor-pointer py-2.5">
+                Business Credit Reports
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/credit-reports?type=personal')} className="cursor-pointer py-2.5">
+                Personal Credit Reports
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/loan-calculator')} className="cursor-pointer py-2.5">
+                Business Calculator
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/credit-score-simulator')} className="cursor-pointer py-2.5">
+                Credit Simulator
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/credit-reports')} className="cursor-pointer py-2.5">
+                Financial Reports
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {(location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') && (
+            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
+          )}
+        </div>
         </div>
       </div>
 
