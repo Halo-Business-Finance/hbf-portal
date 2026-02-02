@@ -279,10 +279,13 @@ Deno.serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('Error in loan-application-processor:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    // Log full error details for debugging, but return generic message to client
+    console.error('[ERROR] loan-application-processor:', error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        error: 'Unable to process request',
+        message: 'An error occurred. Please try again or contact support.'
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
