@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { externalNotificationService, ExternalWebhook } from '@/services/externalNotificationService';
+import { PageHeader } from '@/components/PageHeader';
 import { 
   Plug, 
   Webhook, 
@@ -39,7 +39,6 @@ interface Integration {
 }
 
 const ApiIntegrations = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [zapierWebhook, setZapierWebhook] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -284,18 +283,13 @@ const ApiIntegrations = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <Button variant="ghost" onClick={() => navigate('/admin')} className="mb-4">
-            ← Back to Dashboard
-          </Button>
-          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
-            <Plug className="w-8 h-8 text-blue-900" />
-            API Integrations
-          </h1>
-          <p className="text-muted-foreground">Manage external API connections and third-party integrations</p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="API Integrations" 
+        subtitle="Manage external API connections and third-party integrations"
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
