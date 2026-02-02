@@ -383,7 +383,6 @@ const BorrowerPortal = () => {
                 </Button>
               </CardContent>
             </Card>
-          </div>
         </div>
       </div>
     </div>
