@@ -94,6 +94,12 @@ export const BottomNav = () => {
             </SelectTrigger>
             <SelectContent className="bg-white border shadow-xl min-w-[200px]" side="top" align="center">
               <SelectGroup>
+                <SelectLabel className="text-xs font-semibold text-muted-foreground">My Loans</SelectLabel>
+                <SelectItem value="/existing-loans">Existing Loans</SelectItem>
+                <SelectItem value="/loan-applications">View All Applications</SelectItem>
+              </SelectGroup>
+              <SelectSeparator />
+              <SelectGroup>
                 <SelectLabel className="text-xs font-semibold text-muted-foreground">SBA Loans</SelectLabel>
                 <SelectItem value="/loan-applications?type=sba_7a">SBA 7(a) Loan</SelectItem>
                 <SelectItem value="/loan-applications?type=sba_504">SBA 504 Loan</SelectItem>
@@ -113,8 +119,6 @@ export const BottomNav = () => {
                 <SelectItem value="/loan-applications?type=business_loc">Business Line of Credit</SelectItem>
                 <SelectItem value="/loan-applications?type=equipment">Equipment Financing</SelectItem>
               </SelectGroup>
-              <SelectSeparator />
-              <SelectItem value="/loan-applications">View All Applications</SelectItem>
             </SelectContent>
           </Select>
         </div>
