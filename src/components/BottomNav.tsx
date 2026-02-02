@@ -28,6 +28,12 @@ export const BottomNav = () => {
     return location.pathname === path;
   };
 
+  // Check if any route in a group is active
+  const isLoansActive = location.pathname === '/existing-loans' || location.pathname === '/loan-applications' || location.pathname.startsWith('/loan-applications');
+  const isAccountsActive = location.pathname === '/bank-accounts' || location.pathname.startsWith('/bank-accounts');
+  const isDocsActive = location.pathname === '/my-documents' || location.pathname.startsWith('/my-documents');
+  const isToolsActive = location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator' || location.pathname === '/support';
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
       <div className="flex items-stretch justify-around h-16 px-1">
@@ -71,23 +77,24 @@ export const BottomNav = () => {
               <div className="flex flex-col items-center gap-0.5">
                 <div className={cn(
                   "p-1 rounded-lg transition-all duration-200",
-                  openSelect === 'loans' && "bg-primary/10"
+                  (openSelect === 'loans' || isLoansActive) && "bg-primary/10"
                 )}>
                   <FileText className={cn(
-                    "h-5 w-5 transition-transform duration-200 text-muted-foreground",
-                    openSelect === 'loans' && "text-primary scale-110"
+                    "h-5 w-5 transition-transform duration-200",
+                    (openSelect === 'loans' || isLoansActive) ? "text-primary scale-110" : "text-muted-foreground"
                   )} />
                 </div>
                 <div className="flex items-center gap-0.5">
                   <span className={cn(
-                    "text-[9px] font-medium text-muted-foreground",
-                    openSelect === 'loans' && "text-primary font-semibold"
+                    "text-[9px] font-medium",
+                    (openSelect === 'loans' || isLoansActive) ? "text-primary font-semibold" : "text-muted-foreground"
                   )}>
                     Loans
                   </span>
                   <ChevronUp className={cn(
-                    "h-2.5 w-2.5 text-muted-foreground transition-transform duration-200",
-                    openSelect === 'loans' ? "rotate-0 text-primary" : "rotate-180"
+                    "h-2.5 w-2.5 transition-transform duration-200",
+                    openSelect === 'loans' ? "rotate-0 text-primary" : "rotate-180",
+                    isLoansActive && openSelect !== 'loans' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
               </div>
@@ -130,23 +137,24 @@ export const BottomNav = () => {
               <div className="flex flex-col items-center gap-0.5">
                 <div className={cn(
                   "p-1 rounded-lg transition-all duration-200",
-                  openSelect === 'accounts' && "bg-primary/10"
+                  (openSelect === 'accounts' || isAccountsActive) && "bg-primary/10"
                 )}>
                   <Building2 className={cn(
-                    "h-5 w-5 transition-transform duration-200 text-muted-foreground",
-                    openSelect === 'accounts' && "text-primary scale-110"
+                    "h-5 w-5 transition-transform duration-200",
+                    (openSelect === 'accounts' || isAccountsActive) ? "text-primary scale-110" : "text-muted-foreground"
                   )} />
                 </div>
                 <div className="flex items-center gap-0.5">
                   <span className={cn(
-                    "text-[9px] font-medium text-muted-foreground",
-                    openSelect === 'accounts' && "text-primary font-semibold"
+                    "text-[9px] font-medium",
+                    (openSelect === 'accounts' || isAccountsActive) ? "text-primary font-semibold" : "text-muted-foreground"
                   )}>
                     Accounts
                   </span>
                   <ChevronUp className={cn(
-                    "h-2.5 w-2.5 text-muted-foreground transition-transform duration-200",
-                    openSelect === 'accounts' ? "rotate-0 text-primary" : "rotate-180"
+                    "h-2.5 w-2.5 transition-transform duration-200",
+                    openSelect === 'accounts' ? "rotate-0 text-primary" : "rotate-180",
+                    isAccountsActive && openSelect !== 'accounts' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
               </div>
@@ -167,23 +175,24 @@ export const BottomNav = () => {
               <div className="flex flex-col items-center gap-0.5">
                 <div className={cn(
                   "p-1 rounded-lg transition-all duration-200",
-                  openSelect === 'docs' && "bg-primary/10"
+                  (openSelect === 'docs' || isDocsActive) && "bg-primary/10"
                 )}>
                   <FolderOpen className={cn(
-                    "h-5 w-5 transition-transform duration-200 text-muted-foreground",
-                    openSelect === 'docs' && "text-primary scale-110"
+                    "h-5 w-5 transition-transform duration-200",
+                    (openSelect === 'docs' || isDocsActive) ? "text-primary scale-110" : "text-muted-foreground"
                   )} />
                 </div>
                 <div className="flex items-center gap-0.5">
                   <span className={cn(
-                    "text-[9px] font-medium text-muted-foreground",
-                    openSelect === 'docs' && "text-primary font-semibold"
+                    "text-[9px] font-medium",
+                    (openSelect === 'docs' || isDocsActive) ? "text-primary font-semibold" : "text-muted-foreground"
                   )}>
                     Docs
                   </span>
                   <ChevronUp className={cn(
-                    "h-2.5 w-2.5 text-muted-foreground transition-transform duration-200",
-                    openSelect === 'docs' ? "rotate-0 text-primary" : "rotate-180"
+                    "h-2.5 w-2.5 transition-transform duration-200",
+                    openSelect === 'docs' ? "rotate-0 text-primary" : "rotate-180",
+                    isDocsActive && openSelect !== 'docs' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
               </div>
@@ -202,23 +211,24 @@ export const BottomNav = () => {
               <div className="flex flex-col items-center gap-0.5">
                 <div className={cn(
                   "p-1 rounded-lg transition-all duration-200",
-                  openSelect === 'tools' && "bg-primary/10"
+                  (openSelect === 'tools' || isToolsActive) && "bg-primary/10"
                 )}>
                   <Grid3X3 className={cn(
-                    "h-5 w-5 transition-transform duration-200 text-muted-foreground",
-                    openSelect === 'tools' && "text-primary scale-110"
+                    "h-5 w-5 transition-transform duration-200",
+                    (openSelect === 'tools' || isToolsActive) ? "text-primary scale-110" : "text-muted-foreground"
                   )} />
                 </div>
                 <div className="flex items-center gap-0.5">
                   <span className={cn(
-                    "text-[9px] font-medium text-muted-foreground",
-                    openSelect === 'tools' && "text-primary font-semibold"
+                    "text-[9px] font-medium",
+                    (openSelect === 'tools' || isToolsActive) ? "text-primary font-semibold" : "text-muted-foreground"
                   )}>
                     Tools
                   </span>
                   <ChevronUp className={cn(
-                    "h-2.5 w-2.5 text-muted-foreground transition-transform duration-200",
-                    openSelect === 'tools' ? "rotate-0 text-primary" : "rotate-180"
+                    "h-2.5 w-2.5 transition-transform duration-200",
+                    openSelect === 'tools' ? "rotate-0 text-primary" : "rotate-180",
+                    isToolsActive && openSelect !== 'tools' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
               </div>
