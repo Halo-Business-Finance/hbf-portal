@@ -42,7 +42,7 @@ export const BottomNav = () => {
           to="/"
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all duration-200',
+              'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all duration-200 relative',
               isActive
                 ? 'text-primary'
                 : 'text-muted-foreground hover:text-foreground active:scale-95'
@@ -66,12 +66,15 @@ export const BottomNav = () => {
               )}>
                 Home
               </span>
+              {isActive && (
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
+              )}
             </>
           )}
         </NavLink>
 
         {/* Loan Programs - Select */}
-        <div className="flex flex-col items-center justify-center flex-1 h-full">
+        <div className="flex flex-col items-center justify-center flex-1 h-full relative">
           <Select onValueChange={handleSelectChange} onOpenChange={(open) => setOpenSelect(open ? 'loans' : null)}>
             <SelectTrigger className="border-0 bg-transparent shadow-none h-auto p-0 w-auto focus:ring-0 [&>svg]:hidden">
               <div className="flex flex-col items-center gap-0.5">
@@ -97,7 +100,10 @@ export const BottomNav = () => {
                     isLoansActive && openSelect !== 'loans' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
-              </div>
+                </div>
+                {isLoansActive && (
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
+                )}
             </SelectTrigger>
             <SelectContent className="bg-white border shadow-xl min-w-[200px]" side="top" align="center">
               <SelectGroup>
@@ -131,7 +137,7 @@ export const BottomNav = () => {
         </div>
 
         {/* Bank Accounts - Select */}
-        <div className="flex flex-col items-center justify-center flex-1 h-full">
+        <div className="flex flex-col items-center justify-center flex-1 h-full relative">
           <Select onValueChange={handleSelectChange} onOpenChange={(open) => setOpenSelect(open ? 'accounts' : null)}>
             <SelectTrigger className="border-0 bg-transparent shadow-none h-auto p-0 w-auto focus:ring-0 [&>svg]:hidden">
               <div className="flex flex-col items-center gap-0.5">
@@ -157,7 +163,10 @@ export const BottomNav = () => {
                     isAccountsActive && openSelect !== 'accounts' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
-              </div>
+                </div>
+                {isAccountsActive && (
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
+                )}
             </SelectTrigger>
             <SelectContent className="bg-white border shadow-xl min-w-[180px]" side="top" align="center">
               <SelectItem value="/bank-accounts?type=business">Business Accounts</SelectItem>
@@ -169,7 +178,7 @@ export const BottomNav = () => {
         </div>
 
         {/* Documents - Select */}
-        <div className="flex flex-col items-center justify-center flex-1 h-full">
+        <div className="flex flex-col items-center justify-center flex-1 h-full relative">
           <Select onValueChange={handleSelectChange} onOpenChange={(open) => setOpenSelect(open ? 'docs' : null)}>
             <SelectTrigger className="border-0 bg-transparent shadow-none h-auto p-0 w-auto focus:ring-0 [&>svg]:hidden">
               <div className="flex flex-col items-center gap-0.5">
@@ -195,7 +204,10 @@ export const BottomNav = () => {
                     isDocsActive && openSelect !== 'docs' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
-              </div>
+                </div>
+                {isDocsActive && (
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
+                )}
             </SelectTrigger>
             <SelectContent className="bg-white border shadow-xl min-w-[180px]" side="top" align="center">
               <SelectItem value="/my-documents">My Documents</SelectItem>
@@ -205,7 +217,7 @@ export const BottomNav = () => {
         </div>
 
         {/* Business Tools - Select */}
-        <div className="flex flex-col items-center justify-center flex-1 h-full">
+        <div className="flex flex-col items-center justify-center flex-1 h-full relative">
           <Select onValueChange={handleSelectChange} onOpenChange={(open) => setOpenSelect(open ? 'tools' : null)}>
             <SelectTrigger className="border-0 bg-transparent shadow-none h-auto p-0 w-auto focus:ring-0 [&>svg]:hidden">
               <div className="flex flex-col items-center gap-0.5">
@@ -231,7 +243,10 @@ export const BottomNav = () => {
                     isToolsActive && openSelect !== 'tools' ? "text-primary" : "text-muted-foreground"
                   )} />
                 </div>
-              </div>
+                </div>
+                {isToolsActive && (
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
+                )}
             </SelectTrigger>
             <SelectContent className="bg-white border shadow-xl min-w-[200px]" side="top" align="center">
               <SelectGroup>
