@@ -38,12 +38,11 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
-          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
-            <div className="h-8 bg-white/20 rounded w-48 mb-2"></div>
-            <div className="h-4 bg-white/10 rounded w-72"></div>
-          </div>
-        </div>
+        <PageHeader 
+          title="Admin Dashboard" 
+          subtitle="Manage applications, users, and system settings"
+          loading={true}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground text-center">Loading admin dashboard...</p>
