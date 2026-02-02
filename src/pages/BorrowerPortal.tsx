@@ -20,18 +20,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { 
-  FileText, 
   AlertCircle,
   User,
   Mail,
   Phone,
-  Building,
   Edit,
   Save,
   X,
   LogOut
 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { PageHeader } from '@/components/PageHeader';
 
 const profileSchema = z.object({
   first_name: z.string().trim().min(1, "First name is required").max(100, "First name must be less than 100 characters"),
@@ -189,10 +188,17 @@ const BorrowerPortal = () => {
 
   if (loading || loadingData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-background">
+        {/* Loading skeleton with banner */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
+          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
+            <div className="h-8 bg-white/20 rounded w-48 mb-2"></div>
+            <div className="h-4 bg-white/10 rounded w-64"></div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-foreground">Loading your portal...</p>
+          <p className="text-muted-foreground text-center">Loading your portal...</p>
         </div>
       </div>
     );
@@ -200,14 +206,13 @@ const BorrowerPortal = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-        <div className="space-y-4 sm:space-y-6">
-          <div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-1 sm:mb-2">My Account</h2>
-            <p className="text-sm sm:text-base text-muted-foreground">Manage your account information and preferences</p>
-          </div>
+      <PageHeader 
+        title="My Account" 
+        subtitle="Manage your account information and preferences"
+      />
 
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
             <Card className="overflow-hidden">
               <CardHeader className="px-4 py-4 sm:px-6 sm:py-5">
                 <CardTitle className="flex items-center justify-between text-base sm:text-lg">

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PageHeader } from '@/components/PageHeader';
 
 interface ExistingLoan {
   id: string;
@@ -323,10 +324,17 @@ const ExistingLoans = () => {
 
   if (loading || loadingData) {
     return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-background">
+        {/* Loading skeleton with banner */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
+          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
+            <div className="h-8 bg-white/20 rounded w-48 mb-2"></div>
+            <div className="h-4 bg-white/10 rounded w-72"></div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading existing loans...</p>
+          <p className="text-muted-foreground text-center">Loading existing loans...</p>
         </div>
       </div>
     );
@@ -334,14 +342,12 @@ const ExistingLoans = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 md:p-8">
-        <div className="mb-6">
-          <h1 className="text-xl font-bold tracking-tight mb-2">Existing Loans</h1>
-          <p className="text-muted-foreground">
-            View your commercial and business loans funded by us, partners, or third parties
-          </p>
-        </div>
+      <PageHeader 
+        title="Existing Loans" 
+        subtitle="View your commercial and business loans funded by us, partners, or third parties"
+      />
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <Tabs defaultValue="commercial" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="commercial" count={filteredCommercialLoans.length}>Commercial Loans</TabsTrigger>

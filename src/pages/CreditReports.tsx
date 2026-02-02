@@ -3,17 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { TrendingUp, TrendingDown, ArrowRight, AlertCircle, CheckCircle2, XCircle, Home } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowRight, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as TabsList, ModernTabsTrigger as TabsTrigger } from '@/components/ui/modern-tabs';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
+import { PageHeader } from '@/components/PageHeader';
 
 export default function CreditReports() {
   const [loading, setLoading] = useState(true);
@@ -118,46 +111,38 @@ export default function CreditReports() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="space-y-6 animate-pulse">
-          <div className="h-8 bg-muted rounded w-48"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="h-48 bg-muted rounded-lg"></div>
-            <div className="h-48 bg-muted rounded-lg"></div>
+      <div className="min-h-screen bg-background">
+        {/* Loading skeleton with banner */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
+          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
+            <div className="h-8 bg-white/20 rounded w-64 mb-2"></div>
+            <div className="h-4 bg-white/10 rounded w-48"></div>
           </div>
-          <div className="h-96 bg-muted rounded-lg"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="space-y-6 animate-pulse">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="h-48 bg-muted rounded-lg"></div>
+              <div className="h-48 bg-muted rounded-lg"></div>
+            </div>
+            <div className="h-96 bg-muted rounded-lg"></div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl space-y-6">
-      {/* Breadcrumb Navigation */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/" className="flex items-center gap-1">
-              <Home className="h-4 w-4" />
-              Home
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Credit Reports Dashboard</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Credit Reports Dashboard" 
+        subtitle="Monitor your personal and business credit scores"
+      />
 
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Credit Reports Dashboard</h1>
-      </div>
-
-      {/* Tabs for Personal vs Business */}
-      <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="personal" count={2}>Personal Credit</TabsTrigger>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+        {/* Tabs for Personal vs Business */}
+        <Tabs defaultValue="personal" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="business" count={2}>Business Credit</TabsTrigger>
         </TabsList>
 
@@ -535,6 +520,7 @@ export default function CreditReports() {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }
