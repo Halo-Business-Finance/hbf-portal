@@ -1,28 +1,22 @@
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/PageHeader';
 import { Building2, Plus } from 'lucide-react';
 
 const LoanProducts = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <Button variant="ghost" onClick={() => navigate('/admin')} className="mb-4">
-              ← Back to Dashboard
-            </Button>
-            <h1 className="text-2xl font-bold mb-2">Loan Products</h1>
-            <p className="text-muted-foreground">Manage available loan products and configurations</p>
-          </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </Button>
-        </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Loan Products" 
+        subtitle="Manage available loan products and configurations"
+      >
+        <Button>
+          <Plus className="w-4 h-4 mr-2" />
+          Add Product
+        </Button>
+      </PageHeader>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

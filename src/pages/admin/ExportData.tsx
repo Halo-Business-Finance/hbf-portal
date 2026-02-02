@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { adminService } from '@/services/adminService';
+import { PageHeader } from '@/components/PageHeader';
 import { Download, FileText, Users, DollarSign } from 'lucide-react';
 
 const ExportData = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [exportType, setExportType] = useState('applications');
   const [format, setFormat] = useState('csv');
@@ -44,16 +43,13 @@ const ExportData = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <Button variant="ghost" onClick={() => navigate('/admin')} className="mb-4">
-            ← Back to Dashboard
-          </Button>
-          <h1 className="text-2xl font-bold mb-2">Export Data</h1>
-          <p className="text-muted-foreground">Export applications, users, and reports</p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Export Data" 
+        subtitle="Export applications, users, and reports"
+      />
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>

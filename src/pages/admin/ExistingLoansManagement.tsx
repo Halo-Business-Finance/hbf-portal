@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { PageHeader } from '@/components/PageHeader';
 import { 
   Plus, 
   Search, 
@@ -16,17 +16,8 @@ import {
   Trash2,
   DollarSign,
   Calendar,
-  Home,
   Building2
 } from 'lucide-react';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
 import {
   Table,
   TableBody,
@@ -76,7 +67,6 @@ interface LoanFormData {
 }
 
 const ExistingLoansManagement = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [loans, setLoans] = useState<ExistingLoan[]>([]);
   const [filteredLoans, setFilteredLoans] = useState<ExistingLoan[]>([]);
@@ -304,43 +294,23 @@ const ExistingLoansManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="flex items-center gap-1">
-                <Home className="h-4 w-4" />
-                Home
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/admin">Admin Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Existing Loans Management</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Existing Loans Management" 
+        subtitle="Create and manage existing loans for all users"
+      />
 
-        <div className="flex items-center justify-between">
-          <div>
-            <Button variant="ghost" onClick={() => navigate('/admin')} className="mb-4">
-              ← Back to Dashboard
-            </Button>
-            <h1 className="text-2xl font-bold mb-2">Existing Loans Management</h1>
-            <p className="text-muted-foreground">Create and manage existing loans for all users</p>
-          </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <div className="flex justify-end mb-4">
             <DialogTrigger asChild>
               <Button onClick={() => { setEditingLoan(null); setFormData(emptyForm); }}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Loan
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          </div>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{editingLoan ? 'Edit Loan' : 'Add New Loan'}</DialogTitle>
                 <DialogDescription>
@@ -534,8 +504,7 @@ const ExistingLoansManagement = () => {
                 </DialogFooter>
               </form>
             </DialogContent>
-          </Dialog>
-        </div>
+        </Dialog>
 
         {/* Filters */}
         <Card>

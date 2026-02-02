@@ -1,22 +1,16 @@
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/PageHeader';
 import { Database, HardDrive, Archive, RefreshCw } from 'lucide-react';
 
 const DatabaseManagement = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <Button variant="ghost" onClick={() => navigate('/admin')} className="mb-4">
-            ← Back to Dashboard
-          </Button>
-          <h1 className="text-2xl font-bold mb-2">Database Management</h1>
-          <p className="text-muted-foreground">Monitor database health and perform maintenance</p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Database Management" 
+        subtitle="Monitor database health and perform maintenance"
+      />
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
