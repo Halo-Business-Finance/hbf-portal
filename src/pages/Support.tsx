@@ -8,6 +8,7 @@ import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as
 import { MessageSquare, Send, Ticket, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { PageHeader } from '@/components/PageHeader';
 
 const Support = () => {
   const { toast } = useToast();
@@ -55,12 +56,13 @@ const Support = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2 text-blue-900">Support Center</h1>
-          <p className="text-muted-foreground">Get help with your loan applications and account</p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Support Center" 
+        subtitle="Get help with your loan applications and account"
+      />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
         <Tabs defaultValue="chat" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
