@@ -101,7 +101,7 @@ const Navbar = () => {
         {/* Logo and Commercial Loan Marketplace */}
         <div className="flex flex-col cursor-pointer" onClick={handleLogoClick}>
           <span className="font-bold text-base md:text-xl tracking-tight text-black">HALO BUSINESS FINANCE</span>
-          <span className="text-[8px] md:text-xs font-bold tracking-wide uppercase text-black">NATION-WIDE COMMERCIAL LOAN MARKETPLACE</span>
+          <span className="text-[8px] font-bold tracking-wide uppercase text-black text-center md:text-sm">COMMERCIAL LOAN MARKETPLACE</span>
         </div>
 
         {/* Right Actions */}
@@ -249,9 +249,7 @@ const Navbar = () => {
           <button onClick={() => navigate('/')} className={cn("pl-0 pr-4 py-2 text-sm font-medium transition-colors", isActiveRoute('/') ? "text-primary" : "text-foreground hover:text-primary")}>
             Dashboard
           </button>
-          {isActiveRoute('/') && (
-            <span className="absolute bottom-0 left-0 right-4 h-0.5 bg-primary rounded-full" />
-          )}
+          {isActiveRoute('/') && <span className="absolute bottom-0 left-0 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Loan Programs Dropdown */}
@@ -305,9 +303,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {location.pathname === '/loan-applications' && location.search.includes('type=') && (
-            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
-          )}
+          {location.pathname === '/loan-applications' && location.search.includes('type=') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Applications Dropdown */}
@@ -328,9 +324,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {location.pathname === '/loan-applications' && !location.search.includes('type=') && (
-            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
-          )}
+          {location.pathname === '/loan-applications' && !location.search.includes('type=') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Accounts Dropdown */}
@@ -351,9 +345,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {location.pathname === '/bank-accounts' && (
-            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
-          )}
+          {location.pathname === '/bank-accounts' && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Documents Dropdown */}
@@ -374,16 +366,14 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {(location.pathname === '/my-documents' || location.pathname === '/document-storage') && (
-            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
-          )}
+          {(location.pathname === '/my-documents' || location.pathname === '/document-storage') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Business Tools Dropdown */}
         <div className="relative h-full flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className={cn("flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors", (location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') ? "text-primary" : "text-foreground hover:text-primary")}>
+              <button className={cn("flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator' ? "text-primary" : "text-foreground hover:text-primary")}>
                 <Grid3X3 className="h-4 w-4" />
                 Business Tools
                 <ChevronDown className="h-4 w-4" />
@@ -409,9 +399,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {(location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') && (
-            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
-          )}
+          {(location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
         </div>
       </div>
