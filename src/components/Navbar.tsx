@@ -101,7 +101,7 @@ const Navbar = () => {
         {/* Logo and Commercial Loan Marketplace */}
         <div className="flex flex-col cursor-pointer" onClick={handleLogoClick}>
           <span className="font-bold text-base md:text-xl tracking-tight text-black">HALO BUSINESS FINANCE</span>
-          <span className="text-[8px] font-bold tracking-wide uppercase text-black text-center md:text-sm">COMMERCIAL LOAN MARKETPLACE</span>
+          
         </div>
 
         {/* Right Actions */}
