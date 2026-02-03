@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Flat navy background (favicon-safe) -->
+  <rect x="0" y="0" width="1024" height="1024" rx="200" ry="200" fill="#0B1F3B"/>
+
+  <!-- Bright star (kept white, flat) -->
+  <polygon fill="#FFFFFF"
+    points="
+      220,180
+      240,230
+      295,235
+      252,268
+      265,322
+      220,292
+      175,322
+      188,268
+      145,235
+      200,230
+    "/>
+
+  <!-- Yellow sprinkles (favicon-visible sizes only) -->
+  <circle cx="315" cy="260" r="14" fill="#F5C842"/>
+  <circle cx="350" cy="300" r="12" fill="#F5C842"/>
+  <circle cx="290" cy="315" r="11" fill="#F5C842"/>
+
+  <!-- HBF text (sans-serif, thicker, scaled +18%) -->
+  <text x="512" y="640"
+        text-anchor="middle"
+        font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="380"
+        font-weight="900"
+        letter-spacing="-14"
+        fill="#FFFFFF">
+    HBF
+  </text>
+</svg>
