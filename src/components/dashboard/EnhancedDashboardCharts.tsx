@@ -1,14 +1,24 @@
 import { useState, useEffect } from "react";
 import { 
-  PieChart, Pie, Cell, ResponsiveContainer, 
-  AreaChart, Area, BarChart, Bar, 
-  XAxis, YAxis, Tooltip, CartesianGrid 
+  AreaChart, Area, 
+  XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
 } from "recharts";
-import { TrendingUp, PieChartIcon, BarChart3 } from "lucide-react";
+import { TrendingUp, Building2, User, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from "@/components/ui/premium-card";
-import { ProgressRing } from "@/components/ui/progress-ring";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { AnimatedCurrency } from "@/components/ui/animated-counter";
+
+interface BankAccount {
+  id: string;
+  account_name: string;
+  account_type: string;
+  institution: string;
+  balance: number;
+  is_business: boolean;
+}
 
 interface EnhancedDashboardChartsProps {
   userId?: string;
@@ -19,11 +29,8 @@ export const EnhancedDashboardCharts = ({
   userId,
   className
 }: EnhancedDashboardChartsProps) => {
-  const [statusData, setStatusData] = useState<{
-    name: string;
-    value: number;
-    color: string;
-  }[]>([]);
+  const navigate = useNavigate();
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [monthlyData, setMonthlyData] = useState<{
     month: string;
     applications: number;
@@ -39,44 +46,22 @@ export const EnhancedDashboardCharts = ({
       }
       
       try {
+        // Fetch bank accounts
+        const { data: accounts, error: accountsError } = await supabase
+          .from('bank_accounts')
+          .select('id, account_name, account_type, institution, balance, is_business')
+          .eq('user_id', userId);
+        
+        if (accountsError) throw accountsError;
+        setBankAccounts(accounts || []);
+
+        // Fetch applications for monthly trend
         const { data: applications } = await supabase
           .from('loan_applications')
-          .select('status, created_at, amount_requested')
+          .select('created_at, amount_requested')
           .eq('user_id', userId);
 
         if (applications) {
-          // Status distribution
-          const statusCounts: Record<string, number> = {};
-          applications.forEach(app => {
-            statusCounts[app.status] = (statusCounts[app.status] || 0) + 1;
-          });
-
-          const statusColors: Record<string, string> = {
-            draft: 'hsl(222 20% 65%)',
-            submitted: 'hsl(213 94% 50%)',
-            under_review: 'hsl(38 92% 50%)',
-            approved: 'hsl(152 82% 40%)',
-            rejected: 'hsl(0 84% 60%)',
-            funded: 'hsl(152 76% 35%)'
-          };
-
-          const statusLabels: Record<string, string> = {
-            draft: 'Draft',
-            submitted: 'Submitted',
-            under_review: 'Under Review',
-            approved: 'Approved',
-            rejected: 'Rejected',
-            funded: 'Funded'
-          };
-
-          setStatusData(
-            Object.entries(statusCounts).map(([status, count]) => ({
-              name: statusLabels[status] || status,
-              value: count,
-              color: statusColors[status] || 'hsl(222 20% 50%)'
-            }))
-          );
-
           // Monthly applications with amounts (last 6 months)
           const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
           const monthlyCounts: Record<string, { count: number; amount: number }> = {};
@@ -133,8 +118,11 @@ export const EnhancedDashboardCharts = ({
     );
   }
 
-  const hasData = statusData.length > 0;
-  const totalApplications = statusData.reduce((sum, item) => sum + item.value, 0);
+  // Separate personal and business accounts
+  const personalAccounts = bankAccounts.filter(a => !a.is_business);
+  const businessAccounts = bankAccounts.filter(a => a.is_business);
+  const personalTotal = personalAccounts.reduce((sum, a) => sum + a.balance, 0);
+  const businessTotal = businessAccounts.reduce((sum, a) => sum + a.balance, 0);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -156,58 +144,97 @@ export const EnhancedDashboardCharts = ({
 
   return (
     <div className={cn("grid grid-cols-1 gap-5", className)}>
-      {/* Application Status Distribution */}
+      {/* Bank Accounts Widget */}
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
           <PremiumCardTitle className="flex items-center gap-2 text-base">
             <div className="p-1.5 rounded-lg bg-primary/10">
-              <PieChartIcon className="h-4 w-4 text-primary" />
+              <Building2 className="h-4 w-4 text-primary" />
             </div>
-            Application Status
+            Linked Accounts
           </PremiumCardTitle>
         </PremiumCardHeader>
-        <PremiumCardContent className="px-5 pb-5 pt-4">
-          {hasData ? (
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="relative">
-                <ProgressRing
-                  value={statusData.find(s => s.name === 'Approved' || s.name === 'Funded')?.value || 0}
-                  max={totalApplications}
-                  size={120}
-                  strokeWidth={12}
-                  color="hsl(152 82% 40%)"
-                >
-                  <div className="text-center">
-                    <span className="text-2xl font-bold">{totalApplications}</span>
-                    <p className="text-xs text-muted-foreground">Total</p>
-                  </div>
-                </ProgressRing>
-              </div>
-              <div className="flex-1 w-full space-y-2.5">
-                {statusData.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between group">
-                    <div className="flex items-center gap-2.5">
-                      <div 
-                        className="w-3 h-3 rounded-full transition-transform group-hover:scale-110" 
-                        style={{ backgroundColor: item.color }} 
-                      />
-                      <span className="text-sm text-foreground font-medium">{item.name}</span>
+        <PremiumCardContent className="px-5 pb-5 pt-4 space-y-4">
+          {/* Personal Accounts */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="w-4 h-4" />
+              <span className="font-medium">Personal</span>
+            </div>
+            {personalAccounts.length === 0 ? (
+              <p className="text-sm text-muted-foreground pl-6">No personal accounts linked</p>
+            ) : (
+              <div className="pl-6 space-y-2">
+                {personalAccounts.slice(0, 2).map((account) => (
+                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold">{item.value}</span>
-                      <span className="text-xs text-muted-foreground">
-                        ({Math.round((item.value / totalApplications) * 100)}%)
-                      </span>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-foreground">
+                        <AnimatedCurrency value={account.balance} />
+                      </p>
                     </div>
                   </div>
                 ))}
+                {personalAccounts.length > 2 && (
+                  <p className="text-xs text-muted-foreground">+{personalAccounts.length - 2} more account(s)</p>
+                )}
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-xs text-muted-foreground">Total Personal</span>
+                  <span className="text-sm font-bold text-foreground">
+                    <AnimatedCurrency value={personalTotal} />
+                  </span>
+                </div>
               </div>
+            )}
+          </div>
+
+          {/* Business Accounts */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Building2 className="w-4 h-4" />
+              <span className="font-medium">Business</span>
             </div>
-          ) : (
-            <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
-              No application data available
-            </div>
-          )}
+            {businessAccounts.length === 0 ? (
+              <p className="text-sm text-muted-foreground pl-6">No business accounts linked</p>
+            ) : (
+              <div className="pl-6 space-y-2">
+                {businessAccounts.slice(0, 2).map((account) => (
+                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-foreground">
+                        <AnimatedCurrency value={account.balance} />
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {businessAccounts.length > 2 && (
+                  <p className="text-xs text-muted-foreground">+{businessAccounts.length - 2} more account(s)</p>
+                )}
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-xs text-muted-foreground">Total Business</span>
+                  <span className="text-sm font-bold text-foreground">
+                    <AnimatedCurrency value={businessTotal} />
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="w-full border-primary text-primary transition-all duration-200" 
+            onClick={() => navigate('/bank-accounts')}
+          >
+            Manage Bank Accounts
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
         </PremiumCardContent>
       </PremiumCard>
 
