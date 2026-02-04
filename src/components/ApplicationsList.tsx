@@ -248,13 +248,16 @@ const ApplicationsList = ({
                       <p className="font-bold text-foreground text-lg hidden sm:block">
                         {formatCurrency(application.amount_requested || 0)}
                       </p>
-                      {application.status === 'draft' && programId ? (
+                      {application.status === 'draft' ? (
                         <Button 
                           variant="default" 
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/?program=${programId}&applicationId=${application.id}`);
+                            const pid = getProgramIdForLoanType(application.loan_type);
+                            if (pid) {
+                              navigate(`/?program=${pid}&applicationId=${application.id}`);
+                            }
                           }}
                         >
                           Continue Application
