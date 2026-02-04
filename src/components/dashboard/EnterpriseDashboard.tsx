@@ -242,7 +242,7 @@ export const EnterpriseDashboard = ({
         </div>
 
         {/* Right Column - Loan Stats & Charts */}
-        <div className="space-y-5">
+        <div className="space-y-5 lg:mt-[72px]">
           {/* Cash Flow Widget - Premium Style */}
           <PremiumCard variant="elevated" size="none">
             <PremiumCardHeader className="pb-2 px-5 pt-5">
