@@ -352,7 +352,7 @@ const ApplicationsList = ({
                           }
                         }}
                       >
-                        {application.status === 'draft' ? 'Continue Application' : 'View Application'}
+                        Continue Application
                       </Button>
                       <Button 
                         variant="outline"
