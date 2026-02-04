@@ -73,7 +73,7 @@ export const BottomNav = () => {
           )}
         </NavLink>
 
-        {/* Loan Programs - Select */}
+        {/* New Loan Application - Select */}
         <div className="flex flex-col items-center justify-center flex-1 h-full relative">
           <Select onValueChange={handleSelectChange} onOpenChange={(open) => setOpenSelect(open ? 'loans' : null)}>
             <SelectTrigger className="border-0 bg-transparent shadow-none h-auto p-0 w-auto focus:ring-0 [&>svg]:hidden">
@@ -92,7 +92,7 @@ export const BottomNav = () => {
                     "text-[9px] font-medium",
                     (openSelect === 'loans' || isLoansActive) ? "text-primary font-semibold" : "text-muted-foreground"
                   )}>
-                    Loans
+                    New Loan
                   </span>
                   <ChevronUp className={cn(
                     "h-2.5 w-2.5 transition-transform duration-200",

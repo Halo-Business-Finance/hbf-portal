@@ -252,12 +252,12 @@ const Navbar = () => {
           {isActiveRoute('/') && <span className="absolute bottom-0 left-0 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
-        {/* Loan Programs Dropdown */}
+        {/* New Loan Application Dropdown */}
         <div className="relative h-full flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/loan-applications' && location.search.includes('type=') ? "text-primary" : "text-foreground hover:text-primary")}>
-                Select Loan Program
+                New Loan Application
                 <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
