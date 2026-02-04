@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Activity, Clock } from 'lucide-react';
+import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -173,45 +173,6 @@ const ApplicationsList = ({
       working_capital: 'Working Capital Loan'
     };
     return types[loanType as keyof typeof types] || loanType;
-  };
-  const getLoanStage = (status: string) => {
-    const stages: Record<string, {
-      label: string;
-      step: number;
-    }> = {
-      draft: {
-        label: 'Not Submitted',
-        step: 0
-      },
-      submitted: {
-        label: 'Loan Submitted',
-        step: 1
-      },
-      under_review: {
-        label: 'Loan Processing',
-        step: 2
-      },
-      approved: {
-        label: 'Loan Closing',
-        step: 4
-      },
-      funded: {
-        label: 'Loan Funded',
-        step: 5
-      },
-      paused: {
-        label: 'Paused',
-        step: 0
-      },
-      rejected: {
-        label: 'Application Declined',
-        step: 0
-      }
-    };
-    return stages[status] || {
-      label: 'Unknown',
-      step: 0
-    };
   };
   const getStatusColor = (status: string) => {
     const colors = {
@@ -406,15 +367,6 @@ const ApplicationsList = ({
                               const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
                               return term ? `${term} months` : 'TBD';
                             })()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-muted-foreground">Loan Stage</p>
-                          <p className="text-sm font-medium">
-                            {getLoanStage(application.status).label}
                           </p>
                         </div>
                       </div>
