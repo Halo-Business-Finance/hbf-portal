@@ -8,7 +8,7 @@ const stages = [{
   label: 'Submitted'
 }, {
   key: 'processing',
-  label: 'Processing'
+  label: 'Loan Processing'
 }, {
   key: 'underwriting',
   label: 'Underwriting'
