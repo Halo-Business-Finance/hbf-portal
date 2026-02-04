@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, FileText, Bell, ChevronDown, Grid3X3, HelpCircle } from 'lucide-react';
+import { LogOut, FileText, Bell, ChevronDown, Grid3X3, HelpCircle, Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { LoanCalculatorDialog } from '@/components/LoanCalculatorDialog';
+import { LoanTypeSelector } from '@/components/dashboard/LoanTypeSelector';
 import { userNotificationService, Notification } from '@/services/userNotificationService';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ const Navbar = () => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [loanSelectorOpen, setLoanSelectorOpen] = useState(false);
   useEffect(() => {
     if (authenticated) {
       loadNotifications();
@@ -252,58 +254,15 @@ const Navbar = () => {
           {isActiveRoute('/') && <span className="absolute bottom-0 left-0 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
-        {/* New Loan Application Dropdown */}
+        {/* New Loan Application Button */}
         <div className="relative h-full flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/loan-applications' && location.search.includes('type=') ? "text-primary" : "text-foreground hover:text-primary")}>
-                New Loan Application
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 bg-white border shadow-xl">
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_7a')} className="cursor-pointer py-2.5">
-                SBA 7(a) Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_504')} className="cursor-pointer py-2.5">
-                SBA 504 Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_express')} className="cursor-pointer py-2.5">
-                SBA Express Loan
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=term_loan')} className="cursor-pointer py-2.5">
-                Term Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=bridge_loan')} className="cursor-pointer py-2.5">
-                Bridge Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=conventional')} className="cursor-pointer py-2.5">
-                Conventional Loan
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=working_capital')} className="cursor-pointer py-2.5">
-                Working Capital Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=business_loc')} className="cursor-pointer py-2.5">
-                Business Line of Credit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=equipment')} className="cursor-pointer py-2.5">
-                Equipment Financing
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=invoice_factoring')} className="cursor-pointer py-2.5">
-                Invoice Factoring
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=refinance')} className="cursor-pointer py-2.5">
-                Refinance
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=usda_bi')} className="cursor-pointer py-2.5">
-                USDA B&I Loan
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {location.pathname === '/loan-applications' && location.search.includes('type=') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          <button 
+            onClick={() => setLoanSelectorOpen(true)}
+            className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors text-foreground hover:text-primary")}
+          >
+            <Plus className="h-4 w-4" />
+            New Loan Application
+          </button>
         </div>
 
         {/* Existing Loans - Direct Link */}
@@ -395,6 +354,11 @@ const Navbar = () => {
       </div>
 
       <LoanCalculatorDialog open={calculatorOpen} onOpenChange={setCalculatorOpen} />
+      <LoanTypeSelector 
+        open={loanSelectorOpen} 
+        onClose={() => setLoanSelectorOpen(false)} 
+        onSelect={(id) => console.log('Selected loan type:', id)} 
+      />
     </header>;
 };
 export default Navbar;
