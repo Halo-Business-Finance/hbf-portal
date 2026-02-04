@@ -17,9 +17,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md active:scale-[0.98]",
         ghost: "text-foreground hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-gradient-primary text-primary-foreground shadow-primary hover:shadow-lg hover:opacity-90 active:scale-[0.98]",
-        "gradient-outline": "border-2 border-primary bg-background text-primary hover:bg-primary/5 shadow-sm hover:shadow-primary/20 active:scale-[0.98]",
-        success: "bg-success text-primary-foreground shadow-sm hover:bg-success/90 hover:shadow-md active:scale-[0.98]",
+        gradient: "bg-gradient-primary text-primary-foreground shadow-primary hover:shadow-[0_0_20px_rgba(59,130,246,0.5),0_4px_12px_rgba(59,130,246,0.3)] hover:opacity-90 active:scale-[0.98]",
+        "gradient-outline": "border-2 border-primary bg-background text-primary hover:bg-primary/5 shadow-sm hover:shadow-[0_0_20px_rgba(59,130,246,0.3),0_4px_12px_rgba(59,130,246,0.15)] active:scale-[0.98]",
+        success: "bg-success text-primary-foreground shadow-sm hover:bg-success/90 hover:shadow-[0_0_20px_rgba(34,197,94,0.5),0_4px_12px_rgba(34,197,94,0.3)] active:scale-[0.98]",
       },
       size: {
         default: "h-10 px-4 py-2",
