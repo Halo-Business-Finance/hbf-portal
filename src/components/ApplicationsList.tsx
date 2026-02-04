@@ -338,45 +338,45 @@ const ApplicationsList = ({
                     <Separator className="mb-4" />
                     
                     {/* Details Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-black">Loan Program</p>
-                          <p className="text-sm font-medium">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3 mb-4">
+                      <div className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] lg:text-xs text-muted-foreground">Program</p>
+                          <p className="text-xs lg:text-sm font-medium truncate">
                             {getLoanTypeDisplay(application.loan_type)}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-black">Loan Amount</p>
-                          <p className="text-sm font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <DollarSign className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] lg:text-xs text-muted-foreground">Amount</p>
+                          <p className="text-xs lg:text-sm font-medium truncate">
                             {formatCurrency(application.amount_requested || 0)}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-black">Loan Term</p>
-                          <p className="text-sm font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] lg:text-xs text-muted-foreground">Term</p>
+                          <p className="text-xs lg:text-sm font-medium truncate">
                             {(() => {
                           const details = application.loan_details as any;
                           const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
                           if (!term) return 'TBD';
                           const numericTerm = typeof term === 'string' ? term.replace(/_months|_month/gi, '').replace(/_/g, '') : term;
-                          return `${numericTerm}-Months`;
+                          return `${numericTerm}-Mo`;
                         })()}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Percent className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-black">Interest Rate</p>
-                          <p className="text-sm font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <Percent className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] lg:text-xs text-muted-foreground">Rate</p>
+                          <p className="text-xs lg:text-sm font-medium truncate">
                             {(() => {
                           const details = application.loan_details as any;
                           const rate = details?.interestRate || details?.interest_rate || details?.rate;
@@ -385,20 +385,20 @@ const ApplicationsList = ({
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-black">Loan Started</p>
-                          <p className="text-sm font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] lg:text-xs text-muted-foreground">Started</p>
+                          <p className="text-xs lg:text-sm font-medium truncate">
                             {format(new Date(application.created_at), 'MMM d, yyyy')}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-black">Loan Funded</p>
-                          <p className="text-sm font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] lg:text-xs text-muted-foreground">Funded</p>
+                          <p className="text-xs lg:text-sm font-medium truncate">
                             {application.status === 'funded' && application.funded_date ? format(new Date(application.funded_date), 'MMM d, yyyy') : 'TBD'}
                           </p>
                         </div>
