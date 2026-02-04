@@ -81,41 +81,43 @@ export const Breadcrumbs = () => {
   });
 
   return (
-    <div className="border-b bg-muted/30 px-4 sm:px-6 lg:px-8 py-2">
-      <Breadcrumb>
-        <BreadcrumbList>
-          {breadcrumbs.map((crumb, index) => {
-            const isLast = index === breadcrumbs.length - 1;
-            
-            return (
-              <div key={crumb.path} className="flex items-center">
-                <BreadcrumbItem>
-                  {isLast ? (
-                    <BreadcrumbPage className="font-medium">
-                      {crumb.label}
-                    </BreadcrumbPage>
-                  ) : (
-                    <BreadcrumbLink asChild>
-                      <Link 
-                        to={crumb.path}
-                        className="flex items-center gap-1 hover:text-primary transition-colors"
-                      >
-                        {index === 0 && <Home className="h-4 w-4" />}
+    <div className="border-b bg-muted/30">
+      <div className="max-w-7xl mx-auto px-[30px] sm:px-6 lg:px-[34px] py-2">
+        <Breadcrumb>
+          <BreadcrumbList>
+            {breadcrumbs.map((crumb, index) => {
+              const isLast = index === breadcrumbs.length - 1;
+              
+              return (
+                <div key={crumb.path} className="flex items-center">
+                  <BreadcrumbItem>
+                    {isLast ? (
+                      <BreadcrumbPage className="font-medium">
                         {crumb.label}
-                      </Link>
-                    </BreadcrumbLink>
+                      </BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink asChild>
+                        <Link 
+                          to={crumb.path}
+                          className="flex items-center gap-1 hover:text-primary transition-colors"
+                        >
+                          {index === 0 && <Home className="h-4 w-4" />}
+                          {crumb.label}
+                        </Link>
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                  {!isLast && (
+                    <BreadcrumbSeparator>
+                      <ChevronRight className="h-4 w-4" />
+                    </BreadcrumbSeparator>
                   )}
-                </BreadcrumbItem>
-                {!isLast && (
-                  <BreadcrumbSeparator>
-                    <ChevronRight className="h-4 w-4" />
-                  </BreadcrumbSeparator>
-                )}
-              </div>
-            );
-          })}
-        </BreadcrumbList>
-      </Breadcrumb>
+                </div>
+              );
+            })}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
     </div>
   );
 };
