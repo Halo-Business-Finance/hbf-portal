@@ -387,20 +387,20 @@ const ApplicationsList = ({
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-xs text-muted-foreground">Loan Stage</p>
-                          <p className="text-sm font-medium">
-                            {getLoanStage(application.status).label}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
                         <div>
                           <p className="text-xs text-muted-foreground">Loan Amount</p>
                           <p className="text-sm font-medium">
                             {formatCurrency(application.amount_requested || 0)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Loan Stage</p>
+                          <p className="text-sm font-medium">
+                            {getLoanStage(application.status).label}
                           </p>
                         </div>
                       </div>
