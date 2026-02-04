@@ -127,58 +127,6 @@ export const EnterpriseDashboard = ({
       maximumFractionDigits: 2
     }).format(amount);
   };
-  const getLoanTypeDisplay = (loanType: string) => {
-    const types: Record<string, string> = {
-      refinance: 'Refinance',
-      bridge_loan: 'Bridge Loan',
-      working_capital: 'Working Capital Loan',
-      sba_7a: 'SBA 7(a)',
-      sba_504: 'SBA 504',
-      equipment_financing: 'Equipment',
-      term_loan: 'Term Loan',
-      business_line_of_credit: 'Line of Credit',
-      purchase: 'Purchase',
-      franchise: 'Franchise',
-      factoring: 'Factoring'
-    };
-    return types[loanType] || loanType;
-  };
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, {
-      label: string;
-      className: string;
-    }> = {
-      draft: {
-        label: 'Draft',
-        className: 'bg-muted text-muted-foreground'
-      },
-      submitted: {
-        label: 'Submitted',
-        className: 'bg-blue-500 text-white'
-      },
-      under_review: {
-        label: 'Under Review',
-        className: 'bg-amber-500 text-white'
-      },
-      approved: {
-        label: 'Approved',
-        className: 'bg-green-500 text-white'
-      },
-      funded: {
-        label: 'Funded',
-        className: 'bg-emerald-600 text-white'
-      },
-      rejected: {
-        label: 'Declined',
-        className: 'bg-red-500 text-white'
-      }
-    };
-    const config = statusConfig[status] || {
-      label: status,
-      className: 'bg-muted text-muted-foreground'
-    };
-    return <Badge className={cn('font-medium text-xs', config.className)}>{config.label}</Badge>;
-  };
   const quickActions = [{
     label: 'Tax documents',
     icon: FileText,
@@ -250,15 +198,9 @@ export const EnterpriseDashboard = ({
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h2 className="text-xl font-bold text-foreground whitespace-nowrap">Loan Applications</h2>
-            <div className="flex items-center gap-4 text-black">
-              <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm" onClick={() => navigate('/loan-applications')}>
-                <FileText className="w-4 h-4 mr-1" />
-                Customize application list
-              </Button>
-              {lastLogin && <span className="text-sm text-muted-foreground hidden md:inline">
-                  Last login: {lastLogin}
-                </span>}
-            </div>
+            {lastLogin && <span className="text-sm text-muted-foreground hidden md:inline">
+                Last login: {lastLogin}
+              </span>}
           </div>
 
           {/* Pipeline Summary Row */}
