@@ -319,7 +319,7 @@ export const EnterpriseDashboard = ({
             </div>}
 
           {/* Link Accounts Banner */}
-          <Card className="border border-border bg-muted/30">
+          <Card className="border border-border bg-muted/30 animated-gradient-border-minimal">
             <CardContent className="p-4 md:p-6">
               <div className="flex items-center gap-4">
                 <div className="flex -space-x-2">
@@ -470,7 +470,7 @@ export const EnterpriseDashboard = ({
           </PremiumCard>
 
           {/* Quick Links - Enhanced */}
-          <PremiumCard variant="glass-glow" size="none">
+          <PremiumCard variant="glass-glow" size="none" className="animated-gradient-border-minimal">
             <PremiumCardHeader className="pb-2 px-5 pt-5">
               <PremiumCardTitle className="text-lg font-bold">Resources</PremiumCardTitle>
             </PremiumCardHeader>
