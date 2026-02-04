@@ -7,17 +7,6 @@ import { Filter, ArrowUpDown } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-
-const ITEMS_PER_PAGE = 10;
 
 const LoanApplications = () => {
   const { authenticated, loading } = useAuth();
@@ -26,7 +15,6 @@ const LoanApplications = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date_desc');
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!loading && !authenticated) {
@@ -63,11 +51,6 @@ const LoanApplications = () => {
       filtered = filtered.filter(app => app.status === statusFilter);
     }
 
-    // Filter by status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(app => app.status === statusFilter);
-    }
-
     // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -86,34 +69,6 @@ const LoanApplications = () => {
 
     return filtered;
   }, [applications, statusFilter, sortBy]);
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusFilter, sortBy]);
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredAndSortedApplications.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedApplications = filteredAndSortedApplications.slice(startIndex, endIndex);
-
-  // Generate page numbers to display
-  const getPageNumbers = () => {
-    const pages: (number | 'ellipsis')[] = [];
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      if (currentPage > 3) pages.push('ellipsis');
-      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-        pages.push(i);
-      }
-      if (currentPage < totalPages - 2) pages.push('ellipsis');
-      pages.push(totalPages);
-    }
-    return pages;
-  };
 
   if (loading || loadingData) {
     return (
@@ -137,7 +92,7 @@ const LoanApplications = () => {
     <div className="min-h-screen bg-background">
       <PageHeader 
         title="Existing Loan Applications" 
-        subtitle={`Showing ${startIndex + 1}-${Math.min(endIndex, filteredAndSortedApplications.length)} of ${filteredAndSortedApplications.length} Loan application${filteredAndSortedApplications.length !== 1 ? 's' : ''}`}
+        subtitle={`Showing ${filteredAndSortedApplications.length} Loan application${filteredAndSortedApplications.length !== 1 ? 's' : ''}`}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
@@ -174,44 +129,7 @@ const LoanApplications = () => {
           </div>
         </Card>
         
-        <ApplicationsList applications={paginatedApplications} />
-
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <Pagination className="mt-6">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-              
-              {getPageNumbers().map((page, index) => (
-                <PaginationItem key={index}>
-                  {page === 'ellipsis' ? (
-                    <PaginationEllipsis />
-                  ) : (
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
-                      className="cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  )}
-                </PaginationItem>
-              ))}
-              
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
+        <ApplicationsList applications={filteredAndSortedApplications} />
       </div>
     </div>
   );
