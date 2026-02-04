@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Clock } from 'lucide-react';
+import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Clock, Percent } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -368,6 +368,19 @@ const ApplicationsList = ({
                           if (!term) return 'TBD';
                           const numericTerm = typeof term === 'string' ? term.replace(/_months|_month/gi, '').replace(/_/g, '') : term;
                           return `${numericTerm}-Months`;
+                        })()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Percent className="w-4 h-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-black">Interest Rate</p>
+                          <p className="text-sm font-medium">
+                            {(() => {
+                          const details = application.loan_details as any;
+                          const rate = details?.interestRate || details?.interest_rate || details?.rate;
+                          return rate ? `${rate}%` : 'TBD';
                         })()}
                           </p>
                         </div>
