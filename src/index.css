@@ -221,11 +221,7 @@
     opacity: 0.6;
   }
 
-  .glass-card:hover {
-    border-color: hsl(var(--glass-border-strong));
-    box-shadow: var(--shadow-glass-hover);
-    transform: translateY(-2px);
-  }
+  /* Hover effects intentionally disabled (enterprise/banking UX) */
 
   /* Glass Card with Animated Gradient Border */
   .glass-card-glow {
@@ -261,16 +257,7 @@
     animation: gradient-rotate 4s linear infinite paused;
   }
 
-  .glass-card-glow:hover {
-    box-shadow: var(--shadow-glass-glow);
-    transform: translateY(-3px);
-    border-color: transparent;
-  }
-
-  .glass-card-glow:hover::after {
-    opacity: 1;
-    animation-play-state: running;
-  }
+  /* Hover effects intentionally disabled (enterprise/banking UX) */
 
   @keyframes gradient-rotate {
     0% {
@@ -306,7 +293,6 @@
     animation: gradient-spin 2s ease infinite paused;
   }
 
-  .animated-gradient-border:hover::before,
   .animated-gradient-border:focus-within::before,
   .animated-gradient-border:focus-visible::before {
     opacity: 1;
@@ -333,7 +319,6 @@
     animation: gradient-shift-subtle 3s ease-in-out infinite paused;
   }
 
-  .animated-gradient-border-subtle:hover::before,
   .animated-gradient-border-subtle:focus-within::before,
   .animated-gradient-border-subtle:focus-visible::before {
     opacity: 1;
@@ -360,7 +345,6 @@
     animation: gradient-shimmer 4s ease-in-out infinite paused;
   }
 
-  .animated-gradient-border-minimal:hover::before,
   .animated-gradient-border-minimal:focus-within::before,
   .animated-gradient-border-minimal:focus-visible::before {
     opacity: 1;
