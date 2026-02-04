@@ -221,12 +221,12 @@ const Navbar = () => {
           </DropdownMenu>
 
           {/* Log out with Last Login */}
-          <div className="hidden md:flex flex-col items-end">
+          <div className="hidden md:flex flex-col items-end -mb-1">
             <button onClick={handleSignOut} className="text-sm text-foreground hover:text-primary transition-colors">
               Log out
             </button>
             {lastLogin && (
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-[10px] text-muted-foreground -mt-0.5">
                 Last login: {lastLogin}
               </span>
             )}
