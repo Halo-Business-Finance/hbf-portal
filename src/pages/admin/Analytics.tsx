@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
-import { BarChart3, TrendingUp, DollarSign, Users, FileText, CheckCircle, Clock, Download } from 'lucide-react';
+import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from '@/components/ui/premium-card';
+import { BarChart3, TrendingUp, DollarSign, Users, FileText, CheckCircle, Clock, Download, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { EnhancedAreaChart, EnhancedBarChart, EnhancedPieChart, EnhancedLineChart } from '@/components/ui/charts';
+import { AnimatedCounter, AnimatedCurrency, AnimatedPercentage } from '@/components/ui/animated-counter';
 import { exportAnalyticsToCSV, exportAnalyticsToPDF } from '@/utils/analyticsExport';
+import { cn } from '@/lib/utils';
 
 interface AnalyticsData {
   totalApplications: number;
@@ -18,11 +21,18 @@ interface AnalyticsData {
   totalAmountFunded: number;
   averageLoanAmount: number;
   applicationsByType: { name: string; value: number }[];
-  applicationsByStatus: { name: string; value: number }[];
+  applicationsByStatus: { name: string; value: number; color: string }[];
   monthlyTrend: { month: string; applications: number; funded: number }[];
 }
 
-const COLORS = ['#1e3a5f', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'];
+const STATUS_COLORS: Record<string, string> = {
+  'Draft': 'hsl(222 20% 65%)',
+  'Submitted': 'hsl(213 94% 50%)',
+  'Under Review': 'hsl(38 92% 50%)',
+  'Approved': 'hsl(152 82% 40%)',
+  'Rejected': 'hsl(0 84% 60%)',
+  'Funded': 'hsl(152 76% 35%)',
+};
 
 const Analytics = () => {
   const { toast } = useToast();
@@ -67,29 +77,33 @@ const Analytics = () => {
         value
       }));
 
-      // Applications by status
+      // Applications by status with colors
       const statusCount: Record<string, number> = {};
       data.forEach(app => {
         const status = app.status || 'Unknown';
         statusCount[status] = (statusCount[status] || 0) + 1;
       });
-      const applicationsByStatus = Object.entries(statusCount).map(([name, value]) => ({
-        name: name.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        value
-      }));
+      const applicationsByStatus = Object.entries(statusCount).map(([name, value]) => {
+        const formattedName = name.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return {
+          name: formattedName,
+          value,
+          color: STATUS_COLORS[formattedName] || 'hsl(222 20% 50%)'
+        };
+      });
 
       // Monthly trend (last 6 months)
       const monthlyData: Record<string, { applications: number; funded: number }> = {};
       const now = new Date();
       for (let i = 5; i >= 0; i--) {
         const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+        const key = date.toLocaleDateString('en-US', { month: 'short' });
         monthlyData[key] = { applications: 0, funded: 0 };
       }
 
       data.forEach(app => {
         const date = new Date(app.created_at);
-        const key = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+        const key = date.toLocaleDateString('en-US', { month: 'short' });
         if (monthlyData[key]) {
           monthlyData[key].applications++;
           if (app.status === 'funded') {
@@ -146,8 +160,13 @@ const Analytics = () => {
           loading={true}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground text-center">Loading analytics...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {[1, 2, 3, 4].map(i => (
+              <PremiumCard key={i} variant="metric" className="animate-pulse">
+                <div className="h-20 bg-muted/50 rounded" />
+              </PremiumCard>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -173,6 +192,14 @@ const Analytics = () => {
     }
   };
 
+  const approvalRate = analytics?.totalApplications 
+    ? (analytics.approvedApplications / analytics.totalApplications) * 100 
+    : 0;
+
+  const fundingRate = analytics?.totalApplications 
+    ? (analytics.fundedApplications / analytics.totalApplications) * 100 
+    : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <PageHeader 
@@ -192,214 +219,254 @@ const Analytics = () => {
       </PageHeader>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
-        {/* Key Metrics */}
+        {/* Key Metrics - Premium Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Applications</p>
-                  <p className="text-2xl font-bold">{analytics?.totalApplications || 0}</p>
-                </div>
-                <FileText className="w-8 h-8 text-blue-600" />
+          <PremiumCard variant="metric">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground font-medium">Total Applications</p>
+                <AnimatedCounter 
+                  value={analytics?.totalApplications || 0} 
+                  className="text-3xl font-bold tracking-tight"
+                />
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-2.5 rounded-lg bg-primary/10">
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+          </PremiumCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Approved</p>
-                  <p className="text-2xl font-bold text-green-600">{analytics?.approvedApplications || 0}</p>
+          <PremiumCard variant="metric">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground font-medium">Approved</p>
+                <div className="flex items-baseline gap-2">
+                  <AnimatedCounter 
+                    value={analytics?.approvedApplications || 0} 
+                    className="text-3xl font-bold tracking-tight text-emerald-600"
+                  />
+                  <div className="flex items-center text-emerald-600 text-sm">
+                    <ArrowUpRight className="w-4 h-4" />
+                    <AnimatedPercentage value={approvalRate} decimals={0} className="font-medium" />
+                  </div>
                 </div>
-                <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-2.5 rounded-lg bg-emerald-500/10">
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
+              </div>
+            </div>
+          </PremiumCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Pending Review</p>
-                  <p className="text-2xl font-bold text-amber-600">{analytics?.pendingApplications || 0}</p>
-                </div>
-                <Clock className="w-8 h-8 text-amber-600" />
+          <PremiumCard variant="metric">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground font-medium">Pending Review</p>
+                <AnimatedCounter 
+                  value={analytics?.pendingApplications || 0} 
+                  className="text-3xl font-bold tracking-tight text-amber-600"
+                />
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-2.5 rounded-lg bg-amber-500/10">
+                <Clock className="w-5 h-5 text-amber-600" />
+              </div>
+            </div>
+          </PremiumCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Funded</p>
-                  <p className="text-2xl font-bold text-purple-600">{formatCurrency(analytics?.totalAmountFunded || 0)}</p>
-                </div>
-                <DollarSign className="w-8 h-8 text-purple-600" />
+          <PremiumCard variant="metric">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground font-medium">Total Funded</p>
+                <AnimatedCurrency 
+                  value={analytics?.totalAmountFunded || 0} 
+                  className="text-3xl font-bold tracking-tight text-primary"
+                />
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-2.5 rounded-lg bg-primary/10">
+                <DollarSign className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+          </PremiumCard>
         </div>
 
-        {/* Charts Row */}
+        {/* Charts Row - Enhanced */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Monthly Trend */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
+          {/* Application Trends - Enhanced Line Chart */}
+          <PremiumCard variant="elevated" size="none">
+            <PremiumCardHeader className="px-6 pt-6 pb-2">
+              <PremiumCardTitle className="flex items-center gap-2 text-lg">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                </div>
                 Application Trends
-              </CardTitle>
-              <CardDescription>Applications over the last 6 months</CardDescription>
-            </CardHeader>
-            <CardContent>
+              </PremiumCardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Applications over the last 6 months</p>
+            </PremiumCardHeader>
+            <PremiumCardContent className="px-6 pb-6 pt-4">
               {analytics?.monthlyTrend && analytics.monthlyTrend.length > 0 ? (
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={analytics.monthlyTrend}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" fontSize={12} />
-                    <YAxis fontSize={12} />
-                    <Tooltip />
-                    <Line 
-                      type="monotone" 
-                      dataKey="applications" 
-                      stroke="#1e3a5f" 
-                      strokeWidth={2}
-                      name="Applications"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="funded" 
-                      stroke="#22c55e" 
-                      strokeWidth={2}
-                      name="Funded"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <EnhancedLineChart
+                  data={analytics.monthlyTrend}
+                  xKey="month"
+                  lines={[
+                    { key: "applications", color: "hsl(213 94% 50%)", name: "Applications" },
+                    { key: "funded", color: "hsl(152 82% 40%)", name: "Funded" }
+                  ]}
+                  height={220}
+                  showLegend
+                  animate
+                />
               ) : (
-                <div className="text-center py-8">
+                <div className="text-center py-12">
                   <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
                   <p className="text-muted-foreground">No trend data available</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          {/* Applications by Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Applications by Status
-              </CardTitle>
-              <CardDescription>Distribution of application statuses</CardDescription>
-            </CardHeader>
-            <CardContent>
+          {/* Applications by Status - Enhanced Pie Chart */}
+          <PremiumCard variant="elevated" size="none">
+            <PremiumCardHeader className="px-6 pt-6 pb-2">
+              <PremiumCardTitle className="flex items-center gap-2 text-lg">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                </div>
+                Status Distribution
+              </PremiumCardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Breakdown of application statuses</p>
+            </PremiumCardHeader>
+            <PremiumCardContent className="px-6 pb-6 pt-4">
               {analytics?.applicationsByStatus && analytics.applicationsByStatus.length > 0 ? (
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={analytics.applicationsByStatus}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {analytics.applicationsByStatus.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <EnhancedPieChart
+                    data={analytics.applicationsByStatus}
+                    height={180}
+                    innerRadius={45}
+                    outerRadius={75}
+                    animate
+                    centerContent={
+                      <div className="text-center">
+                        <span className="text-2xl font-bold">{analytics.totalApplications}</span>
+                        <p className="text-xs text-muted-foreground">Total</p>
+                      </div>
+                    }
+                  />
+                  <div className="flex-1 w-full space-y-2">
+                    {analytics.applicationsByStatus.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between group">
+                        <div className="flex items-center gap-2.5">
+                          <div 
+                            className="w-3 h-3 rounded-full transition-transform group-hover:scale-110" 
+                            style={{ backgroundColor: item.color }} 
+                          />
+                          <span className="text-sm text-foreground font-medium">{item.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold">{item.value}</span>
+                          <span className="text-xs text-muted-foreground">
+                            ({Math.round((item.value / analytics.totalApplications) * 100)}%)
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ) : (
-                <div className="text-center py-8">
+                <div className="text-center py-12">
                   <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
                   <p className="text-muted-foreground">No status data available</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </div>
 
         {/* Second Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Applications by Type */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
+          {/* Applications by Type - Enhanced Bar Chart */}
+          <PremiumCard variant="elevated" size="none">
+            <PremiumCardHeader className="px-6 pt-6 pb-2">
+              <PremiumCardTitle className="flex items-center gap-2 text-lg">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <Users className="h-4 w-4 text-primary" />
+                </div>
                 Applications by Loan Type
-              </CardTitle>
-              <CardDescription>Breakdown by loan product</CardDescription>
-            </CardHeader>
-            <CardContent>
+              </PremiumCardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Breakdown by loan product</p>
+            </PremiumCardHeader>
+            <PremiumCardContent className="px-6 pb-6 pt-4">
               {analytics?.applicationsByType && analytics.applicationsByType.length > 0 ? (
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={analytics.applicationsByType} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" fontSize={12} />
-                    <YAxis dataKey="name" type="category" width={100} fontSize={11} />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#1e3a5f" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <EnhancedBarChart
+                  data={analytics.applicationsByType}
+                  xKey="name"
+                  yKey="value"
+                  height={220}
+                  layout="vertical"
+                  animate
+                  barRadius={4}
+                  primaryColor="hsl(213 94% 50%)"
+                />
               ) : (
-                <div className="text-center py-8">
+                <div className="text-center py-12">
                   <Users className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
                   <p className="text-muted-foreground">No loan type data available</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          {/* Financial Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5" />
+          {/* Financial Summary - Premium Styling */}
+          <PremiumCard variant="elevated" size="none">
+            <PremiumCardHeader className="px-6 pt-6 pb-2">
+              <PremiumCardTitle className="flex items-center gap-2 text-lg">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <DollarSign className="h-4 w-4 text-primary" />
+                </div>
                 Financial Summary
-              </CardTitle>
-              <CardDescription>Overview of loan amounts</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Total Amount Requested</span>
-                  <span className="font-semibold">{formatCurrency(analytics?.totalAmountRequested || 0)}</span>
+              </PremiumCardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Overview of loan amounts</p>
+            </PremiumCardHeader>
+            <PremiumCardContent className="px-6 pb-6 pt-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl border border-border/50 transition-all hover:border-primary/20">
+                  <span className="text-sm text-muted-foreground font-medium">Total Requested</span>
+                  <AnimatedCurrency 
+                    value={analytics?.totalAmountRequested || 0} 
+                    className="font-bold text-foreground"
+                  />
                 </div>
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Total Amount Funded</span>
-                  <span className="font-semibold text-green-600">{formatCurrency(analytics?.totalAmountFunded || 0)}</span>
+                <div className="flex justify-between items-center p-4 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 rounded-xl border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+                  <span className="text-sm text-muted-foreground font-medium">Total Funded</span>
+                  <AnimatedCurrency 
+                    value={analytics?.totalAmountFunded || 0} 
+                    className="font-bold text-emerald-600"
+                  />
                 </div>
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Average Loan Amount</span>
-                  <span className="font-semibold">{formatCurrency(analytics?.averageLoanAmount || 0)}</span>
+                <div className="flex justify-between items-center p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl border border-border/50 transition-all hover:border-primary/20">
+                  <span className="text-sm text-muted-foreground font-medium">Average Loan</span>
+                  <AnimatedCurrency 
+                    value={analytics?.averageLoanAmount || 0} 
+                    className="font-bold text-foreground"
+                  />
                 </div>
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Approval Rate</span>
-                  <span className="font-semibold">
-                    {analytics?.totalApplications 
-                      ? ((analytics.approvedApplications / analytics.totalApplications) * 100).toFixed(1) 
-                      : 0}%
-                  </span>
+                <div className="flex justify-between items-center p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl border border-border/50 transition-all hover:border-primary/20">
+                  <span className="text-sm text-muted-foreground font-medium">Approval Rate</span>
+                  <AnimatedPercentage 
+                    value={approvalRate} 
+                    decimals={1} 
+                    className="font-bold text-foreground"
+                  />
                 </div>
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Funding Rate</span>
-                  <span className="font-semibold text-purple-600">
-                    {analytics?.totalApplications 
-                      ? ((analytics.fundedApplications / analytics.totalApplications) * 100).toFixed(1) 
-                      : 0}%
-                  </span>
+                <div className="flex justify-between items-center p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20 transition-all hover:border-primary/40">
+                  <span className="text-sm text-muted-foreground font-medium">Funding Rate</span>
+                  <AnimatedPercentage 
+                    value={fundingRate} 
+                    decimals={1} 
+                    className="font-bold text-primary"
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </div>
       </div>
     </div>
