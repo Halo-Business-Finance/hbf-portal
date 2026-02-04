@@ -4,13 +4,24 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, DollarSign, FileText, User, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, DollarSign, FileText, User, ChevronDown, ChevronUp, Trash2, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { LoanProgressBar } from '@/components/LoanProgressBar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 interface LoanApplication {
   id: string;
   loan_type: string;
@@ -52,6 +63,56 @@ const ApplicationsList = ({
       }
       return newSet;
     });
+  };
+
+  const handleDeleteApplication = async (applicationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('loan_applications')
+        .delete()
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      setApplications(prev => prev.filter(app => app.id !== applicationId));
+      toast({
+        title: "Application Deleted",
+        description: "Your loan application has been permanently deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the application. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCancelApplication = async (applicationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('loan_applications')
+        .update({ status: 'rejected' })
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      setApplications(prev => prev.map(app => 
+        app.id === applicationId ? { ...app, status: 'rejected' } : app
+      ));
+      toast({
+        title: "Application Cancelled",
+        description: "Your loan application has been cancelled.",
+      });
+    } catch (error) {
+      console.error('Error cancelling application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel the application. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   useEffect(() => {
     if (externalApplications) {
@@ -309,18 +370,74 @@ const ApplicationsList = ({
                     {/* Actions */}
                     <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
                       <Button variant="default" onClick={() => {
-                    const pid = getProgramIdForLoanType(application.loan_type);
-                    if (pid) {
-                      navigate(`/?program=${pid}&applicationId=${application.id}`);
-                    } else {
-                      navigate(`/loan-applications?id=${application.id}`);
-                    }
-                  }}>
+                        const pid = getProgramIdForLoanType(application.loan_type);
+                        if (pid) {
+                          navigate(`/?program=${pid}&applicationId=${application.id}`);
+                        } else {
+                          navigate(`/loan-applications?id=${application.id}`);
+                        }
+                      }}>
                         Continue Application
                       </Button>
                       <Button variant="outline" onClick={() => navigate('/support')}>
                         Contact Support
                       </Button>
+                      
+                      {/* Cancel Application - only show for non-rejected/non-funded applications */}
+                      {application.status !== 'rejected' && application.status !== 'funded' && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" className="text-amber-600 border-amber-300 hover:bg-amber-50 hover:text-amber-700">
+                              <XCircle className="w-4 h-4 mr-2" />
+                              Cancel Loan
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Cancel Loan Application?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to cancel this loan application? This action will mark your application as cancelled and it cannot be resumed.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Keep Application</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => handleCancelApplication(application.id)}
+                                className="bg-amber-600 hover:bg-amber-700"
+                              >
+                                Cancel Application
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+
+                      {/* Delete Application */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Loan Application?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your loan application and all associated data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteApplication(application.id)}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Delete Application
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </CollapsibleContent>
                 </CardContent>
