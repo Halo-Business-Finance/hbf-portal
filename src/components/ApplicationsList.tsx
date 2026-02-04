@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, DollarSign, FileText, User, ChevronDown, ChevronUp, Trash2, XCircle } from 'lucide-react';
+import { Calendar, DollarSign, FileText, User, ChevronDown, ChevronUp, Trash2, Pause, Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -89,27 +89,53 @@ const ApplicationsList = ({
     }
   };
 
-  const handleCancelApplication = async (applicationId: string) => {
+  const handlePauseApplication = async (applicationId: string) => {
     try {
       const { error } = await supabase
         .from('loan_applications')
-        .update({ status: 'rejected' })
+        .update({ status: 'paused' })
         .eq('id', applicationId);
 
       if (error) throw error;
 
       setApplications(prev => prev.map(app => 
-        app.id === applicationId ? { ...app, status: 'rejected' } : app
+        app.id === applicationId ? { ...app, status: 'paused' } : app
       ));
       toast({
-        title: "Application Cancelled",
-        description: "Your loan application has been cancelled.",
+        title: "Application Paused",
+        description: "Your loan application has been paused. You can resume it anytime within 90 days.",
       });
     } catch (error) {
-      console.error('Error cancelling application:', error);
+      console.error('Error pausing application:', error);
       toast({
         title: "Error",
-        description: "Failed to cancel the application. Please try again.",
+        description: "Failed to pause the application. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleResumeApplication = async (applicationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('loan_applications')
+        .update({ status: 'draft' })
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      setApplications(prev => prev.map(app => 
+        app.id === applicationId ? { ...app, status: 'draft' } : app
+      ));
+      toast({
+        title: "Application Resumed",
+        description: "Your loan application has been resumed. You can continue where you left off.",
+      });
+    } catch (error) {
+      console.error('Error resuming application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to resume the application. Please try again.",
         variant: "destructive"
       });
     }
@@ -169,7 +195,8 @@ const ApplicationsList = ({
       under_review: 'border-amber-400 text-amber-800 bg-amber-50',
       approved: 'border-emerald-400 text-emerald-800 bg-emerald-50',
       rejected: 'border-red-400 text-red-800 bg-red-50',
-      funded: 'border-indigo-400 text-indigo-800 bg-indigo-50'
+      funded: 'border-indigo-400 text-indigo-800 bg-indigo-50',
+      paused: 'border-orange-400 text-orange-800 bg-orange-50'
     };
     return colors[status as keyof typeof colors] || 'border-slate-300 text-slate-700 bg-slate-50';
   };
@@ -266,6 +293,10 @@ const ApplicationsList = ({
       funded: {
         text: 'Funded',
         color: 'text-indigo-700'
+      },
+      paused: {
+        text: 'Paused - Resume Anytime',
+        color: 'text-orange-700'
       }
     };
     return messages[status as keyof typeof messages] || messages.draft;
@@ -383,32 +414,40 @@ const ApplicationsList = ({
                         Contact Support
                       </Button>
                       
-                      {/* Cancel Application - only show for non-rejected/non-funded applications */}
-                      {application.status !== 'rejected' && application.status !== 'funded' && (
+                      {/* Pause/Resume Application - show for draft, submitted, or under_review */}
+                      {(application.status === 'draft' || application.status === 'submitted' || application.status === 'under_review') && (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="outline">
-                              <XCircle className="w-4 h-4 mr-2" />
-                              Cancel Loan
+                              <Pause className="w-4 h-4 mr-2" />
+                              Pause Loan
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Cancel Loan Application?</AlertDialogTitle>
+                              <AlertDialogTitle>Pause Loan Application?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to cancel this loan application? This action will mark your application as cancelled and it cannot be resumed.
+                                Pausing your application will prevent it from timing out. You can resume it anytime within 90 days to continue where you left off.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Keep Application</AlertDialogCancel>
+                              <AlertDialogCancel>Keep Active</AlertDialogCancel>
                               <AlertDialogAction 
-                                onClick={() => handleCancelApplication(application.id)}
+                                onClick={() => handlePauseApplication(application.id)}
                               >
-                                Cancel Application
+                                Pause Application
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                      )}
+
+                      {/* Resume Application - show for paused applications */}
+                      {application.status === 'paused' && (
+                        <Button variant="outline" onClick={() => handleResumeApplication(application.id)}>
+                          <Play className="w-4 h-4 mr-2" />
+                          Resume Loan
+                        </Button>
                       )}
 
                       {/* Delete Application */}

@@ -1069,6 +1069,7 @@ export type Database = {
         | "approved"
         | "rejected"
         | "funded"
+        | "paused"
       loan_type:
         | "refinance"
         | "bridge_loan"
@@ -1219,6 +1220,7 @@ export const Constants = {
         "approved",
         "rejected",
         "funded",
+        "paused",
       ],
       loan_type: [
         "refinance",
