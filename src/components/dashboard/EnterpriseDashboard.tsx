@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from '@/components/ui/premium-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clock, CheckCircle, AlertCircle, Building2, Plus, Link2, TrendingUp, ArrowRight, User, Briefcase } from 'lucide-react';
+import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clock, CheckCircle, AlertCircle, Building2, Plus, Link2, TrendingUp, ArrowRight, User, Briefcase, FileBarChart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -249,7 +249,7 @@ export const EnterpriseDashboard = ({
                       className="text-primary p-0 h-auto font-medium text-sm justify-start group transition-all duration-200 hover:translate-x-1" 
                       onClick={() => navigate('/credit-reports')}
                     >
-                      <CreditCard className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
+                      <FileBarChart className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
                       Connect Credit Reports
                       <ArrowRight className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:translate-x-1" />
                     </Button>
