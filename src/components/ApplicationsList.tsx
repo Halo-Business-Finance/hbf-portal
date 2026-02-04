@@ -369,7 +369,7 @@ const ApplicationsList = ({
                     </div>
                     {/* Actions */}
                     <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
-                      <Button variant="default" onClick={() => {
+                      <Button variant="outline" onClick={() => {
                         const pid = getProgramIdForLoanType(application.loan_type);
                         if (pid) {
                           navigate(`/?program=${pid}&applicationId=${application.id}`);
@@ -387,7 +387,7 @@ const ApplicationsList = ({
                       {application.status !== 'rejected' && application.status !== 'funded' && (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="outline" className="text-amber-600 border-amber-300 hover:bg-amber-50 hover:text-amber-700">
+                            <Button variant="outline">
                               <XCircle className="w-4 h-4 mr-2" />
                               Cancel Loan
                             </Button>
@@ -403,7 +403,6 @@ const ApplicationsList = ({
                               <AlertDialogCancel>Keep Application</AlertDialogCancel>
                               <AlertDialogAction 
                                 onClick={() => handleCancelApplication(application.id)}
-                                className="bg-amber-600 hover:bg-amber-700"
                               >
                                 Cancel Application
                               </AlertDialogAction>
@@ -415,7 +414,7 @@ const ApplicationsList = ({
                       {/* Delete Application */}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
+                          <Button variant="outline">
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete
                           </Button>
