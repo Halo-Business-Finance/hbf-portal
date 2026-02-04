@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Activity } from 'lucide-react';
+import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Activity, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +25,7 @@ interface LoanApplication {
   application_submitted_date: string;
   funded_date: string | null;
   created_at: string;
+  loan_details?: unknown;
 }
 interface ApplicationsListProps {
   statusFilter?: string | null;
@@ -392,6 +393,19 @@ const ApplicationsList = ({
                           <p className="text-xs text-muted-foreground">Loan Amount</p>
                           <p className="text-sm font-medium">
                             {formatCurrency(application.amount_requested || 0)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Loan Term</p>
+                          <p className="text-sm font-medium">
+                            {(() => {
+                              const details = application.loan_details as any;
+                              const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
+                              return term ? `${term} months` : 'TBD';
+                            })()}
                           </p>
                         </div>
                       </div>
