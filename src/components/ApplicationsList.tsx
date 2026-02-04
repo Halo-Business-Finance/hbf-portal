@@ -345,7 +345,7 @@ const ApplicationsList = ({
                   </div>
 
                   {/* Progress Bar */}
-                  <LoanProgressBar status={application.status} />
+                  <LoanProgressBar status={application.status} startDate={application.application_started_date || application.created_at} />
 
                   {/* Collapsible Content */}
                   <CollapsibleContent className="mt-4">
