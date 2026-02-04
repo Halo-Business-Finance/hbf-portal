@@ -127,8 +127,8 @@ export const BottomNav = () => {
               </SelectGroup>
               <SelectSeparator />
               <SelectGroup>
-                <SelectLabel className="text-xs font-semibold text-muted-foreground">Working Capital</SelectLabel>
-                <SelectItem value="/loan-applications?type=working_capital">Working Capital</SelectItem>
+                <SelectLabel className="text-xs font-semibold text-muted-foreground">Working Capital Loans</SelectLabel>
+                <SelectItem value="/loan-applications?type=working_capital">Working Capital Loan</SelectItem>
                 <SelectItem value="/loan-applications?type=business_loc">Business Line of Credit</SelectItem>
                 <SelectItem value="/loan-applications?type=equipment">Equipment Financing</SelectItem>
               </SelectGroup>

@@ -35,7 +35,7 @@ const workingCapitalSchema = z.object({
   yearsInBusiness: z.number().min(1, 'Years in business must be at least 1'),
   industry: z.string().min(2, 'Industry is required'),
   
-  // Working Capital Details
+  // Working Capital Loan Details
   amountRequested: z.number().min(10000, 'Minimum amount is $10,000'),
   purposeOfFunds: z.string().min(10, 'Purpose must be at least 10 characters'),
   monthlyRevenue: z.number().min(1000, 'Monthly revenue is required'),
@@ -142,7 +142,7 @@ const WorkingCapitalForm = () => {
         clearOnSubmit();
         toast({
           title: "Application Submitted Successfully!",
-          description: `Your working capital application #${result.application_number} has been submitted for review.`
+          description: `Your working capital loan application #${result.application_number} has been submitted for review.`
         });
         form.reset();
         setCurrentStep(1);
@@ -337,7 +337,7 @@ const WorkingCapitalForm = () => {
           <div className="space-y-4">
             <div className="text-center mb-6">
               <DollarSign className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-semibold">Working Capital Details</h3>
+              <h3 className="text-xl font-semibold">Working Capital Loan Details</h3>
               <p className="text-muted-foreground">Specify your funding requirements</p>
             </div>
             
@@ -535,7 +535,7 @@ const WorkingCapitalForm = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="w-6 h-6" />
-          Working Capital Application
+          Working Capital Loan Application
         </CardTitle>
         <CardDescription>
           Step {currentStep} of {totalSteps} - Secure working capital for your business operations

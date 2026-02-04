@@ -354,7 +354,7 @@ const ExistingLoansManagement = () => {
                         <SelectItem value="sba_7a">SBA 7(a)</SelectItem>
                         <SelectItem value="sba_504">SBA 504</SelectItem>
                         <SelectItem value="equipment_financing">Equipment Financing</SelectItem>
-                        <SelectItem value="working_capital">Working Capital</SelectItem>
+                        <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                         <SelectItem value="bridge_loan">Bridge Loan</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>

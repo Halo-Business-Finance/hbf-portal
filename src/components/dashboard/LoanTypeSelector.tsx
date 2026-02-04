@@ -99,7 +99,7 @@ const loanPrograms: LoanProgram[] = [
   },
   {
     id: 7,
-    title: "Working Capital",
+    title: "Working Capital Loan",
     icon: TrendingUp,
     description: "Bridge cash flow gaps and fund day-to-day business operations",
     badge: "Prime + 1%",

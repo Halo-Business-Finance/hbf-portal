@@ -429,7 +429,7 @@ const AdminLoanDetail = () => {
                           <SelectItem value="refinance">Refinance</SelectItem>
                           <SelectItem value="bridge">Bridge Loan</SelectItem>
                           <SelectItem value="purchase">Purchase</SelectItem>
-                          <SelectItem value="working_capital">Working Capital</SelectItem>
+                          <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : (

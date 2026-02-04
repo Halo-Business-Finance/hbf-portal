@@ -130,7 +130,7 @@ export const EnterpriseDashboard = ({
     const types: Record<string, string> = {
       refinance: 'Refinance',
       bridge_loan: 'Bridge Loan',
-      working_capital: 'Working Capital',
+      working_capital: 'Working Capital Loan',
       sba_7a: 'SBA 7(a)',
       sba_504: 'SBA 504',
       equipment_financing: 'Equipment',
