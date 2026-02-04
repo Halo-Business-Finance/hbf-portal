@@ -373,7 +373,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Date Funded </p>
+                          <p className="text-xs text-muted-foreground"> Loan Funded </p>
                           <p className="text-sm font-medium">
                             {application.application_submitted_date ? format(new Date(application.application_submitted_date), 'MMM d, yyyy') : 'Not submitted'}
                           </p>
