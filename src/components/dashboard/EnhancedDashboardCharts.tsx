@@ -10,6 +10,13 @@ import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnimatedCurrency } from "@/components/ui/animated-counter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BankAccount {
   id: string;
@@ -213,29 +220,25 @@ export const EnhancedDashboardCharts = ({
       {/* Monthly Revenue Trend - Enhanced Area Chart with 3 Lines */}
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <PremiumCardTitle className="flex items-center gap-2 text-base">
               <TrendingUp className="h-4 w-4 text-primary" />
               Monthly Trend
             </PremiumCardTitle>
             
-            {/* Period Selector */}
-            <div className="flex gap-1 bg-muted/50 p-1 rounded-lg">
-              {periodOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setSelectedPeriod(option.value)}
-                  className={cn(
-                    "px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200",
-                    selectedPeriod === option.value
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+            {/* Period Selector Dropdown */}
+            <Select value={selectedPeriod} onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}>
+              <SelectTrigger className="w-[120px] h-8 text-xs bg-background border-border">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border z-50">
+                {periodOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </PremiumCardHeader>
         <PremiumCardContent className="px-5 pb-5 pt-4">
