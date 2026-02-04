@@ -173,18 +173,44 @@ const ApplicationsList = ({
     };
     return types[loanType as keyof typeof types] || loanType;
   };
-
   const getLoanStage = (status: string) => {
-    const stages: Record<string, { label: string; step: number }> = {
-      draft: { label: 'Not Submitted', step: 0 },
-      submitted: { label: 'Loan Submitted', step: 1 },
-      under_review: { label: 'Loan Processing', step: 2 },
-      approved: { label: 'Loan Closing', step: 4 },
-      funded: { label: 'Loan Funded', step: 5 },
-      paused: { label: 'Paused', step: 0 },
-      rejected: { label: 'Application Declined', step: 0 }
+    const stages: Record<string, {
+      label: string;
+      step: number;
+    }> = {
+      draft: {
+        label: 'Not Submitted',
+        step: 0
+      },
+      submitted: {
+        label: 'Loan Submitted',
+        step: 1
+      },
+      under_review: {
+        label: 'Loan Processing',
+        step: 2
+      },
+      approved: {
+        label: 'Loan Closing',
+        step: 4
+      },
+      funded: {
+        label: 'Loan Funded',
+        step: 5
+      },
+      paused: {
+        label: 'Paused',
+        step: 0
+      },
+      rejected: {
+        label: 'Application Declined',
+        step: 0
+      }
     };
-    return stages[status] || { label: 'Unknown', step: 0 };
+    return stages[status] || {
+      label: 'Unknown',
+      step: 0
+    };
   };
   const getStatusColor = (status: string) => {
     const colors = {
@@ -316,7 +342,7 @@ const ApplicationsList = ({
                         <p className="font-semibold text-foreground truncate">
                           {application.business_name || 'New Application'}
                         </p>
-                        <p className="text-sm text-muted-foreground truncate">
+                        <p className="text-sm truncate text-black">
                           {getLoanTypeDisplay(application.loan_type)}
                         </p>
                       </div>
@@ -394,9 +420,7 @@ const ApplicationsList = ({
                         <div>
                           <p className="text-xs text-muted-foreground">Loan Funded</p>
                           <p className="text-sm font-medium">
-                            {application.status === 'funded' && application.funded_date 
-                              ? format(new Date(application.funded_date), 'MMM d, yyyy') 
-                              : 'TBD'}
+                            {application.status === 'funded' && application.funded_date ? format(new Date(application.funded_date), 'MMM d, yyyy') : 'TBD'}
                           </p>
                         </div>
                       </div>
