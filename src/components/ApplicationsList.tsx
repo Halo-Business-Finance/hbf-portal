@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, DollarSign, FileText, User, ChevronDown, ChevronUp, Trash2, Pause, Play } from 'lucide-react';
+import { Calendar, DollarSign, FileText, User, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -399,20 +399,22 @@ const ApplicationsList = ({
                       </div>
                     </div>
                     {/* Actions */}
-                    <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
-                      <Button variant="outline" onClick={() => {
-                        const pid = getProgramIdForLoanType(application.loan_type);
-                        if (pid) {
-                          navigate(`/?program=${pid}&applicationId=${application.id}`);
-                        } else {
-                          navigate(`/loan-applications?id=${application.id}`);
-                        }
-                      }}>
-                        Continue Application
-                      </Button>
-                      <Button variant="outline" onClick={() => navigate('/support')}>
-                        Contact Support
-                      </Button>
+                                    <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
+                                      <Button variant="outline" onClick={() => {
+                                        const pid = getProgramIdForLoanType(application.loan_type);
+                                        if (pid) {
+                                          navigate(`/?program=${pid}&applicationId=${application.id}`);
+                                        } else {
+                                          navigate(`/loan-applications?id=${application.id}`);
+                                        }
+                                      }}>
+                                        <ArrowRight className="w-4 h-4 mr-2" />
+                                        Continue Application
+                                      </Button>
+                                      <Button variant="outline" onClick={() => navigate('/support')}>
+                                        <Headphones className="w-4 h-4 mr-2" />
+                                        Contact Support
+                                      </Button>
                       
                       {/* Pause/Resume Application - show for draft, submitted, or under_review */}
                       {(application.status === 'draft' || application.status === 'submitted' || application.status === 'under_review') && (
