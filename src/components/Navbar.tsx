@@ -306,25 +306,25 @@ const Navbar = () => {
           {location.pathname === '/loan-applications' && location.search.includes('type=') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
-        {/* Applications Dropdown */}
+        {/* Existing Loans Dropdown */}
         <div className="relative h-full flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/loan-applications' && !location.search.includes('type=') ? "text-primary" : "text-foreground hover:text-primary")}>
-                Loan Applications
+              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/existing-loans' || location.pathname === '/loan-applications' ? "text-primary" : "text-foreground hover:text-primary")}>
+                Existing Loans
                 <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
+              <DropdownMenuItem onClick={() => navigate('/existing-loans')} className="cursor-pointer py-2.5">
+                My Funded Loans
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate('/loan-applications')} className="cursor-pointer py-2.5">
                 View All Applications
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?new=true')} className="cursor-pointer py-2.5">
-                Start New Application
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {location.pathname === '/loan-applications' && !location.search.includes('type=') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {(location.pathname === '/existing-loans' || location.pathname === '/loan-applications') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Accounts Dropdown */}
