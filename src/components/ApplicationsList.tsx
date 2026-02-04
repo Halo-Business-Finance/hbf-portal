@@ -384,7 +384,7 @@ const ApplicationsList = ({
                         <div>
                           <p className="text-xs text-muted-foreground">Loan Started</p>
                           <p className="text-sm font-medium">
-                            {application.application_started_date ? format(new Date(application.application_started_date), 'MMM d, yyyy') : format(new Date(application.created_at), 'MMM d, yyyy')}
+                            {format(new Date(application.created_at), 'MMM d, yyyy')}
                           </p>
                         </div>
                       </div>
@@ -393,7 +393,9 @@ const ApplicationsList = ({
                         <div>
                           <p className="text-xs text-muted-foreground">Loan Funded</p>
                           <p className="text-sm font-medium">
-                            {application.application_submitted_date ? format(new Date(application.application_submitted_date), 'MMM d, yyyy') : 'Not submitted'}
+                            {application.status === 'funded' && application.application_submitted_date 
+                              ? format(new Date(application.application_submitted_date), 'MMM d, yyyy') 
+                              : 'TBD'}
                           </p>
                         </div>
                       </div>
