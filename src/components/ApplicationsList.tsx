@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { LoanProgressBar } from '@/components/LoanProgressBar';
-import { LoanTimeline } from '@/components/LoanTimeline';
+
 interface LoanApplication {
   id: string;
   loan_type: string;
@@ -332,13 +332,6 @@ const ApplicationsList = ({
                         </div>
                       </div>
                     </div>
-
-                    {/* Timeline */}
-                    <LoanTimeline 
-                      loanApplicationId={application.id} 
-                      currentStatus={application.status} 
-                    />
-
                     {/* Actions */}
                     <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
                       <Button 
