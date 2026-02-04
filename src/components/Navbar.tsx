@@ -251,7 +251,7 @@ const Navbar = () => {
           <button onClick={() => navigate('/')} className={cn("pl-0 pr-4 py-2 text-sm font-medium transition-colors", isActiveRoute('/') ? "text-primary" : "text-foreground hover:text-primary")}>
             Dashboard
           </button>
-          {isActiveRoute('/') && <span className="absolute bottom-0 left-0 right-4 h-0.5 bg-primary rounded-full" />}
+          {isActiveRoute('/') && <span className="absolute bottom-2 left-0 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* New Loan Application Button */}
@@ -273,7 +273,7 @@ const Navbar = () => {
           >
             Existing Loans
           </button>
-          {location.pathname === '/existing-loans' && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {location.pathname === '/existing-loans' && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Accounts Dropdown */}
@@ -294,7 +294,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {location.pathname === '/bank-accounts' && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {location.pathname === '/bank-accounts' && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Documents Dropdown */}
@@ -315,7 +315,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {(location.pathname === '/my-documents' || location.pathname === '/document-storage') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {(location.pathname === '/my-documents' || location.pathname === '/document-storage') && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Business Tools Dropdown */}
@@ -348,7 +348,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {(location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {(location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
         </div>
       </div>
