@@ -124,11 +124,6 @@ export const EnterpriseDashboard = ({
     icon: FileText,
     action: () => navigate('/my-documents')
   }, {
-    label: 'New Application',
-    icon: Plus,
-    action: () => onNewApplication?.(),
-    chevron: true
-  }, {
     label: 'Upload Documents',
     icon: Upload,
     action: () => navigate('/my-documents'),
