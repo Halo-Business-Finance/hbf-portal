@@ -104,7 +104,7 @@ const LoanApplications = () => {
     <div className="min-h-screen bg-background">
       <PageHeader 
         title="Existing Loan Applications" 
-        subtitle={`Showing ${filteredAndSortedApplications.length} of ${applications.length} application${applications.length !== 1 ? 's' : ''}`}
+        subtitle={`Showing ${filteredAndSortedApplications.length} of ${applications.length} Loan application${applications.length !== 1 ? 's' : ''}`}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
