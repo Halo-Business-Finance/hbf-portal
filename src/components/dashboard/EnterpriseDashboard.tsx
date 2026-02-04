@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from '@/components/ui/premium-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clock, CheckCircle, AlertCircle, Building2, MoreHorizontal, Plus, Link2, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
+import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clock, CheckCircle, AlertCircle, Building2, Plus, Link2, TrendingUp, ArrowRight, User, Briefcase } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -23,6 +22,14 @@ interface LoanApplication {
   created_at: string;
   updated_at: string;
 }
+
+interface CreditScore {
+  id: string;
+  score: number;
+  bureau: string;
+  score_date: string;
+}
+
 interface EnterpriseDashboardProps {
   onNewApplication?: () => void;
 }
@@ -35,8 +42,8 @@ export const EnterpriseDashboard = ({
   } = useAuth();
   const [firstName, setFirstName] = useState<string | null>(null);
   const [applications, setApplications] = useState<LoanApplication[]>([]);
+  const [creditScores, setCreditScores] = useState<CreditScore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loanWidgetDays, setLoanWidgetDays] = useState<string>('30');
   const [stats, setStats] = useState({
     totalPipeline: 0,
     approved: 0,
@@ -45,52 +52,40 @@ export const EnterpriseDashboard = ({
     fundedAmount: 0,
     pendingAmount: 0
   });
-  const [filteredStats, setFilteredStats] = useState({
-    fundedAmount: 0,
-    pendingAmount: 0,
-    approvedCount: 0,
-    pendingCount: 0,
-    totalCount: 0
-  });
   
   useEffect(() => {
     if (user) {
       fetchDashboardData();
     }
   }, [user]);
-
-  // Calculate filtered stats based on selected days
-  useEffect(() => {
-    const days = parseInt(loanWidgetDays);
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - days);
-    const filteredApps = applications.filter(app => new Date(app.created_at) >= cutoffDate);
-    const approved = filteredApps.filter(a => a.status === 'approved' || a.status === 'funded');
-    const pending = filteredApps.filter(a => a.status === 'submitted' || a.status === 'under_review');
-    setFilteredStats({
-      fundedAmount: approved.reduce((sum, a) => sum + (a.amount_requested || 0), 0),
-      pendingAmount: pending.reduce((sum, a) => sum + (a.amount_requested || 0), 0),
-      approvedCount: approved.length,
-      pendingCount: pending.length,
-      totalCount: filteredApps.length
-    });
-  }, [loanWidgetDays, applications]);
   const fetchDashboardData = async () => {
     if (!user) return;
     try {
-      const {
-        data: profile
-      } = await supabase.from('profiles').select('first_name').eq('id', user.id).maybeSingle();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name')
+        .eq('id', user.id)
+        .maybeSingle();
       setFirstName(profile?.first_name ?? null);
-      const {
-        data: apps,
-        error
-      } = await supabase.from('loan_applications').select('*').eq('user_id', user.id).order('updated_at', {
-        ascending: false
-      });
+
+      const { data: apps, error } = await supabase
+        .from('loan_applications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
       if (error) throw error;
       const appData = apps || [];
       setApplications(appData);
+
+      // Fetch credit scores
+      const { data: scores, error: scoresError } = await supabase
+        .from('credit_scores')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('score_date', { ascending: false });
+      if (scoresError) throw scoresError;
+      setCreditScores(scores || []);
+
       const approved = appData.filter(a => a.status === 'approved' || a.status === 'funded');
       const pending = appData.filter(a => a.status === 'submitted' || a.status === 'under_review');
       const drafts = appData.filter(a => a.status === 'draft');
@@ -111,6 +106,14 @@ export const EnterpriseDashboard = ({
       setIsLoading(false);
     }
   };
+
+  // Separate personal and business credit scores
+  const personalScores = creditScores.filter(s => 
+    ['transunion', 'equifax', 'experian'].includes(s.bureau.toLowerCase())
+  );
+  const businessScores = creditScores.filter(s => 
+    !['transunion', 'equifax', 'experian'].includes(s.bureau.toLowerCase())
+  );
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -244,62 +247,64 @@ export const EnterpriseDashboard = ({
         {/* Right Column - Loan Stats & Charts */}
         <div className="space-y-5 lg:mt-[80px]">
           {/* Cash Flow Widget - Premium Style */}
+          {/* Credit Scores Widget */}
           <PremiumCard variant="elevated" size="none">
             <PremiumCardHeader className="pb-2 px-5 pt-5">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <PremiumCardTitle className="text-lg font-bold">Loan Applications</PremiumCardTitle>
-                <Select value={loanWidgetDays} onValueChange={setLoanWidgetDays}>
-                  <SelectTrigger className="w-full sm:w-[130px] h-8 text-xs bg-muted/50 border-border/60">
-                    <SelectValue placeholder="Select days" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">Last 30 days</SelectItem>
-                    <SelectItem value="60">Last 60 days</SelectItem>
-                    <SelectItem value="90">Last 90 days</SelectItem>
-                    <SelectItem value="180">Last 180 days</SelectItem>
-                    <SelectItem value="360">Last 360 days</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <PremiumCardTitle className="text-lg font-bold">Credit Scores</PremiumCardTitle>
             </PremiumCardHeader>
             <PremiumCardContent className="px-5 pb-5 space-y-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Badge variant="secondary" className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-primary/10 text-primary border-0">
-                  {filteredStats.totalCount} application{filteredStats.totalCount !== 1 ? 's' : ''}
-                </Badge>
-                <span>in selected period</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <div className="text-sm text-muted-foreground flex items-center gap-1.5">
-                    Approved
-                    <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
-                      {filteredStats.approvedCount}
-                    </Badge>
-                  </div>
-                  <div className="text-xl font-bold text-emerald-600 flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4" />
-                    <AnimatedCurrency value={filteredStats.fundedAmount} showSign />
-                  </div>
+              {/* Personal Credit Scores */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span className="font-medium">Personal</span>
                 </div>
-                <div className="space-y-1">
-                  <div className="text-sm text-muted-foreground flex items-center gap-1.5">
-                    Pending
-                    <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
-                      {filteredStats.pendingCount}
-                    </Badge>
+                {personalScores.length === 0 ? (
+                  <p className="text-sm text-muted-foreground pl-6">No personal scores available</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 pl-6">
+                    {personalScores.slice(0, 2).map((score) => (
+                      <div key={score.id} className="text-center p-3 rounded-lg bg-muted/30 border border-border/50">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                          {score.bureau}
+                        </p>
+                        <p className="text-2xl font-bold text-foreground">{score.score}</p>
+                      </div>
+                    ))}
                   </div>
-                  <div className="text-xl font-bold text-foreground">
-                    <AnimatedCurrency value={filteredStats.pendingAmount} />
-                  </div>
-                </div>
+                )}
               </div>
+
+              {/* Business Credit Scores */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Briefcase className="w-4 h-4" />
+                  <span className="font-medium">Business</span>
+                </div>
+                {businessScores.length === 0 ? (
+                  <p className="text-sm text-muted-foreground pl-6">No business scores available</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 pl-6">
+                    {businessScores.slice(0, 2).map((score) => (
+                      <div key={score.id} className="text-center p-3 rounded-lg bg-muted/30 border border-border/50">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                          {score.bureau}
+                        </p>
+                        <p className="text-2xl font-bold text-foreground">{score.score}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <p className="text-xs text-muted-foreground">Scores checked daily with VantageScore 3.0</p>
+              
               <Button 
                 variant="outline" 
-                className="w-full border-primary text-primary hover:bg-primary/5 transition-all duration-200" 
-                onClick={() => navigate('/loan-applications')}
+                className="w-full border-primary text-primary transition-all duration-200" 
+                onClick={() => navigate('/credit-reports')}
               >
-                Continue to Pipeline
+                View All Credit Reports
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </PremiumCardContent>
