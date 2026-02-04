@@ -1,18 +1,11 @@
 import { cn } from '@/lib/utils';
 import { Calendar, Clock } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 interface LoanProgressBarProps {
   status: string;
   className?: string;
   startDate?: string | null;
 }
-
 const stages = [{
   key: 'submitted',
   label: 'Loan Submitted',
@@ -49,7 +42,6 @@ const stages = [{
   minDays: 1,
   maxDays: 3
 }];
-
 const getStageIndex = (status: string): number => {
   const statusMap: Record<string, number> = {
     draft: -1,
@@ -62,7 +54,6 @@ const getStageIndex = (status: string): number => {
   };
   return statusMap[status] ?? -1;
 };
-
 const getStatusLabel = (status: string): string => {
   const labels: Record<string, string> = {
     draft: 'Not Submitted',
@@ -75,39 +66,40 @@ const getStatusLabel = (status: string): string => {
   };
   return labels[status] || 'Unknown';
 };
-
-const calculateEstimatedDate = (startDate: string, stageIndex: number): { min: Date; max: Date } => {
+const calculateEstimatedDate = (startDate: string, stageIndex: number): {
+  min: Date;
+  max: Date;
+} => {
   const start = new Date(startDate);
-  
+
   // Sum up days from all previous stages plus current stage
   let totalMinDays = 0;
   let totalMaxDays = 0;
-  
   for (let i = 0; i <= stageIndex; i++) {
     totalMinDays += stages[i].minDays;
     totalMaxDays += stages[i].maxDays;
   }
-  
   const minDate = new Date(start);
   minDate.setDate(minDate.getDate() + totalMinDays);
-  
   const maxDate = new Date(start);
   maxDate.setDate(maxDate.getDate() + totalMaxDays);
-  
-  return { min: minDate, max: maxDate };
+  return {
+    min: minDate,
+    max: maxDate
+  };
 };
-
 const formatDateRange = (min: Date, max: Date): string => {
-  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+  const options: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric'
+  };
   const minStr = min.toLocaleDateString('en-US', options);
   const maxStr = max.toLocaleDateString('en-US', options);
-  
   if (minStr === maxStr) {
     return minStr;
   }
   return `${minStr} - ${maxStr}`;
 };
-
 export const LoanProgressBar = ({
   status,
   className,
@@ -118,93 +110,61 @@ export const LoanProgressBar = ({
   const isPaused = status === 'paused';
   const isDraft = status === 'draft';
   const isFunded = status === 'funded';
-  
-  // Calculate estimated completion for current stage
-  const estimatedDates = startDate && currentStageIndex >= 0 && !isFunded
-    ? calculateEstimatedDate(startDate, currentStageIndex)
-    : null;
 
-  return (
-    <div className={cn('space-y-3', className)}>
+  // Calculate estimated completion for current stage
+  const estimatedDates = startDate && currentStageIndex >= 0 && !isFunded ? calculateEstimatedDate(startDate, currentStageIndex) : null;
+  return <div className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between text-xs sm:text-sm">
         <span className="uppercase tracking-wide font-semibold text-muted-foreground text-xs">
           Loan Progress
         </span>
         
         {/* Estimated completion indicator */}
-        {estimatedDates && !isRejected && !isPaused && (
-          <div className="flex items-center gap-1.5 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
+        {estimatedDates && !isRejected && !isPaused && <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-white text-black">
             <Clock className="w-3 h-3" />
             <span className="font-medium">
               Est. completion: {formatDateRange(estimatedDates.min, estimatedDates.max)}
             </span>
-          </div>
-        )}
+          </div>}
         
-        {isFunded && (
-          <div className="flex items-center gap-1.5 text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full">
+        {isFunded && <div className="flex items-center gap-1.5 text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full">
             <Calendar className="w-3 h-3" />
             <span className="font-medium">Completed</span>
-          </div>
-        )}
+          </div>}
       </div>
 
-      {isRejected ? (
-        <div className="h-1.5 rounded-full bg-red-100 border border-red-200">
+      {isRejected ? <div className="h-1.5 rounded-full bg-red-100 border border-red-200">
           <div className="h-full rounded-full bg-gradient-to-r from-red-500 to-red-600 w-full" />
-        </div>
-      ) : (
-        <div className="flex items-center gap-1">
+        </div> : <div className="flex items-center gap-1">
           {stages.map((stage, index) => {
-            const isCompleted = index <= currentStageIndex;
-            const isCurrent = index === currentStageIndex;
-            return (
-              <div
-                key={stage.key}
-                className={cn(
-                  'flex-1 h-2 rounded-full transition-all duration-300',
-                  isCompleted ? 'bg-gradient-to-r from-primary to-primary/80' : 'bg-muted/50',
-                  isCurrent && 'ring-2 ring-primary/30'
-                )}
-              />
-            );
-          })}
-        </div>
-      )}
+        const isCompleted = index <= currentStageIndex;
+        const isCurrent = index === currentStageIndex;
+        return <div key={stage.key} className={cn('flex-1 h-2 rounded-full transition-all duration-300', isCompleted ? 'bg-gradient-to-r from-primary to-primary/80' : 'bg-muted/50', isCurrent && 'ring-2 ring-primary/30')} />;
+      })}
+        </div>}
 
       <TooltipProvider>
         <div className="flex justify-between text-xs text-muted-foreground font-medium">
           {stages.map((stage, index) => {
-            const isCompleted = index <= currentStageIndex;
-            const isCurrent = index === currentStageIndex;
-            const stageEstimate = startDate ? calculateEstimatedDate(startDate, index) : null;
-            
-            return (
-              <Tooltip key={stage.key}>
+          const isCompleted = index <= currentStageIndex;
+          const isCurrent = index === currentStageIndex;
+          const stageEstimate = startDate ? calculateEstimatedDate(startDate, index) : null;
+          return <Tooltip key={stage.key}>
                 <TooltipTrigger asChild>
-                  <span className={cn(
-                    'text-center flex-1 cursor-help',
-                    isCompleted && 'text-primary font-semibold',
-                    isCurrent && 'text-primary font-bold',
-                    !isCompleted && !isCurrent && 'text-muted-foreground'
-                  )}>
+                  <span className={cn('text-center flex-1 cursor-help', isCompleted && 'text-primary font-semibold', isCurrent && 'text-primary font-bold', !isCompleted && !isCurrent && 'text-muted-foreground')}>
                     {stage.label}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-[220px] text-center">
                   <p className="font-medium">{stage.description}</p>
                   <p className="text-xs text-muted-foreground mt-1">{stage.timeframe}</p>
-                  {stageEstimate && (
-                    <p className="text-xs text-primary mt-1 font-medium">
+                  {stageEstimate && <p className="text-xs text-primary mt-1 font-medium">
                       Target: {formatDateRange(stageEstimate.min, stageEstimate.max)}
-                    </p>
-                  )}
+                    </p>}
                 </TooltipContent>
-              </Tooltip>
-            );
-          })}
+              </Tooltip>;
+        })}
         </div>
       </TooltipProvider>
-    </div>
-  );
+    </div>;
 };
