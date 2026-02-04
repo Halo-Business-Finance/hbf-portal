@@ -688,6 +688,7 @@ export type Database = {
           created_at: string
           email: string | null
           first_name: string | null
+          funded_date: string | null
           id: string
           last_name: string | null
           loan_details: Json | null
@@ -711,6 +712,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          funded_date?: string | null
           id?: string
           last_name?: string | null
           loan_details?: Json | null
@@ -734,6 +736,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          funded_date?: string | null
           id?: string
           last_name?: string | null
           loan_details?: Json | null

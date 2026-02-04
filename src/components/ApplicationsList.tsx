@@ -23,6 +23,7 @@ interface LoanApplication {
   business_name: string;
   application_started_date: string;
   application_submitted_date: string;
+  funded_date: string | null;
   created_at: string;
 }
 interface ApplicationsListProps {
@@ -393,8 +394,8 @@ const ApplicationsList = ({
                         <div>
                           <p className="text-xs text-muted-foreground">Loan Funded</p>
                           <p className="text-sm font-medium">
-                            {application.status === 'funded' && application.application_submitted_date 
-                              ? format(new Date(application.application_submitted_date), 'MMM d, yyyy') 
+                            {application.status === 'funded' && application.funded_date 
+                              ? format(new Date(application.funded_date), 'MMM d, yyyy') 
                               : 'TBD'}
                           </p>
                         </div>
