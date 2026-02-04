@@ -5,19 +5,19 @@ interface LoanProgressBarProps {
 }
 const stages = [{
   key: 'submitted',
-  label: 'Submitted'
+  label: 'Loan Submitted'
 }, {
   key: 'processing',
   label: 'Loan Processing'
 }, {
   key: 'underwriting',
-  label: 'Underwriting'
+  label: 'Loan Underwriting'
 }, {
   key: 'closing',
-  label: 'Closing'
+  label: 'Loan Closing'
 }, {
   key: 'funded',
-  label: 'Funded'
+  label: 'Loan Funded'
 }];
 const getStageIndex = (status: string): number => {
   const statusMap: Record<string, number> = {
