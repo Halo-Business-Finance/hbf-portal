@@ -308,10 +308,6 @@ const ApplicationsList = ({
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Badge variant="outline" className={getStatusColor(application.status)}>
-                        {application.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </Badge>
-                      
                       {application.status === 'draft' ? <Button variant="default" size="sm" onClick={e => {
                     e.stopPropagation();
                     const pid = getProgramIdForLoanType(application.loan_type);
