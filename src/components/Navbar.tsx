@@ -283,7 +283,7 @@ const Navbar = () => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate('/loan-applications?type=working_capital')} className="cursor-pointer py-2.5">
-                Working Capital
+                Working Capital Loan
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate('/loan-applications?type=business_loc')} className="cursor-pointer py-2.5">
                 Business Line of Credit

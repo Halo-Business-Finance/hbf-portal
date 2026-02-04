@@ -540,7 +540,7 @@ const SBAExpressLoanForm: React.FC = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="working_capital">Working Capital</SelectItem>
+                      <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                       <SelectItem value="equipment">Equipment Purchase</SelectItem>
                       <SelectItem value="inventory">Inventory</SelectItem>
                       <SelectItem value="business_acquisition">Business Acquisition</SelectItem>

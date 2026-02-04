@@ -144,7 +144,7 @@ export const ConventionalLoanForm: React.FC = () => {
                     <SelectValue placeholder="Select loan purpose" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="working_capital">Working Capital</SelectItem>
+                    <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                     <SelectItem value="equipment_purchase">Equipment Purchase</SelectItem>
                     <SelectItem value="real_estate">Real Estate</SelectItem>
                     <SelectItem value="business_expansion">Business Expansion</SelectItem>

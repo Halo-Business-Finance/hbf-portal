@@ -65,7 +65,7 @@ const FundedLoansView = ({
     const types = {
       refinance: 'Refinance',
       bridge_loan: 'Bridge Loan',
-      working_capital: 'Working Capital',
+      working_capital: 'Working Capital Loan',
       sba_7a: 'SBA 7(a)',
       sba_504: 'SBA 504',
       equipment_financing: 'Equipment Financing',
@@ -356,7 +356,7 @@ const Index = () => {
     details: "100% financing available | Fast approval | Equipment as collateral"
   }, {
     id: 7,
-    title: "Working Capital",
+    title: "Working Capital Loan",
     icon: TrendingUp,
     description: "Bridge cash flow gaps and fund day-to-day business operations",
     badge: "Prime + 1%",

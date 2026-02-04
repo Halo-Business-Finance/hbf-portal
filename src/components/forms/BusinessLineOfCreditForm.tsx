@@ -158,7 +158,7 @@ export const BusinessLineOfCreditForm: React.FC = () => {
                   <SelectValue placeholder="Select primary purpose" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="working_capital">Working Capital</SelectItem>
+                  <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                   <SelectItem value="inventory_financing">Inventory Financing</SelectItem>
                   <SelectItem value="seasonal_operations">Seasonal Operations</SelectItem>
                   <SelectItem value="cash_flow_management">Cash Flow Management</SelectItem>

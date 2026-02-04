@@ -169,7 +169,7 @@ const ApplicationsList = ({
       purchase: 'Purchase of Property',
       franchise: 'Franchise Loan',
       factoring: 'Factoring Loan',
-      working_capital: 'Working Capital'
+      working_capital: 'Working Capital Loan'
     };
     return types[loanType as keyof typeof types] || loanType;
   };

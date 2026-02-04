@@ -614,7 +614,7 @@ export default function SBA7aLoanForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="working_capital">Working Capital</SelectItem>
+                      <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                       <SelectItem value="equipment">Equipment Purchase</SelectItem>
                       <SelectItem value="real_estate">Real Estate Purchase</SelectItem>
                       <SelectItem value="business_acquisition">Business Acquisition</SelectItem>
