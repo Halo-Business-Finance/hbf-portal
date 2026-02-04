@@ -14,23 +14,28 @@ interface LoanProgressBarProps {
 const stages = [{
   key: 'submitted',
   label: 'Loan Submitted',
-  description: 'Your application has been received and is awaiting initial review.'
+  description: 'Your application has been received and is awaiting initial review.',
+  timeframe: 'Typically 1-2 business days'
 }, {
   key: 'processing',
   label: 'Loan Processing',
-  description: 'Our team is verifying your documents and gathering necessary information.'
+  description: 'Our team is verifying your documents and gathering necessary information.',
+  timeframe: 'Typically 3-5 business days'
 }, {
   key: 'underwriting',
   label: 'Loan Underwriting',
-  description: 'A detailed analysis of your financials and risk assessment is in progress.'
+  description: 'A detailed analysis of your financials and risk assessment is in progress.',
+  timeframe: 'Typically 5-10 business days'
 }, {
   key: 'closing',
   label: 'Loan Closing',
-  description: 'Final documents are being prepared for your signature and funding approval.'
+  description: 'Final documents are being prepared for your signature and funding approval.',
+  timeframe: 'Typically 3-7 business days'
 }, {
   key: 'funded',
   label: 'Loan Funded',
-  description: 'Congratulations! Your loan has been funded and disbursed.'
+  description: 'Congratulations! Your loan has been funded and disbursed.',
+  timeframe: 'Funds available within 1-3 business days'
 }];
 const getStageIndex = (status: string): number => {
   const statusMap: Record<string, number> = {
@@ -99,8 +104,9 @@ export const LoanProgressBar = ({
                     {stage.label}
                   </span>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-[200px] text-center">
-                  <p>{stage.description}</p>
+                <TooltipContent side="bottom" className="max-w-[220px] text-center">
+                  <p className="font-medium">{stage.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{stage.timeframe}</p>
                 </TooltipContent>
               </Tooltip>
             );
