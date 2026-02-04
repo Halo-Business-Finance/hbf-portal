@@ -23,9 +23,7 @@ export const PageHeader = ({
                 <h1 className="font-bold mb-1 text-lg md:text-2xl">
                   {title}
                 </h1>
-                {subtitle && <p className="text-primary-foreground/80 text-sm md:text-base">
-                    {subtitle}
-                  </p>}
+                {subtitle}
               </>}
           </div>
           {children && !loading && <div className="flex items-center gap-2">
