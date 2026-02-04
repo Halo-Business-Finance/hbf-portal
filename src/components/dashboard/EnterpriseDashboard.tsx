@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { AnimatedCurrency } from '@/components/ui/animated-counter';
 import { StatusIndicator } from '@/components/ui/status-indicator';
 import { EnhancedDashboardCharts } from './EnhancedDashboardCharts';
+import ApplicationsList from '@/components/ApplicationsList';
 interface LoanApplication {
   id: string;
   application_number: string;
@@ -277,46 +278,14 @@ export const EnterpriseDashboard = ({
                   Start Your First Application
                 </Button>
               </CardContent>
-            </Card> : <div className="space-y-4">
-              {applications.slice(0, 3).map(app => <Card key={app.id} className="border border-border hover:shadow-md transition-shadow cursor-pointer animated-gradient-border-subtle" onClick={() => navigate(`/loan-applications?id=${app.id}`)}>
-                  <CardContent className="p-4 md:p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-8 sm:w-12 sm:h-8 rounded flex items-center justify-center bg-white flex-shrink-0">
-                          <Building2 className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-semibold text-foreground truncate">
-                            {app.business_name || 'New Application'} ...{app.application_number?.slice(-4) || '0000'}
-                          </p>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {getLoanTypeDisplay(app.loan_type)} • {app.application_number || 'Draft'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-end sm:text-right flex-shrink-0 pl-13 sm:pl-0">
-                        <p className="font-bold text-foreground text-lg">
-                          {formatCurrency(app.amount_requested || 0)}
-                        </p>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground ml-2" />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      {getStatusBadge(app.status)}
-                      <Button variant="outline" size="sm" className="rounded-full text-xs" onClick={e => {
-                    e.stopPropagation();
-                    navigate(`/loan-applications?id=${app.id}`);
-                  }}>
-                        View details
-                        <ChevronRight className="w-3 h-3 ml-1" />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="ml-auto" onClick={e => e.stopPropagation()}>
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>)}
-            </div>}
+            </Card> : <ApplicationsList applications={applications.slice(0, 3).map(app => ({
+              ...app,
+              first_name: '',
+              last_name: '',
+              application_started_date: app.created_at,
+              application_submitted_date: app.created_at,
+              funded_date: null
+            }))} />}
 
           {/* Link Accounts Banner */}
           <Card className="border border-border bg-muted/30 animated-gradient-border-minimal">
