@@ -25,15 +25,28 @@ const Navbar = () => {
   const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [loanSelectorOpen, setLoanSelectorOpen] = useState(false);
+  const [lastLogin, setLastLogin] = useState<string | null>(null);
   useEffect(() => {
     if (authenticated) {
       loadNotifications();
+      loadLastLogin();
       const unsubscribe = userNotificationService.subscribeToNotifications(() => {
         loadNotifications();
       });
       return unsubscribe;
     }
   }, [authenticated]);
+
+  const loadLastLogin = () => {
+    const stored = localStorage.getItem('hbf_last_login');
+    if (stored) {
+      setLastLogin(new Date(stored).toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }) + ' CT');
+    }
+  };
   const loadNotifications = async () => {
     try {
       const count = await userNotificationService.getUnreadCount();
@@ -207,10 +220,17 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Log out */}
-          <button onClick={handleSignOut} className="hidden md:block text-sm text-foreground hover:text-primary transition-colors">
-            Log out
-          </button>
+          {/* Log out with Last Login */}
+          <div className="hidden md:flex flex-col items-end">
+            <button onClick={handleSignOut} className="text-sm text-foreground hover:text-primary transition-colors">
+              Log out
+            </button>
+            {lastLogin && (
+              <span className="text-[10px] text-muted-foreground">
+                Last login: {lastLogin}
+              </span>
+            )}
+          </div>
 
           {/* Mobile Menu */}
           <DropdownMenu>

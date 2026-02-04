@@ -52,7 +52,7 @@ export const EnterpriseDashboard = ({
     pendingCount: 0,
     totalCount: 0
   });
-  const [lastLogin, setLastLogin] = useState<string | null>(null);
+  
   useEffect(() => {
     if (user) {
       fetchDashboardData();
@@ -105,14 +105,6 @@ export const EnterpriseDashboard = ({
         fundedAmount,
         pendingAmount
       });
-      const stored = localStorage.getItem('hbf_last_login');
-      if (stored) {
-        setLastLogin(new Date(stored).toLocaleString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) + ' CT');
-      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -198,9 +190,6 @@ export const EnterpriseDashboard = ({
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h2 className="text-xl font-bold text-foreground whitespace-nowrap">Loan Applications</h2>
-            {lastLogin && <span className="text-sm text-muted-foreground hidden md:inline">
-                Last login: {lastLogin}
-              </span>}
           </div>
 
           {/* Pipeline Summary Row */}
