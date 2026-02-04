@@ -371,15 +371,15 @@ export const EnterpriseDashboard = ({
               <PremiumCardTitle className="text-lg font-bold">Resources</PremiumCardTitle>
             </PremiumCardHeader>
             <PremiumCardContent className="px-5 pb-5 space-y-1">
-              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted/50 transition-all duration-200" onClick={() => navigate('/my-documents')}>
+              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-transparent" onClick={() => navigate('/my-documents')}>
                 <span className="text-sm font-medium">Upload Documents</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </Button>
-              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted/50 transition-all duration-200" onClick={() => navigate('/credit-reports')}>
+              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-transparent" onClick={() => navigate('/credit-reports')}>
                 <span className="text-sm font-medium">Credit Reports</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </Button>
-              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted/50 transition-all duration-200" onClick={() => navigate('/support')}>
+              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-transparent" onClick={() => navigate('/support')}>
                 <span className="text-sm font-medium">Get Support</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </Button>
