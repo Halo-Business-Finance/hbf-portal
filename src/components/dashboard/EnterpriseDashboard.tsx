@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from '@/components/ui/premium-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,6 +9,9 @@ import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clo
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { AnimatedCurrency } from '@/components/ui/animated-counter';
+import { StatusIndicator } from '@/components/ui/status-indicator';
+import { EnhancedDashboardCharts } from './EnhancedDashboardCharts';
 interface LoanApplication {
   id: string;
   application_number: string;
@@ -341,15 +345,15 @@ export const EnterpriseDashboard = ({
           </Card>
         </div>
 
-        {/* Right Column - Cash Flow & Transactions */}
-        <div className="space-y-6">
-          {/* Cash Flow Widget - US Bank Style */}
-          <Card className="border border-border">
-            <CardHeader className="pb-2">
+        {/* Right Column - Loan Stats & Charts */}
+        <div className="space-y-5">
+          {/* Cash Flow Widget - Premium Style */}
+          <PremiumCard variant="elevated" size="none">
+            <PremiumCardHeader className="pb-2 px-5 pt-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <CardTitle className="text-lg font-bold">Loan applications</CardTitle>
+                <PremiumCardTitle className="text-lg font-bold">Loan Applications</PremiumCardTitle>
                 <Select value={loanWidgetDays} onValueChange={setLoanWidgetDays}>
-                  <SelectTrigger className="w-full sm:w-[130px] h-8 text-xs">
+                  <SelectTrigger className="w-full sm:w-[130px] h-8 text-xs bg-muted/50 border-border/60">
                     <SelectValue placeholder="Select days" />
                   </SelectTrigger>
                   <SelectContent>
@@ -361,28 +365,28 @@ export const EnterpriseDashboard = ({
                   </SelectContent>
                 </Select>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            </PremiumCardHeader>
+            <PremiumCardContent className="px-5 pb-5 space-y-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs font-medium">
+                <Badge variant="secondary" className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-primary/10 text-primary border-0">
                   {filteredStats.totalCount} application{filteredStats.totalCount !== 1 ? 's' : ''}
                 </Badge>
                 <span>in selected period</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <div className="space-y-1">
                   <div className="text-sm text-muted-foreground flex items-center gap-1.5">
                     Approved
                     <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
                       {filteredStats.approvedCount}
                     </Badge>
                   </div>
-                  <div className="text-xl font-bold text-green-600 flex items-center gap-1">
+                  <div className="text-xl font-bold text-emerald-600 flex items-center gap-1">
                     <TrendingUp className="w-4 h-4" />
-                    +{formatCurrency(filteredStats.fundedAmount)}
+                    <AnimatedCurrency value={filteredStats.fundedAmount} showSign />
                   </div>
                 </div>
-                <div>
+                <div className="space-y-1">
                   <div className="text-sm text-muted-foreground flex items-center gap-1.5">
                     Pending
                     <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[10px] font-medium">
@@ -390,29 +394,56 @@ export const EnterpriseDashboard = ({
                     </Badge>
                   </div>
                   <div className="text-xl font-bold text-foreground">
-                    {formatCurrency(filteredStats.pendingAmount)}
+                    <AnimatedCurrency value={filteredStats.pendingAmount} />
                   </div>
                 </div>
               </div>
-              <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10" onClick={() => navigate('/loan-applications')}>
+              <Button 
+                variant="outline" 
+                className="w-full border-primary text-primary hover:bg-primary/5 transition-all duration-200" 
+                onClick={() => navigate('/loan-applications')}
+              >
                 Continue to Pipeline
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
 
-          {/* Recent Activity / Transactions */}
-          <Card className="border border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold">Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              {applications.length === 0 ? <p className="text-sm text-muted-foreground text-center py-4">
+          {/* Enhanced Charts */}
+          <EnhancedDashboardCharts userId={user?.id} />
+
+          {/* Recent Activity - Enhanced */}
+          <PremiumCard variant="elevated" size="none">
+            <PremiumCardHeader className="pb-2 px-5 pt-5">
+              <PremiumCardTitle className="text-lg font-bold">Recent Activity</PremiumCardTitle>
+            </PremiumCardHeader>
+            <PremiumCardContent className="px-5 pb-5 space-y-1">
+              {applications.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
                   No recent activity
-                </p> : applications.slice(0, 5).map(app => <div key={app.id} className="flex items-center justify-between py-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 hover:shadow-sm hover:scale-[1.01] -mx-2 px-2 rounded-lg transition-all duration-200 ease-out" onClick={() => navigate(`/loan-applications?id=${app.id}`)}>
+                </p>
+              ) : (
+                applications.slice(0, 5).map(app => (
+                  <div 
+                    key={app.id} 
+                    className="flex items-center justify-between py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/30 -mx-2 px-2 rounded-lg transition-all duration-200 ease-out group" 
+                    onClick={() => navigate(`/loan-applications?id=${app.id}`)}
+                  >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0", app.status === 'approved' || app.status === 'funded' ? "bg-green-100" : app.status === 'rejected' ? "bg-red-100" : "bg-transparent")}>
-                        {app.status === 'approved' || app.status === 'funded' ? <CheckCircle className="w-4 h-4 text-green-600" /> : app.status === 'rejected' ? <AlertCircle className="w-4 h-4 text-red-600" /> : <Clock className="w-4 h-4 text-blue-600" />}
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110", 
+                        app.status === 'approved' || app.status === 'funded' 
+                          ? "bg-emerald-100" 
+                          : app.status === 'rejected' 
+                          ? "bg-rose-100" 
+                          : "bg-blue-50"
+                      )}>
+                        {app.status === 'approved' || app.status === 'funded' 
+                          ? <CheckCircle className="w-4 h-4 text-emerald-600" /> 
+                          : app.status === 'rejected' 
+                          ? <AlertCircle className="w-4 h-4 text-rose-600" /> 
+                          : <Clock className="w-4 h-4 text-blue-600" />
+                        }
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">
@@ -420,10 +451,10 @@ export const EnterpriseDashboard = ({
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(app.updated_at).toLocaleDateString('en-US', {
-                        month: '2-digit',
-                        day: '2-digit',
-                        year: 'numeric'
-                      })}
+                            month: '2-digit',
+                            day: '2-digit',
+                            year: 'numeric'
+                          })}
                         </p>
                       </div>
                     </div>
@@ -432,30 +463,32 @@ export const EnterpriseDashboard = ({
                         {formatCurrency(app.amount_requested || 0)}
                       </p>
                     </div>
-                  </div>)}
-            </CardContent>
-          </Card>
+                  </div>
+                ))
+              )}
+            </PremiumCardContent>
+          </PremiumCard>
 
-          {/* Quick Links */}
-          <Card className="border border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold">Resources</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted" onClick={() => navigate('/my-documents')}>
+          {/* Quick Links - Enhanced */}
+          <PremiumCard variant="glass" size="none">
+            <PremiumCardHeader className="pb-2 px-5 pt-5">
+              <PremiumCardTitle className="text-lg font-bold">Resources</PremiumCardTitle>
+            </PremiumCardHeader>
+            <PremiumCardContent className="px-5 pb-5 space-y-1">
+              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted/50 transition-all duration-200" onClick={() => navigate('/my-documents')}>
                 <span className="text-sm font-medium">Upload Documents</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </Button>
-              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted" onClick={() => navigate('/credit-reports')}>
+              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted/50 transition-all duration-200" onClick={() => navigate('/credit-reports')}>
                 <span className="text-sm font-medium">Credit Reports</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </Button>
-              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted" onClick={() => navigate('/support')}>
+              <Button variant="ghost" className="w-full justify-between h-auto py-3 px-2 hover:bg-muted/50 transition-all duration-200" onClick={() => navigate('/support')}>
                 <span className="text-sm font-medium">Get Support</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </Button>
-            </CardContent>
-          </Card>
+            </PremiumCardContent>
+          </PremiumCard>
         </div>
       </div>
       </div>
