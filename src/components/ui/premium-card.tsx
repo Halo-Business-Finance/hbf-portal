@@ -7,14 +7,14 @@ const premiumCardVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-card border border-border shadow-card hover:shadow-card-hover",
+        default: "bg-card border border-border shadow-card",
         glass: "glass-card",
         "glass-strong": "frosted-panel",
         "glass-glow": "glass-card-glow",
-        elevated: "bg-card border border-border/60 shadow-card hover:shadow-card-hover hover:-translate-y-0.5",
-        gradient: "bg-card border border-border/40 shadow-card hover:shadow-lg",
-        metric: "bg-card border border-border/60 shadow-card hover:border-primary/20 hover:shadow-glow hover:-translate-y-1",
-        glow: "bg-card border border-border shadow-card hover:shadow-glow hover:border-primary/30",
+        elevated: "bg-card border border-border/60 shadow-card",
+        gradient: "bg-card border border-border/40 shadow-card",
+        metric: "bg-card border border-border/60 shadow-card",
+        glow: "bg-card border border-border shadow-card",
       },
       size: {
         default: "p-6",
@@ -44,7 +44,9 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
         ref={ref}
         className={cn(
           premiumCardVariants({ variant, size }),
-          gradientBorder && "before:absolute before:inset-0 before:rounded-xl before:p-px before:bg-gradient-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:-z-10",
+          // Keep keyboard accessibility (focus-within) without hover effects
+          gradientBorder &&
+            "before:absolute before:inset-0 before:rounded-xl before:p-px before:bg-gradient-primary before:opacity-0 focus-within:before:opacity-100 before:transition-opacity before:duration-300 before:-z-10",
           className
         )}
         style={glowColor ? { "--glow-color": glowColor } as React.CSSProperties : undefined}
