@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { LoanProgressBar } from '@/components/LoanProgressBar';
-
 interface LoanApplication {
   id: string;
   loan_type: string;
@@ -210,28 +209,19 @@ const ApplicationsList = ({
     };
     return messages[status as keyof typeof messages] || messages.draft;
   };
-  return (
-    <div>
+  return <div>
       <div className="space-y-4">
         {filteredApplications.map(application => {
-          const statusInfo = getStatusMessage(application.status);
-          const isCollapsed = collapsedCards.has(application.id);
-          const programId = getProgramIdForLoanType(application.loan_type);
-          
-          return (
-            <Collapsible 
-              key={application.id} 
-              open={!isCollapsed} 
-              onOpenChange={() => toggleCard(application.id)}
-            >
+        const statusInfo = getStatusMessage(application.status);
+        const isCollapsed = collapsedCards.has(application.id);
+        const programId = getProgramIdForLoanType(application.loan_type);
+        return <Collapsible key={application.id} open={!isCollapsed} onOpenChange={() => toggleCard(application.id)}>
               <Card className="border border-border hover:shadow-md transition-shadow">
                 <CardContent className="p-4 md:p-6">
                   {/* Header Section */}
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 flex-shrink-0">
-                        <FileText className="w-5 h-5 text-primary" />
-                      </div>
+                      
                       <div className="min-w-0">
                         <p className="font-semibold text-foreground truncate">
                           {application.business_name || 'New Application'}
@@ -248,32 +238,20 @@ const ApplicationsList = ({
                       <p className="font-bold text-foreground text-lg hidden sm:block">
                         {formatCurrency(application.amount_requested || 0)}
                       </p>
-                      {application.status === 'draft' ? (
-                        <Button 
-                          variant="default" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const pid = getProgramIdForLoanType(application.loan_type);
-                            if (pid) {
-                              navigate(`/?program=${pid}&applicationId=${application.id}`);
-                            }
-                          }}
-                        >
+                      {application.status === 'draft' ? <Button variant="default" size="sm" onClick={e => {
+                    e.stopPropagation();
+                    const pid = getProgramIdForLoanType(application.loan_type);
+                    if (pid) {
+                      navigate(`/?program=${pid}&applicationId=${application.id}`);
+                    }
+                  }}>
                           Continue Application
-                        </Button>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleCard(application.id);
-                          }}
-                        >
+                        </Button> : <Button variant="outline" size="sm" onClick={e => {
+                    e.stopPropagation();
+                    toggleCard(application.id);
+                  }}>
                           View Details
-                        </Button>
-                      )}
+                        </Button>}
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm">
                           {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
@@ -314,9 +292,7 @@ const ApplicationsList = ({
                         <div>
                           <p className="text-xs text-muted-foreground">Started</p>
                           <p className="text-sm font-medium">
-                            {application.application_started_date 
-                              ? format(new Date(application.application_started_date), 'MMM d, yyyy')
-                              : format(new Date(application.created_at), 'MMM d, yyyy')}
+                            {application.application_started_date ? format(new Date(application.application_started_date), 'MMM d, yyyy') : format(new Date(application.created_at), 'MMM d, yyyy')}
                           </p>
                         </div>
                       </div>
@@ -325,44 +301,33 @@ const ApplicationsList = ({
                         <div>
                           <p className="text-xs text-muted-foreground">Submitted</p>
                           <p className="text-sm font-medium">
-                            {application.application_submitted_date 
-                              ? format(new Date(application.application_submitted_date), 'MMM d, yyyy')
-                              : 'Not submitted'}
+                            {application.application_submitted_date ? format(new Date(application.application_submitted_date), 'MMM d, yyyy') : 'Not submitted'}
                           </p>
                         </div>
                       </div>
                     </div>
                     {/* Actions */}
                     <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
-                      <Button 
-                        variant="default" 
-                        onClick={() => {
-                          const pid = getProgramIdForLoanType(application.loan_type);
-                          if (pid) {
-                            navigate(`/?program=${pid}&applicationId=${application.id}`);
-                          } else {
-                            navigate(`/loan-applications?id=${application.id}`);
-                          }
-                        }}
-                      >
+                      <Button variant="default" onClick={() => {
+                    const pid = getProgramIdForLoanType(application.loan_type);
+                    if (pid) {
+                      navigate(`/?program=${pid}&applicationId=${application.id}`);
+                    } else {
+                      navigate(`/loan-applications?id=${application.id}`);
+                    }
+                  }}>
                         Continue Application
                       </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={() => navigate('/support')}
-                      >
+                      <Button variant="outline" onClick={() => navigate('/support')}>
                         Contact Support
                       </Button>
                     </div>
                   </CollapsibleContent>
                 </CardContent>
               </Card>
-            </Collapsible>
-          );
-        })}
+            </Collapsible>;
+      })}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ApplicationsList;
