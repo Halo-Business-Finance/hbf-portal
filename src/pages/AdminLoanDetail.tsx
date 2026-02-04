@@ -53,6 +53,7 @@ interface LoanApplication {
   created_at: string;
   updated_at: string;
   application_submitted_date: string;
+  funded_date: string | null;
   loan_details: any;
 }
 
@@ -540,7 +541,17 @@ const AdminLoanDetail = () => {
                   <div>
                     <Label>Submitted Date</Label>
                     <p className="text-sm font-medium mt-1">
-                      {new Date(application.application_submitted_date).toLocaleDateString()} at {new Date(application.application_submitted_date).toLocaleTimeString()}
+                      {application.application_submitted_date 
+                        ? `${new Date(application.application_submitted_date).toLocaleDateString()} at ${new Date(application.application_submitted_date).toLocaleTimeString()}`
+                        : 'Not yet submitted'}
+                    </p>
+                  </div>
+                  <div>
+                    <Label>Funded Date</Label>
+                    <p className="text-sm font-medium mt-1">
+                      {application.funded_date 
+                        ? `${new Date(application.funded_date).toLocaleDateString()} at ${new Date(application.funded_date).toLocaleTimeString()}`
+                        : <span className="text-muted-foreground">Not yet funded</span>}
                     </p>
                   </div>
                 </CardContent>
