@@ -271,7 +271,9 @@ export const EnterpriseDashboard = ({
 
         {/* Right Column - Loan Stats & Charts */}
         <div className="space-y-5 lg:mt-[80px]">
-          {/* Cash Flow Widget - Premium Style */}
+          {/* Enhanced Charts - Monthly Trend and Linked Accounts */}
+          <EnhancedDashboardCharts userId={user?.id} />
+
           {/* Credit Scores Widget */}
           <PremiumCard variant="elevated" size="none">
             <PremiumCardHeader className="pb-2 px-5 pt-5">
@@ -334,9 +336,6 @@ export const EnterpriseDashboard = ({
               </Button>
             </PremiumCardContent>
           </PremiumCard>
-
-          {/* Enhanced Charts */}
-          <EnhancedDashboardCharts userId={user?.id} />
 
         </div>
       </div>
