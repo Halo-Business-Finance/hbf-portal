@@ -227,9 +227,9 @@
     transform: translateY(-2px);
   }
 
-  /* Glass Card with Glow */
+  /* Glass Card with Animated Gradient Border */
   .glass-card-glow {
-    @apply relative rounded-xl transition-all duration-300 overflow-hidden;
+    @apply relative rounded-xl transition-all duration-300 overflow-visible;
     background: linear-gradient(135deg, hsl(var(--glass-bg-strong)), hsl(var(--glass-bg)));
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
@@ -241,22 +241,88 @@
     content: '';
     @apply absolute inset-0 rounded-xl pointer-events-none;
     background: linear-gradient(135deg, hsl(var(--glass-highlight)) 0%, transparent 40%);
+    z-index: 1;
   }
 
+  /* Animated gradient border */
   .glass-card-glow::after {
     content: '';
-    @apply absolute -inset-px rounded-xl pointer-events-none opacity-0 transition-opacity duration-300;
-    background: linear-gradient(135deg, hsl(213 94% 50% / 0.3), hsl(152 82% 45% / 0.2), transparent);
+    @apply absolute -inset-[2px] rounded-xl pointer-events-none opacity-0 transition-opacity duration-500;
+    background: linear-gradient(
+      var(--gradient-angle, 135deg),
+      hsl(213 94% 50% / 0.6),
+      hsl(186 94% 41% / 0.4),
+      hsl(152 82% 45% / 0.5),
+      hsl(262 83% 58% / 0.4),
+      hsl(213 94% 50% / 0.6)
+    );
+    background-size: 300% 300%;
     z-index: -1;
+    animation: gradient-rotate 4s linear infinite paused;
   }
 
   .glass-card-glow:hover {
     box-shadow: var(--shadow-glass-glow);
     transform: translateY(-3px);
+    border-color: transparent;
   }
 
   .glass-card-glow:hover::after {
     opacity: 1;
+    animation-play-state: running;
+  }
+
+  @keyframes gradient-rotate {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Premium Animated Border - Standalone Class */
+  .animated-gradient-border {
+    @apply relative;
+  }
+
+  .animated-gradient-border::before {
+    content: '';
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none;
+    background: linear-gradient(
+      var(--gradient-angle, 0deg),
+      hsl(213 94% 50%),
+      hsl(186 94% 41%),
+      hsl(152 82% 45%),
+      hsl(262 83% 58%),
+      hsl(213 94% 50%)
+    );
+    background-size: 400% 400%;
+    z-index: -1;
+    animation: gradient-spin 3s ease infinite paused;
+  }
+
+  .animated-gradient-border:hover::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+
+  @keyframes gradient-spin {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 100% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
   }
 
   /* Frosted Glass Panel */
