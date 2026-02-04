@@ -1,23 +1,36 @@
 import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+
 interface LoanProgressBarProps {
   status: string;
   className?: string;
 }
+
 const stages = [{
   key: 'submitted',
-  label: 'Loan Submitted'
+  label: 'Loan Submitted',
+  description: 'Your application has been received and is awaiting initial review.'
 }, {
   key: 'processing',
-  label: 'Loan Processing'
+  label: 'Loan Processing',
+  description: 'Our team is verifying your documents and gathering necessary information.'
 }, {
   key: 'underwriting',
-  label: 'Loan Underwriting'
+  label: 'Loan Underwriting',
+  description: 'A detailed analysis of your financials and risk assessment is in progress.'
 }, {
   key: 'closing',
-  label: 'Loan Closing'
+  label: 'Loan Closing',
+  description: 'Final documents are being prepared for your signature and funding approval.'
 }, {
   key: 'funded',
-  label: 'Loan Funded'
+  label: 'Loan Funded',
+  description: 'Congratulations! Your loan has been funded and disbursed.'
 }];
 const getStageIndex = (status: string): number => {
   const statusMap: Record<string, number> = {
@@ -69,14 +82,30 @@ export const LoanProgressBar = ({
       })}
         </div>}
 
-      <div className="flex justify-between text-xs text-muted-foreground font-medium">
-        {stages.map((stage, index) => {
-        const isCompleted = index <= currentStageIndex;
-        const isCurrent = index === currentStageIndex;
-        return <span key={stage.key} className={cn('text-center flex-1', isCompleted && 'text-primary font-semibold', isCurrent && 'text-primary font-bold', !isCompleted && !isCurrent && 'text-muted-foreground')}>
-              {stage.label}
-            </span>;
-      })}
-      </div>
+      <TooltipProvider>
+        <div className="flex justify-between text-xs text-muted-foreground font-medium">
+          {stages.map((stage, index) => {
+            const isCompleted = index <= currentStageIndex;
+            const isCurrent = index === currentStageIndex;
+            return (
+              <Tooltip key={stage.key}>
+                <TooltipTrigger asChild>
+                  <span className={cn(
+                    'text-center flex-1 cursor-help',
+                    isCompleted && 'text-primary font-semibold',
+                    isCurrent && 'text-primary font-bold',
+                    !isCompleted && !isCurrent && 'text-muted-foreground'
+                  )}>
+                    {stage.label}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-[200px] text-center">
+                  <p>{stage.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </TooltipProvider>
     </div>;
 };
