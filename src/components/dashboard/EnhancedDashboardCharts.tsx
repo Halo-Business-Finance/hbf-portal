@@ -221,8 +221,8 @@ export const EnhancedDashboardCharts = ({
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
           <div className="flex items-center justify-between gap-3">
-            <PremiumCardTitle className="flex items-center gap-2 text-base">
-              <TrendingUp className="h-4 w-4 text-primary" />
+            <PremiumCardTitle className="flex items-center gap-2 text-base whitespace-nowrap">
+              <TrendingUp className="h-4 w-4 text-primary flex-shrink-0" />
               Monthly Trend
             </PremiumCardTitle>
             
