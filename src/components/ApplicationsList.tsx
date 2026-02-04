@@ -297,7 +297,7 @@ const ApplicationsList = ({
               <Card className="border border-border hover:shadow-md transition-shadow">
                 <CardContent className="p-4 md:p-6">
                   {/* Header Section */}
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                  <div className="flex-col sm:flex-row gap-3 mb-4 flex sm:items-start sm:justify-between">
                     <div className="flex items-center gap-3 min-w-0">
                       
                       <div className="min-w-0">
@@ -363,10 +363,10 @@ const ApplicationsList = ({
                           <p className="text-xs text-muted-foreground">Loan Term</p>
                           <p className="text-sm font-medium">
                             {(() => {
-                              const details = application.loan_details as any;
-                              const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
-                              return term ? `${term} months` : 'TBD';
-                            })()}
+                          const details = application.loan_details as any;
+                          const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
+                          return term ? `${term} months` : 'TBD';
+                        })()}
                           </p>
                         </div>
                       </div>
