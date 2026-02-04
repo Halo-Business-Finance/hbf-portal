@@ -310,6 +310,54 @@
     animation-play-state: running;
   }
 
+  /* Subtle Animated Border - Less Prominent Version */
+  .animated-gradient-border-subtle {
+    @apply relative;
+  }
+
+  .animated-gradient-border-subtle::before {
+    content: '';
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-500 pointer-events-none;
+    background: linear-gradient(
+      var(--gradient-angle, 0deg),
+      hsl(213 94% 50% / 0.4),
+      hsl(222 33% 80% / 0.3),
+      hsl(213 94% 50% / 0.4)
+    );
+    background-size: 200% 200%;
+    z-index: -1;
+    animation: gradient-shift-subtle 6s ease-in-out infinite paused;
+  }
+
+  .animated-gradient-border-subtle:hover::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+
+  /* Minimal Animated Border - Very Subtle */
+  .animated-gradient-border-minimal {
+    @apply relative;
+  }
+
+  .animated-gradient-border-minimal::before {
+    content: '';
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-700 pointer-events-none;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--border)),
+      hsl(213 94% 50% / 0.25),
+      hsl(var(--border))
+    );
+    background-size: 200% 100%;
+    z-index: -1;
+    animation: gradient-shimmer 8s ease-in-out infinite paused;
+  }
+
+  .animated-gradient-border-minimal:hover::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+
   @keyframes gradient-spin {
     0%, 100% {
       background-position: 0% 50%;
@@ -322,6 +370,24 @@
     }
     75% {
       background-position: 0% 100%;
+    }
+  }
+
+  @keyframes gradient-shift-subtle {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes gradient-shimmer {
+    0% {
+      background-position: -200% 0%;
+    }
+    100% {
+      background-position: 200% 0%;
     }
   }
 
