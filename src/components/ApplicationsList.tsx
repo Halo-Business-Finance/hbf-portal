@@ -338,7 +338,7 @@ const ApplicationsList = ({
                     <Separator className="mb-4" />
                     
                     {/* Details Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-muted-foreground" />
                         <div>
