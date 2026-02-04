@@ -74,44 +74,46 @@ const ExistingLoans = () => {
         return;
       }
 
-      const { data: loans, error } = await supabase
-        .from('existing_loans')
+      // Fetch funded loan applications
+      const { data: fundedApplications, error: appError } = await supabase
+        .from('loan_applications')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .eq('status', 'funded')
+        .order('funded_date', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching existing loans:', error);
-        toast.error('Failed to load existing loans');
+      if (appError) {
+        console.error('Error fetching funded applications:', appError);
+        toast.error('Failed to load funded loans');
         return;
       }
 
-      // Transform database records to component format
-      const transformedLoans: ExistingLoan[] = (loans || []).map(loan => ({
-        id: loan.id,
-        loanType: loan.loan_type as 'commercial' | 'business',
-        loanName: loan.loan_name,
-        lender: loan.lender,
-        loanBalance: Number(loan.loan_balance),
-        originalAmount: Number(loan.original_amount),
-        monthlyPayment: Number(loan.monthly_payment),
-        interestRate: Number(loan.interest_rate),
-        termMonths: loan.term_months,
-        remainingMonths: loan.remaining_months,
-        maturityDate: loan.maturity_date,
-        originationDate: loan.origination_date,
-        hasPrepaymentPenalty: loan.has_prepayment_penalty,
-        prepaymentPeriodEndDate: loan.prepayment_period_end_date,
-        status: loan.status as 'current' | 'funded_by_us' | 'partner_funded',
-        loanPurpose: loan.loan_purpose
-      }));
+      // Transform funded applications to ExistingLoan format
+      const transformedLoans: ExistingLoan[] = (fundedApplications || []).map(app => {
+        const loanDetails = app.loan_details as any || {};
+        return {
+          id: app.id,
+          loanType: 'commercial' as 'commercial' | 'business',
+          loanName: `${app.loan_type?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())} - ${app.business_name || 'Business Loan'}`,
+          lender: 'Halo Business Finance',
+          loanBalance: Number(app.amount_requested || 0),
+          originalAmount: Number(app.amount_requested || 0),
+          monthlyPayment: Number(loanDetails.monthly_payment || 0),
+          interestRate: Number(loanDetails.interest_rate || 0),
+          termMonths: Number(loanDetails.term_months || 0),
+          remainingMonths: Number(loanDetails.term_months || 0),
+          maturityDate: loanDetails.maturity_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          originationDate: app.funded_date || app.created_at,
+          hasPrepaymentPenalty: loanDetails.has_prepayment_penalty || false,
+          prepaymentPeriodEndDate: loanDetails.prepayment_period_end_date,
+          status: 'funded_by_us' as 'current' | 'funded_by_us' | 'partner_funded',
+          loanPurpose: app.loan_type?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Business Loan'
+        };
+      });
 
-      // Separate by loan type
-      const commercial = transformedLoans.filter(loan => loan.loanType === 'commercial');
-      const business = transformedLoans.filter(loan => loan.loanType === 'business');
-
-      setCommercialLoans(commercial);
-      setBusinessLoans(business);
+      // For now, all funded loans go to commercial (can be expanded later)
+      setCommercialLoans(transformedLoans);
+      setBusinessLoans([]);
     } catch (error) {
       console.error('Error loading existing loans:', error);
       toast.error('An unexpected error occurred');
