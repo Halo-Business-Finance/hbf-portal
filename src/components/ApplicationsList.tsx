@@ -297,7 +297,7 @@ const ApplicationsList = ({
               <Card className="border border-border hover:shadow-md transition-shadow">
                 <CardContent className="p-4 md:p-6">
                   {/* Header Section */}
-                  <div className="flex-col sm:flex-row gap-3 mb-4 flex sm:items-center sm:justify-between">
+                  <div className="flex-col gap-3 mb-4 sm:items-end sm:justify-between flex sm:flex-row">
                     <div className="flex items-center gap-3 min-w-0">
                       
                       <div className="min-w-0">
