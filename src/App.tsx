@@ -228,9 +228,11 @@ const App = () => (
                 </Layout>
               } />
               <Route path="/change-password" element={
-                <ProtectedRoute>
-                  <ChangePassword />
-                </ProtectedRoute>
+                <Layout>
+                  <ProtectedRoute>
+                    <ChangePassword />
+                  </ProtectedRoute>
+                </Layout>
               } />
               <Route path="/change-email" element={
                 <Layout>
@@ -247,14 +249,23 @@ const App = () => (
                 </Layout>
               } />
               <Route path="/mfa-verify" element={
-                <ProtectedRoute>
-                  <MFAVerification />
-                </ProtectedRoute>
+                <Layout>
+                  <ProtectedRoute>
+                    <MFAVerification />
+                  </ProtectedRoute>
+                </Layout>
               } />
               <Route path="/loan-applications" element={
                 <Layout>
                   <ProtectedRoute>
                     <LoanApplications />
+                  </ProtectedRoute>
+                </Layout>
+              } />
+              <Route path="/my-documents" element={
+                <Layout>
+                  <ProtectedRoute>
+                    <MyDocuments />
                   </ProtectedRoute>
                 </Layout>
               } />
