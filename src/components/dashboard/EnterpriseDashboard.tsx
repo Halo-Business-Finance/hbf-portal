@@ -348,7 +348,7 @@ export const EnterpriseDashboard = ({
         {/* Right Column - Loan Stats & Charts */}
         <div className="space-y-5">
           {/* Cash Flow Widget - Premium Style */}
-          <PremiumCard variant="elevated" size="none">
+          <PremiumCard variant="glass-glow" size="none">
             <PremiumCardHeader className="pb-2 px-5 pt-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <PremiumCardTitle className="text-lg font-bold">Loan Applications</PremiumCardTitle>
@@ -413,7 +413,7 @@ export const EnterpriseDashboard = ({
           <EnhancedDashboardCharts userId={user?.id} />
 
           {/* Recent Activity - Enhanced */}
-          <PremiumCard variant="elevated" size="none">
+          <PremiumCard variant="glass-glow" size="none">
             <PremiumCardHeader className="pb-2 px-5 pt-5">
               <PremiumCardTitle className="text-lg font-bold">Recent Activity</PremiumCardTitle>
             </PremiumCardHeader>
@@ -470,7 +470,7 @@ export const EnterpriseDashboard = ({
           </PremiumCard>
 
           {/* Quick Links - Enhanced */}
-          <PremiumCard variant="glass" size="none">
+          <PremiumCard variant="glass-glow" size="none">
             <PremiumCardHeader className="pb-2 px-5 pt-5">
               <PremiumCardTitle className="text-lg font-bold">Resources</PremiumCardTitle>
             </PremiumCardHeader>
