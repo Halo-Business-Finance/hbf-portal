@@ -235,16 +235,16 @@ export const EnterpriseDashboard = ({
                 <div className="space-y-1">
                   <p className="font-semibold text-foreground">Link your accounts to see your full financial picture.</p>
                   <div className="flex flex-col gap-1">
-                    <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/bank-accounts')}>
-                      Connect Bank Accounts
+                    <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/my-documents?folder=Tax Documents')}>
+                      Connect Tax Returns
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                     <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/credit-reports')}>
                       Connect Credit Reports
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
-                    <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/my-documents?folder=Tax Documents')}>
-                      Connect Tax Returns
+                    <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/bank-accounts')}>
+                      Connect Bank Accounts
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </div>
