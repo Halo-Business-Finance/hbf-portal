@@ -106,6 +106,7 @@ const LoanApplications = () => {
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="paused">Paused</SelectItem>
                 <SelectItem value="submitted">Submitted</SelectItem>
                 <SelectItem value="under_review">Under Review</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
