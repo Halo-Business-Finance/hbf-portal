@@ -316,7 +316,7 @@ const ApplicationsList = ({
                           {application.business_name || 'New Application'}
                         </p>
                         <p className="text-sm text-muted-foreground truncate">
-                          {application.application_number || 'Draft'}
+                          {getLoanTypeDisplay(application.loan_type)}
                         </p>
                       </div>
                     </div>
