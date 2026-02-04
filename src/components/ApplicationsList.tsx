@@ -365,7 +365,9 @@ const ApplicationsList = ({
                             {(() => {
                           const details = application.loan_details as any;
                           const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
-                          return term ? `${term} months` : 'TBD';
+                          if (!term) return 'TBD';
+                          const numericTerm = typeof term === 'string' ? term.replace(/_months|_month/gi, '').replace(/_/g, '') : term;
+                          return `${numericTerm}-Months`;
                         })()}
                           </p>
                         </div>
