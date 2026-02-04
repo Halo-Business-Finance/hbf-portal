@@ -278,7 +278,7 @@ export const EnterpriseDashboard = ({
                 </Button>
               </CardContent>
             </Card> : <div className="space-y-4">
-              {applications.slice(0, 3).map(app => <Card key={app.id} className="border border-border hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/loan-applications?id=${app.id}`)}>
+              {applications.slice(0, 3).map(app => <Card key={app.id} className="border border-border hover:shadow-md transition-shadow cursor-pointer animated-gradient-border-subtle" onClick={() => navigate(`/loan-applications?id=${app.id}`)}>
                   <CardContent className="p-4 md:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
                       <div className="flex items-center gap-3 min-w-0">
