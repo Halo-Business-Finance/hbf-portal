@@ -33,8 +33,9 @@ export const EnhancedDashboardCharts = ({
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [monthlyData, setMonthlyData] = useState<{
     month: string;
-    applications: number;
-    amount: number;
+    grossRevenue: number;
+    netRevenue: number;
+    expenses: number;
   }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,36 +63,38 @@ export const EnhancedDashboardCharts = ({
           .eq('user_id', userId);
 
         if (applications) {
-          // Monthly applications with amounts (last 6 months)
+          // Generate monthly revenue/expense data (last 6 months)
           const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-          const monthlyCounts: Record<string, { count: number; amount: number }> = {};
           const now = new Date();
+          
+          const monthlyFinancials: { month: string; grossRevenue: number; netRevenue: number; expenses: number }[] = [];
           
           for (let i = 5; i >= 0; i--) {
             const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            monthlyCounts[key] = { count: 0, amount: 0 };
+            const monthName = monthNames[d.getMonth()];
+            
+            // Calculate based on applications data
+            const monthApps = applications.filter(app => {
+              const appDate = new Date(app.created_at);
+              return appDate.getFullYear() === d.getFullYear() && appDate.getMonth() === d.getMonth();
+            });
+            
+            const totalRequested = monthApps.reduce((sum, app) => sum + (app.amount_requested || 0), 0);
+            
+            // Simulate financial metrics based on application amounts
+            const grossRevenue = totalRequested * 0.03; // 3% of loan amounts as gross revenue
+            const expenses = grossRevenue * 0.35; // 35% of gross as expenses
+            const netRevenue = grossRevenue - expenses;
+            
+            monthlyFinancials.push({
+              month: monthName,
+              grossRevenue: Math.round(grossRevenue / 1000), // Convert to thousands
+              netRevenue: Math.round(netRevenue / 1000),
+              expenses: Math.round(expenses / 1000)
+            });
           }
 
-          applications.forEach(app => {
-            const date = new Date(app.created_at);
-            const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            if (monthlyCounts.hasOwnProperty(key)) {
-              monthlyCounts[key].count++;
-              monthlyCounts[key].amount += app.amount_requested || 0;
-            }
-          });
-
-          setMonthlyData(
-            Object.entries(monthlyCounts).map(([key, data]) => {
-              const [year, month] = key.split('-');
-              return {
-                month: monthNames[parseInt(month) - 1],
-                applications: data.count,
-                amount: data.amount / 1000 // Convert to thousands
-              };
-            })
-          );
+          setMonthlyData(monthlyFinancials);
         }
       } catch (error) {
         console.error('Error fetching chart data:', error);
@@ -128,12 +131,10 @@ export const EnhancedDashboardCharts = ({
     if (active && payload && payload.length) {
       return (
         <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3">
-          <p className="text-sm font-medium text-foreground">{label}</p>
+          <p className="text-sm font-medium text-foreground mb-1">{label}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm text-muted-foreground">
-              {entry.name}: <span className="font-semibold text-foreground">
-                {entry.name === 'amount' ? `$${entry.value}K` : entry.value}
-              </span>
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: <span className="font-semibold">${entry.value}K</span>
             </p>
           ))}
         </div>
@@ -238,7 +239,7 @@ export const EnhancedDashboardCharts = ({
         </PremiumCardContent>
       </PremiumCard>
 
-      {/* Monthly Applications Trend - Enhanced Area Chart */}
+      {/* Monthly Revenue Trend - Enhanced Area Chart with 3 Lines */}
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
           <PremiumCardTitle className="flex items-center gap-2 text-base">
@@ -249,14 +250,38 @@ export const EnhancedDashboardCharts = ({
           </PremiumCardTitle>
         </PremiumCardHeader>
         <PremiumCardContent className="px-5 pb-5 pt-4">
-          {monthlyData.some(d => d.applications > 0) ? (
+          {/* Legend */}
+          <div className="flex flex-wrap gap-4 mb-3 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(142 76% 36%)' }} />
+              <span className="text-muted-foreground">Gross Revenue</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(213 94% 50%)' }} />
+              <span className="text-muted-foreground">Net Revenue</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(0 84% 60%)' }} />
+              <span className="text-muted-foreground">Expenses</span>
+            </div>
+          </div>
+          
+          {monthlyData.some(d => d.grossRevenue > 0 || d.netRevenue > 0 || d.expenses > 0) ? (
             <div className="h-36">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={monthlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="colorApplications" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="colorGrossRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(142 76% 36%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(142 76% 36%)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorNetRevenue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(213 94% 50%)" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="hsl(213 94% 50%)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(0 84% 60%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(0 84% 60%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid 
@@ -278,20 +303,40 @@ export const EnhancedDashboardCharts = ({
                   <Tooltip content={<CustomTooltip />} />
                   <Area
                     type="monotone"
-                    dataKey="applications"
-                    name="Applications"
+                    dataKey="grossRevenue"
+                    name="Gross Revenue"
+                    stroke="hsl(142 76% 36%)"
+                    strokeWidth={2.5}
+                    fill="url(#colorGrossRevenue)"
+                    dot={{ fill: 'hsl(142 76% 36%)', strokeWidth: 2, r: 3, stroke: 'white' }}
+                    activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="netRevenue"
+                    name="Net Revenue"
                     stroke="hsl(213 94% 50%)"
                     strokeWidth={2.5}
-                    fill="url(#colorApplications)"
-                    dot={{ fill: 'hsl(213 94% 50%)', strokeWidth: 2, r: 4, stroke: 'white' }}
-                    activeDot={{ r: 6, stroke: 'white', strokeWidth: 2 }}
+                    fill="url(#colorNetRevenue)"
+                    dot={{ fill: 'hsl(213 94% 50%)', strokeWidth: 2, r: 3, stroke: 'white' }}
+                    activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="expenses"
+                    name="Expenses"
+                    stroke="hsl(0 84% 60%)"
+                    strokeWidth={2.5}
+                    fill="url(#colorExpenses)"
+                    dot={{ fill: 'hsl(0 84% 60%)', strokeWidth: 2, r: 3, stroke: 'white' }}
+                    activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           ) : (
             <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
-              No application history yet
+              No financial data yet
             </div>
           )}
         </PremiumCardContent>
