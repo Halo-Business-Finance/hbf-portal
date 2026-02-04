@@ -8,7 +8,9 @@ const premiumCardVariants = cva(
     variants: {
       variant: {
         default: "bg-card border border-border shadow-card hover:shadow-card-hover",
-        glass: "bg-card/80 backdrop-blur-xl border border-border/50 shadow-card hover:shadow-card-hover",
+        glass: "glass-card",
+        "glass-strong": "frosted-panel",
+        "glass-glow": "glass-card-glow",
         elevated: "bg-card border border-border/60 shadow-card hover:shadow-card-hover hover:-translate-y-0.5",
         gradient: "bg-card border border-border/40 shadow-card hover:shadow-lg",
         metric: "bg-card border border-border/60 shadow-card hover:border-primary/20 hover:shadow-glow hover:-translate-y-1",

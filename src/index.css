@@ -52,11 +52,20 @@
     --cyan: 186 94% 41%;
     --indigo: 239 84% 67%;
 
-    /* Glass & Surface Effects */
-    --glass-light: 222 40% 10% / 0.8;
-    --glass-border: 222 33% 25% / 0.5;
+    /* Glass & Surface Effects - Enhanced Glassmorphism */
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-bg-strong: 0 0% 100% / 0.85;
+    --glass-border: 0 0% 100% / 0.3;
+    --glass-border-strong: 213 94% 50% / 0.2;
+    --glass-highlight: 0 0% 100% / 0.5;
+    --glass-shadow: 222 47% 11% / 0.1;
     --surface-elevated: 222 40% 12%;
     --surface-sunken: 222 47% 4%;
+    
+    /* Glassmorphism Shadows */
+    --shadow-glass: 0 8px 32px hsl(222 47% 11% / 0.12), 0 2px 8px hsl(222 47% 11% / 0.08), inset 0 1px 0 hsl(0 0% 100% / 0.4);
+    --shadow-glass-hover: 0 16px 48px hsl(222 47% 11% / 0.16), 0 4px 12px hsl(222 47% 11% / 0.1), inset 0 1px 0 hsl(0 0% 100% / 0.5);
+    --shadow-glass-glow: 0 0 60px hsl(213 94% 50% / 0.15), 0 8px 32px hsl(222 47% 11% / 0.12);
 
     /* Modern Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(213 94% 50%), hsl(213 94% 60%));
@@ -195,14 +204,79 @@
 }
 
 @layer components {
-  /* Glass Effect Card */
+  /* Enhanced Glass Effect Card - Prominent Glassmorphism */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl;
-    box-shadow: var(--shadow-card);
+    @apply relative rounded-xl transition-all duration-300 overflow-hidden;
+    background: linear-gradient(135deg, hsl(var(--glass-bg-strong)), hsl(var(--glass-bg)));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-card::before {
+    content: '';
+    @apply absolute inset-0 rounded-xl pointer-events-none;
+    background: linear-gradient(135deg, hsl(var(--glass-highlight)) 0%, transparent 50%);
+    opacity: 0.6;
   }
 
   .glass-card:hover {
-    box-shadow: var(--shadow-card-hover);
+    border-color: hsl(var(--glass-border-strong));
+    box-shadow: var(--shadow-glass-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Glass Card with Glow */
+  .glass-card-glow {
+    @apply relative rounded-xl transition-all duration-300 overflow-hidden;
+    background: linear-gradient(135deg, hsl(var(--glass-bg-strong)), hsl(var(--glass-bg)));
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-card-glow::before {
+    content: '';
+    @apply absolute inset-0 rounded-xl pointer-events-none;
+    background: linear-gradient(135deg, hsl(var(--glass-highlight)) 0%, transparent 40%);
+  }
+
+  .glass-card-glow::after {
+    content: '';
+    @apply absolute -inset-px rounded-xl pointer-events-none opacity-0 transition-opacity duration-300;
+    background: linear-gradient(135deg, hsl(213 94% 50% / 0.3), hsl(152 82% 45% / 0.2), transparent);
+    z-index: -1;
+  }
+
+  .glass-card-glow:hover {
+    box-shadow: var(--shadow-glass-glow);
+    transform: translateY(-3px);
+  }
+
+  .glass-card-glow:hover::after {
+    opacity: 1;
+  }
+
+  /* Frosted Glass Panel */
+  .frosted-panel {
+    @apply relative rounded-2xl overflow-hidden;
+    background: linear-gradient(145deg, hsl(0 0% 100% / 0.9), hsl(0 0% 100% / 0.7));
+    backdrop-filter: blur(40px) saturate(200%) brightness(105%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(105%);
+    border: 1px solid hsl(0 0% 100% / 0.4);
+    box-shadow: 
+      0 20px 60px hsl(222 47% 11% / 0.15),
+      0 8px 24px hsl(222 47% 11% / 0.1),
+      inset 0 1px 0 hsl(0 0% 100% / 0.6),
+      inset 0 -1px 0 hsl(222 47% 11% / 0.05);
+  }
+
+  .frosted-panel::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: linear-gradient(180deg, hsl(0 0% 100% / 0.3) 0%, transparent 30%);
   }
 
   /* Elevated Card with Premium Feel */
