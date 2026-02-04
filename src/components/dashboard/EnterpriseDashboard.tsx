@@ -313,63 +313,6 @@ export const EnterpriseDashboard = ({
           {/* Enhanced Charts */}
           <EnhancedDashboardCharts userId={user?.id} />
 
-          {/* Recent Activity - Enhanced */}
-          <PremiumCard variant="elevated" size="none">
-            <PremiumCardHeader className="pb-2 px-5 pt-5">
-              <PremiumCardTitle className="text-lg font-bold">Recent Activity</PremiumCardTitle>
-            </PremiumCardHeader>
-            <PremiumCardContent className="px-5 pb-5 space-y-1">
-              {applications.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No recent activity
-                </p>
-              ) : (
-                applications.slice(0, 5).map(app => (
-                  <div 
-                    key={app.id} 
-                    className="flex items-center justify-between py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/30 -mx-2 px-2 rounded-lg transition-all duration-200 ease-out group" 
-                    onClick={() => navigate(`/loan-applications?id=${app.id}`)}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110", 
-                        app.status === 'approved' || app.status === 'funded' 
-                          ? "bg-emerald-100" 
-                          : app.status === 'rejected' 
-                          ? "bg-rose-100" 
-                          : "bg-blue-50"
-                      )}>
-                        {app.status === 'approved' || app.status === 'funded' 
-                          ? <CheckCircle className="w-4 h-4 text-emerald-600" /> 
-                          : app.status === 'rejected' 
-                          ? <AlertCircle className="w-4 h-4 text-rose-600" /> 
-                          : <Clock className="w-4 h-4 text-blue-600" />
-                        }
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">
-                          {app.business_name || 'New Application'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(app.updated_at).toLocaleDateString('en-US', {
-                            month: '2-digit',
-                            day: '2-digit',
-                            year: 'numeric'
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-semibold text-foreground">
-                        {formatCurrency(app.amount_requested || 0)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </PremiumCardContent>
-          </PremiumCard>
-
         </div>
       </div>
       </div>
