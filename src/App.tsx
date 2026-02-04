@@ -76,7 +76,11 @@ const App = () => (
               <Routes>
               {/* Public routes without Layout */}
               <Route path="/" element={<Index />} />
-              <Route path="/loan-calculator" element={<LoanCalculator />} />
+              <Route path="/loan-calculator" element={
+                <Layout>
+                  <LoanCalculator />
+                </Layout>
+              } />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
