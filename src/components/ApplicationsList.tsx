@@ -241,13 +241,36 @@ const ApplicationsList = ({
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Badge variant="outline" className={getStatusColor(application.status)}>
                         {application.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </Badge>
-                      <p className="font-bold text-foreground text-lg">
+                      <p className="font-bold text-foreground text-lg hidden sm:block">
                         {formatCurrency(application.amount_requested || 0)}
                       </p>
+                      {application.status === 'draft' && programId ? (
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/?program=${programId}&applicationId=${application.id}`);
+                          }}
+                        >
+                          Continue Application
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleCard(application.id);
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      )}
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm">
                           {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
