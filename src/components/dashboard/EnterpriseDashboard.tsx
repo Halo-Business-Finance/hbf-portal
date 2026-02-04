@@ -120,6 +120,11 @@ export const EnterpriseDashboard = ({
     }).format(amount);
   };
   const quickActions = [{
+    label: 'Upload Documents',
+    icon: Upload,
+    action: () => navigate('/my-documents'),
+    chevron: true
+  }, {
     label: 'Tax documents',
     icon: FileText,
     action: () => navigate('/my-documents')
@@ -127,11 +132,6 @@ export const EnterpriseDashboard = ({
     label: 'Bank Statements',
     icon: Building2,
     action: () => navigate('/my-documents?folder=Bank Statements'),
-    chevron: true
-  }, {
-    label: 'Upload Documents',
-    icon: Upload,
-    action: () => navigate('/my-documents'),
     chevron: true
   }, {
     label: 'Loan Calculator',
