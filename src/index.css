@@ -284,25 +284,26 @@
     }
   }
 
-  /* Premium Animated Border - Standalone Class */
+  /* Premium Animated Border - Standalone Class (Primary Blue Tones, Fast) */
   .animated-gradient-border {
     @apply relative;
   }
 
   .animated-gradient-border::before {
     content: '';
-    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none;
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-200 pointer-events-none;
     background: linear-gradient(
       var(--gradient-angle, 0deg),
+      hsl(213 94% 55%),
+      hsl(224 64% 40%),
+      hsl(199 89% 48%),
       hsl(213 94% 50%),
-      hsl(186 94% 41%),
-      hsl(152 82% 45%),
-      hsl(262 83% 58%),
-      hsl(213 94% 50%)
+      hsl(224 64% 33%),
+      hsl(213 94% 55%)
     );
-    background-size: 400% 400%;
+    background-size: 300% 300%;
     z-index: -1;
-    animation: gradient-spin 3s ease infinite paused;
+    animation: gradient-spin 2s ease infinite paused;
   }
 
   .animated-gradient-border:hover::before {
@@ -310,23 +311,24 @@
     animation-play-state: running;
   }
 
-  /* Subtle Animated Border - Less Prominent Version */
+  /* Subtle Animated Border - Less Prominent Version (Primary Blue Tones) */
   .animated-gradient-border-subtle {
     @apply relative;
   }
 
   .animated-gradient-border-subtle::before {
     content: '';
-    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-500 pointer-events-none;
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none;
     background: linear-gradient(
       var(--gradient-angle, 0deg),
-      hsl(213 94% 50% / 0.4),
-      hsl(222 33% 80% / 0.3),
-      hsl(213 94% 50% / 0.4)
+      hsl(213 94% 50% / 0.5),
+      hsl(224 64% 45% / 0.4),
+      hsl(199 89% 48% / 0.5),
+      hsl(213 94% 50% / 0.5)
     );
     background-size: 200% 200%;
     z-index: -1;
-    animation: gradient-shift-subtle 6s ease-in-out infinite paused;
+    animation: gradient-shift-subtle 3s ease-in-out infinite paused;
   }
 
   .animated-gradient-border-subtle:hover::before {
@@ -334,23 +336,24 @@
     animation-play-state: running;
   }
 
-  /* Minimal Animated Border - Very Subtle */
+  /* Minimal Animated Border - Very Subtle (Primary Blue Shimmer) */
   .animated-gradient-border-minimal {
     @apply relative;
   }
 
   .animated-gradient-border-minimal::before {
     content: '';
-    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-700 pointer-events-none;
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-500 pointer-events-none;
     background: linear-gradient(
       90deg,
       hsl(var(--border)),
-      hsl(213 94% 50% / 0.25),
+      hsl(213 94% 50% / 0.35),
+      hsl(199 89% 48% / 0.3),
       hsl(var(--border))
     );
     background-size: 200% 100%;
     z-index: -1;
-    animation: gradient-shimmer 8s ease-in-out infinite paused;
+    animation: gradient-shimmer 4s ease-in-out infinite paused;
   }
 
   .animated-gradient-border-minimal:hover::before {
