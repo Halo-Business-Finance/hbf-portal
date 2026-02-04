@@ -374,7 +374,7 @@
 
   .input-animated-focus::before {
     content: '';
-    @apply absolute -inset-[2px] rounded-lg opacity-0 transition-opacity duration-200 pointer-events-none;
+    @apply absolute -inset-[2px] rounded-lg opacity-0 transition-all duration-200 pointer-events-none;
     background: linear-gradient(
       90deg,
       hsl(213 94% 50%),
@@ -390,6 +390,10 @@
   .input-animated-focus:focus-within::before {
     opacity: 1;
     animation-play-state: running;
+  }
+
+  .input-animated-focus:focus-within {
+    filter: drop-shadow(0 0 8px hsl(213 94% 50% / 0.4)) drop-shadow(0 0 20px hsl(213 94% 50% / 0.2));
   }
 
   @keyframes input-glow {
