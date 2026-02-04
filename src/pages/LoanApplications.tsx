@@ -103,7 +103,7 @@ const LoanApplications = () => {
   return (
     <div className="min-h-screen bg-background">
       <PageHeader 
-        title="Loan Applications" 
+        title="Existing Loan Applications" 
         subtitle={`Showing ${filteredAndSortedApplications.length} of ${applications.length} application${applications.length !== 1 ? 's' : ''}`}
       />
 
