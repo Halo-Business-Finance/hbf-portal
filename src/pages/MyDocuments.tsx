@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,6 +65,7 @@ interface FolderCategory {
 const MyDocuments = () => {
   const { authenticated, loading, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -121,6 +122,17 @@ const MyDocuments = () => {
       loadDocuments();
     }
   }, [authenticated, loading, navigate, user]);
+
+  // Handle folder query parameter to auto-expand folder
+  useEffect(() => {
+    const folderParam = searchParams.get('folder');
+    if (folderParam) {
+      const matchedFolder = folders.find(f => f.name.toLowerCase() === folderParam.toLowerCase());
+      if (matchedFolder) {
+        setExpandedFolder(matchedFolder.id);
+      }
+    }
+  }, [searchParams]);
 
   const loadDocuments = async () => {
     try {

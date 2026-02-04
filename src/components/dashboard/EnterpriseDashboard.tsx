@@ -124,6 +124,11 @@ export const EnterpriseDashboard = ({
     icon: FileText,
     action: () => navigate('/my-documents')
   }, {
+    label: 'Bank Statements',
+    icon: Building2,
+    action: () => navigate('/my-documents?folder=Bank Statements'),
+    chevron: true
+  }, {
     label: 'Upload Documents',
     icon: Upload,
     action: () => navigate('/my-documents'),
