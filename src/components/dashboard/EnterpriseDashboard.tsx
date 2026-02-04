@@ -236,14 +236,17 @@ export const EnterpriseDashboard = ({
                   <p className="font-semibold text-foreground">Link your accounts to see your full financial picture.</p>
                   <div className="flex flex-col gap-1">
                     <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/my-documents?folder=Tax Documents')}>
+                      <FileText className="w-4 h-4 mr-1.5" />
                       Connect Tax Returns
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                     <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/credit-reports')}>
+                      <CreditCard className="w-4 h-4 mr-1.5" />
                       Connect Credit Reports
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                     <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm justify-start" onClick={() => navigate('/bank-accounts')}>
+                      <Building2 className="w-4 h-4 mr-1.5" />
                       Connect Bank Accounts
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
