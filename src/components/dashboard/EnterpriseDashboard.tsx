@@ -143,10 +143,6 @@ export const EnterpriseDashboard = ({
     icon: CreditCard,
     action: () => navigate('/credit-reports'),
     chevron: true
-  }, {
-    label: 'More',
-    icon: MoreHorizontal,
-    action: () => navigate('/loan-applications')
   }];
   if (isLoading) {
     return <div className="space-y-6 animate-pulse">
