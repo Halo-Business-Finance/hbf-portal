@@ -303,7 +303,7 @@ const ApplicationsList = ({
                           {application.business_name || 'New Application'}
                         </p>
                         <p className="text-sm text-muted-foreground truncate">
-                          {getLoanTypeDisplay(application.loan_type)} • {application.application_number || 'Draft'}
+                          {application.application_number || 'Draft'}
                         </p>
                       </div>
                     </div>
@@ -338,7 +338,16 @@ const ApplicationsList = ({
                     <Separator className="mb-4" />
                     
                     {/* Details Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Loan Program</p>
+                          <p className="text-sm font-medium">
+                            {getLoanTypeDisplay(application.loan_type)}
+                          </p>
+                        </div>
+                      </div>
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
                         <div>
@@ -369,7 +378,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground"> Loan Funded </p>
+                          <p className="text-xs text-muted-foreground">Loan Funded</p>
                           <p className="text-sm font-medium">
                             {application.application_submitted_date ? format(new Date(application.application_submitted_date), 'MMM d, yyyy') : 'Not submitted'}
                           </p>
