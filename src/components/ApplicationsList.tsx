@@ -342,9 +342,7 @@ const ApplicationsList = ({
                         <p className="font-semibold text-foreground truncate">
                           {application.business_name || 'New Application'}
                         </p>
-                        <p className="text-sm truncate text-black">
-                          {getLoanTypeDisplay(application.loan_type)}
-                        </p>
+                        
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
