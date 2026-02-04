@@ -7,7 +7,7 @@ export const Footer = () => {
         <div className="flex items-center gap-4 md:gap-6">
           <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline transition-colors text-black font-medium">Privacy Policy</a>
           <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline transition-colors text-black font-medium">Terms of Service</a>
-          <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline transition-colors font-semibold text-black">Support</a>
+          <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline transition-colors text-black font-medium">Support</a>
         </div>
       </div>
     </footer>;
