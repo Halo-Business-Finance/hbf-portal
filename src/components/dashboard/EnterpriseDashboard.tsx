@@ -276,8 +276,10 @@ export const EnterpriseDashboard = ({
 
           {/* Credit Scores Widget */}
           <PremiumCard variant="elevated" size="none">
-            <PremiumCardHeader className="pb-2 px-5 pt-5">
-              <PremiumCardTitle className="text-lg font-bold">Credit Scores</PremiumCardTitle>
+            <PremiumCardHeader className="px-5 pt-5 pb-0">
+              <div className="flex items-center justify-between">
+                <PremiumCardTitle className="flex items-center gap-2 text-base">Credit Scores</PremiumCardTitle>
+              </div>
             </PremiumCardHeader>
             <PremiumCardContent className="px-5 pb-5 space-y-4">
               {/* Personal Credit Scores */}

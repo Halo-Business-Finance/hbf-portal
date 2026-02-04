@@ -337,10 +337,12 @@ export const EnhancedDashboardCharts = ({
       {/* Bank Accounts Widget */}
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
-          <PremiumCardTitle className="flex items-center gap-2 text-base">
-            <Building2 className="h-4 w-4 text-primary" />
-            Linked Accounts
-          </PremiumCardTitle>
+          <div className="flex items-center justify-between">
+            <PremiumCardTitle className="flex items-center gap-2 text-base">
+              <Building2 className="h-4 w-4 text-primary" />
+              Linked Accounts
+            </PremiumCardTitle>
+          </div>
         </PremiumCardHeader>
         <PremiumCardContent className="px-5 pb-5 pt-4 space-y-4">
           {/* Personal Accounts */}
