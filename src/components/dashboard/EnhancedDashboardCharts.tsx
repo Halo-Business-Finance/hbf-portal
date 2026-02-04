@@ -210,98 +210,6 @@ export const EnhancedDashboardCharts = ({
 
   return (
     <div className={cn("grid grid-cols-1 gap-5", className)}>
-      {/* Bank Accounts Widget */}
-      <PremiumCard variant="elevated" size="none">
-        <PremiumCardHeader className="px-5 pt-5 pb-0">
-          <PremiumCardTitle className="flex items-center gap-2 text-base">
-            <Building2 className="h-4 w-4 text-primary" />
-            Linked Accounts
-          </PremiumCardTitle>
-        </PremiumCardHeader>
-        <PremiumCardContent className="px-5 pb-5 pt-4 space-y-4">
-          {/* Personal Accounts */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="w-4 h-4" />
-              <span className="font-medium">Personal</span>
-            </div>
-            {personalAccounts.length === 0 ? (
-              <p className="text-sm text-muted-foreground pl-6">No personal accounts linked</p>
-            ) : (
-              <div className="pl-6 space-y-2">
-                {personalAccounts.slice(0, 2).map((account) => (
-                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">
-                        <AnimatedCurrency value={account.balance} />
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                {personalAccounts.length > 2 && (
-                  <p className="text-xs text-muted-foreground">+{personalAccounts.length - 2} more account(s)</p>
-                )}
-                <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs text-muted-foreground">Total Personal</span>
-                  <span className="text-sm font-bold text-foreground">
-                    <AnimatedCurrency value={personalTotal} />
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Business Accounts */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Building2 className="w-4 h-4" />
-              <span className="font-medium">Business</span>
-            </div>
-            {businessAccounts.length === 0 ? (
-              <p className="text-sm text-muted-foreground pl-6">No business accounts linked</p>
-            ) : (
-              <div className="pl-6 space-y-2">
-                {businessAccounts.slice(0, 2).map((account) => (
-                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">
-                        <AnimatedCurrency value={account.balance} />
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                {businessAccounts.length > 2 && (
-                  <p className="text-xs text-muted-foreground">+{businessAccounts.length - 2} more account(s)</p>
-                )}
-                <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs text-muted-foreground">Total Business</span>
-                  <span className="text-sm font-bold text-foreground">
-                    <AnimatedCurrency value={businessTotal} />
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <Button 
-            variant="outline" 
-            className="w-full border-primary text-primary transition-all duration-200" 
-            onClick={() => navigate('/bank-accounts')}
-          >
-            Manage Bank Accounts
-            <ChevronRight className="w-4 h-4 ml-2" />
-          </Button>
-        </PremiumCardContent>
-      </PremiumCard>
-
       {/* Monthly Revenue Trend - Enhanced Area Chart with 3 Lines */}
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
@@ -420,6 +328,98 @@ export const EnhancedDashboardCharts = ({
               No financial data yet
             </div>
           )}
+        </PremiumCardContent>
+      </PremiumCard>
+
+      {/* Bank Accounts Widget */}
+      <PremiumCard variant="elevated" size="none">
+        <PremiumCardHeader className="px-5 pt-5 pb-0">
+          <PremiumCardTitle className="flex items-center gap-2 text-base">
+            <Building2 className="h-4 w-4 text-primary" />
+            Linked Accounts
+          </PremiumCardTitle>
+        </PremiumCardHeader>
+        <PremiumCardContent className="px-5 pb-5 pt-4 space-y-4">
+          {/* Personal Accounts */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="w-4 h-4" />
+              <span className="font-medium">Personal</span>
+            </div>
+            {personalAccounts.length === 0 ? (
+              <p className="text-sm text-muted-foreground pl-6">No personal accounts linked</p>
+            ) : (
+              <div className="pl-6 space-y-2">
+                {personalAccounts.slice(0, 2).map((account) => (
+                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-foreground">
+                        <AnimatedCurrency value={account.balance} />
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {personalAccounts.length > 2 && (
+                  <p className="text-xs text-muted-foreground">+{personalAccounts.length - 2} more account(s)</p>
+                )}
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-xs text-muted-foreground">Total Personal</span>
+                  <span className="text-sm font-bold text-foreground">
+                    <AnimatedCurrency value={personalTotal} />
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Business Accounts */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Building2 className="w-4 h-4" />
+              <span className="font-medium">Business</span>
+            </div>
+            {businessAccounts.length === 0 ? (
+              <p className="text-sm text-muted-foreground pl-6">No business accounts linked</p>
+            ) : (
+              <div className="pl-6 space-y-2">
+                {businessAccounts.slice(0, 2).map((account) => (
+                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-foreground">
+                        <AnimatedCurrency value={account.balance} />
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {businessAccounts.length > 2 && (
+                  <p className="text-xs text-muted-foreground">+{businessAccounts.length - 2} more account(s)</p>
+                )}
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-xs text-muted-foreground">Total Business</span>
+                  <span className="text-sm font-bold text-foreground">
+                    <AnimatedCurrency value={businessTotal} />
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="w-full border-primary text-primary transition-all duration-200" 
+            onClick={() => navigate('/bank-accounts')}
+          >
+            Manage Bank Accounts
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
         </PremiumCardContent>
       </PremiumCard>
     </div>
