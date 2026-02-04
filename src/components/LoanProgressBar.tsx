@@ -151,7 +151,7 @@ export const LoanProgressBar = ({
           const stageEstimate = startDate ? calculateEstimatedDate(startDate, index) : null;
           return <Tooltip key={stage.key}>
                 <TooltipTrigger asChild>
-                  <span className={cn('text-center flex-1 cursor-help', isCompleted && 'text-primary font-semibold', isCurrent && 'text-primary font-bold', !isCompleted && !isCurrent && 'text-muted-foreground')}>
+                  <span className={cn("text-center flex-1 cursor-help text-black", isCompleted && 'text-primary font-semibold', isCurrent && 'text-primary font-bold', !isCompleted && !isCurrent && 'text-muted-foreground')}>
                     {stage.label}
                   </span>
                 </TooltipTrigger>
