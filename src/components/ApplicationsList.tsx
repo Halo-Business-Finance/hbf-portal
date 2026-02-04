@@ -11,17 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { LoanProgressBar } from '@/components/LoanProgressBar';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 interface LoanApplication {
   id: string;
   loan_type: string;
@@ -64,20 +54,16 @@ const ApplicationsList = ({
       return newSet;
     });
   };
-
   const handleDeleteApplication = async (applicationId: string) => {
     try {
-      const { error } = await supabase
-        .from('loan_applications')
-        .delete()
-        .eq('id', applicationId);
-
+      const {
+        error
+      } = await supabase.from('loan_applications').delete().eq('id', applicationId);
       if (error) throw error;
-
       setApplications(prev => prev.filter(app => app.id !== applicationId));
       toast({
         title: "Application Deleted",
-        description: "Your loan application has been permanently deleted.",
+        description: "Your loan application has been permanently deleted."
       });
     } catch (error) {
       console.error('Error deleting application:', error);
@@ -88,22 +74,21 @@ const ApplicationsList = ({
       });
     }
   };
-
   const handlePauseApplication = async (applicationId: string) => {
     try {
-      const { error } = await supabase
-        .from('loan_applications')
-        .update({ status: 'paused' })
-        .eq('id', applicationId);
-
+      const {
+        error
+      } = await supabase.from('loan_applications').update({
+        status: 'paused'
+      }).eq('id', applicationId);
       if (error) throw error;
-
-      setApplications(prev => prev.map(app => 
-        app.id === applicationId ? { ...app, status: 'paused' } : app
-      ));
+      setApplications(prev => prev.map(app => app.id === applicationId ? {
+        ...app,
+        status: 'paused'
+      } : app));
       toast({
         title: "Application Paused",
-        description: "Your loan application has been paused. You can resume it anytime within 90 days.",
+        description: "Your loan application has been paused. You can resume it anytime within 90 days."
       });
     } catch (error) {
       console.error('Error pausing application:', error);
@@ -114,22 +99,21 @@ const ApplicationsList = ({
       });
     }
   };
-
   const handleResumeApplication = async (applicationId: string) => {
     try {
-      const { error } = await supabase
-        .from('loan_applications')
-        .update({ status: 'draft' })
-        .eq('id', applicationId);
-
+      const {
+        error
+      } = await supabase.from('loan_applications').update({
+        status: 'draft'
+      }).eq('id', applicationId);
       if (error) throw error;
-
-      setApplications(prev => prev.map(app => 
-        app.id === applicationId ? { ...app, status: 'draft' } : app
-      ));
+      setApplications(prev => prev.map(app => app.id === applicationId ? {
+        ...app,
+        status: 'draft'
+      } : app));
       toast({
         title: "Application Resumed",
-        description: "Your loan application has been resumed. You can continue where you left off.",
+        description: "Your loan application has been resumed. You can continue where you left off."
       });
     } catch (error) {
       console.error('Error resuming application:', error);
@@ -327,9 +311,7 @@ const ApplicationsList = ({
                       <Badge variant="outline" className={getStatusColor(application.status)}>
                         {application.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </Badge>
-                      <p className="font-bold text-foreground text-lg hidden sm:block">
-                        {formatCurrency(application.amount_requested || 0)}
-                      </p>
+                      
                       {application.status === 'draft' ? <Button variant="default" size="sm" onClick={e => {
                     e.stopPropagation();
                     const pid = getProgramIdForLoanType(application.loan_type);
@@ -373,7 +355,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Amount</p>
+                          <p className="text-xs text-muted-foreground">Loan Amount</p>
                           <p className="text-sm font-medium">
                             {formatCurrency(application.amount_requested || 0)}
                           </p>
@@ -382,7 +364,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Started</p>
+                          <p className="text-xs text-muted-foreground">Loan Started</p>
                           <p className="text-sm font-medium">
                             {application.application_started_date ? format(new Date(application.application_started_date), 'MMM d, yyyy') : format(new Date(application.created_at), 'MMM d, yyyy')}
                           </p>
@@ -391,7 +373,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Submitted</p>
+                          <p className="text-xs text-muted-foreground">Date Funded </p>
                           <p className="text-sm font-medium">
                             {application.application_submitted_date ? format(new Date(application.application_submitted_date), 'MMM d, yyyy') : 'Not submitted'}
                           </p>
@@ -401,13 +383,13 @@ const ApplicationsList = ({
                     {/* Actions */}
                                     <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
                                       <Button variant="outline" onClick={() => {
-                                        const pid = getProgramIdForLoanType(application.loan_type);
-                                        if (pid) {
-                                          navigate(`/?program=${pid}&applicationId=${application.id}`);
-                                        } else {
-                                          navigate(`/loan-applications?id=${application.id}`);
-                                        }
-                                      }}>
+                    const pid = getProgramIdForLoanType(application.loan_type);
+                    if (pid) {
+                      navigate(`/?program=${pid}&applicationId=${application.id}`);
+                    } else {
+                      navigate(`/loan-applications?id=${application.id}`);
+                    }
+                  }}>
                                         <ArrowRight className="w-4 h-4 mr-2" />
                                         Continue Application
                                       </Button>
@@ -417,8 +399,7 @@ const ApplicationsList = ({
                                       </Button>
                       
                       {/* Pause/Resume Application - show for draft, submitted, or under_review */}
-                      {(application.status === 'draft' || application.status === 'submitted' || application.status === 'under_review') && (
-                        <AlertDialog>
+                      {(application.status === 'draft' || application.status === 'submitted' || application.status === 'under_review') && <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="outline">
                               <Pause className="w-4 h-4 mr-2" />
@@ -434,23 +415,18 @@ const ApplicationsList = ({
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Keep Active</AlertDialogCancel>
-                              <AlertDialogAction 
-                                onClick={() => handlePauseApplication(application.id)}
-                              >
+                              <AlertDialogAction onClick={() => handlePauseApplication(application.id)}>
                                 Pause Application
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
-                        </AlertDialog>
-                      )}
+                        </AlertDialog>}
 
                       {/* Resume Application - show for paused applications */}
-                      {application.status === 'paused' && (
-                        <Button variant="outline" onClick={() => handleResumeApplication(application.id)}>
+                      {application.status === 'paused' && <Button variant="outline" onClick={() => handleResumeApplication(application.id)}>
                           <Play className="w-4 h-4 mr-2" />
                           Resume Loan
-                        </Button>
-                      )}
+                        </Button>}
 
                       {/* Delete Application */}
                       <AlertDialog>
@@ -469,10 +445,7 @@ const ApplicationsList = ({
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => handleDeleteApplication(application.id)}
-                              className="bg-destructive hover:bg-destructive/90"
-                            >
+                            <AlertDialogAction onClick={() => handleDeleteApplication(application.id)} className="bg-destructive hover:bg-destructive/90">
                               Delete Application
                             </AlertDialogAction>
                           </AlertDialogFooter>
