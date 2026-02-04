@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { 
   AreaChart, Area, 
   XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
@@ -20,6 +20,13 @@ interface BankAccount {
   is_business: boolean;
 }
 
+interface Application {
+  created_at: string;
+  amount_requested: number | null;
+}
+
+type PeriodOption = '30d' | '3m' | '6m' | '12m';
+
 interface EnhancedDashboardChartsProps {
   userId?: string;
   className?: string;
@@ -31,13 +38,16 @@ export const EnhancedDashboardCharts = ({
 }: EnhancedDashboardChartsProps) => {
   const navigate = useNavigate();
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
-  const [monthlyData, setMonthlyData] = useState<{
-    month: string;
-    grossRevenue: number;
-    netRevenue: number;
-    expenses: number;
-  }[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('6m');
   const [isLoading, setIsLoading] = useState(true);
+
+  const periodOptions: { value: PeriodOption; label: string }[] = [
+    { value: '30d', label: '30 Days' },
+    { value: '3m', label: '3 Months' },
+    { value: '6m', label: '6 Months' },
+    { value: '12m', label: '12 Months' },
+  ];
 
   useEffect(() => {
     const fetchChartData = async () => {
@@ -57,45 +67,12 @@ export const EnhancedDashboardCharts = ({
         setBankAccounts(accounts || []);
 
         // Fetch applications for monthly trend
-        const { data: applications } = await supabase
+        const { data: apps } = await supabase
           .from('loan_applications')
           .select('created_at, amount_requested')
           .eq('user_id', userId);
 
-        if (applications) {
-          // Generate monthly revenue/expense data (last 6 months)
-          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-          const now = new Date();
-          
-          const monthlyFinancials: { month: string; grossRevenue: number; netRevenue: number; expenses: number }[] = [];
-          
-          for (let i = 5; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const monthName = monthNames[d.getMonth()];
-            
-            // Calculate based on applications data
-            const monthApps = applications.filter(app => {
-              const appDate = new Date(app.created_at);
-              return appDate.getFullYear() === d.getFullYear() && appDate.getMonth() === d.getMonth();
-            });
-            
-            const totalRequested = monthApps.reduce((sum, app) => sum + (app.amount_requested || 0), 0);
-            
-            // Simulate financial metrics based on application amounts
-            const grossRevenue = totalRequested * 0.03; // 3% of loan amounts as gross revenue
-            const expenses = grossRevenue * 0.35; // 35% of gross as expenses
-            const netRevenue = grossRevenue - expenses;
-            
-            monthlyFinancials.push({
-              month: monthName,
-              grossRevenue: Math.round(grossRevenue / 1000), // Convert to thousands
-              netRevenue: Math.round(netRevenue / 1000),
-              expenses: Math.round(expenses / 1000)
-            });
-          }
-
-          setMonthlyData(monthlyFinancials);
-        }
+        setApplications(apps || []);
       } catch (error) {
         console.error('Error fetching chart data:', error);
       } finally {
@@ -105,6 +82,94 @@ export const EnhancedDashboardCharts = ({
 
     fetchChartData();
   }, [userId]);
+
+  // Generate monthly data based on selected period
+  const monthlyData = useMemo(() => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const now = new Date();
+    
+    // Determine number of periods based on selection
+    let periodsBack: number;
+    let isDays = false;
+    
+    switch (selectedPeriod) {
+      case '30d':
+        periodsBack = 30;
+        isDays = true;
+        break;
+      case '3m':
+        periodsBack = 3;
+        break;
+      case '6m':
+        periodsBack = 6;
+        break;
+      case '12m':
+        periodsBack = 12;
+        break;
+      default:
+        periodsBack = 6;
+    }
+
+    if (isDays) {
+      // For 30 days, group by week
+      const weeklyData: { month: string; grossRevenue: number; netRevenue: number; expenses: number }[] = [];
+      
+      for (let i = 4; i >= 0; i--) {
+        const weekEnd = new Date(now);
+        weekEnd.setDate(weekEnd.getDate() - (i * 7));
+        const weekStart = new Date(weekEnd);
+        weekStart.setDate(weekStart.getDate() - 7);
+        
+        const weekLabel = i === 0 ? 'This Week' : i === 1 ? 'Last Week' : `${i} Weeks Ago`;
+        
+        const weekApps = applications.filter(app => {
+          const appDate = new Date(app.created_at);
+          return appDate >= weekStart && appDate <= weekEnd;
+        });
+        
+        const totalRequested = weekApps.reduce((sum, app) => sum + (app.amount_requested || 0), 0);
+        const grossRevenue = totalRequested * 0.03;
+        const expenses = grossRevenue * 0.35;
+        const netRevenue = grossRevenue - expenses;
+        
+        weeklyData.push({
+          month: weekLabel,
+          grossRevenue: Math.round(grossRevenue / 1000),
+          netRevenue: Math.round(netRevenue / 1000),
+          expenses: Math.round(expenses / 1000)
+        });
+      }
+      
+      return weeklyData;
+    }
+
+    // For months
+    const monthlyFinancials: { month: string; grossRevenue: number; netRevenue: number; expenses: number }[] = [];
+    
+    for (let i = periodsBack - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthName = monthNames[d.getMonth()];
+      
+      const monthApps = applications.filter(app => {
+        const appDate = new Date(app.created_at);
+        return appDate.getFullYear() === d.getFullYear() && appDate.getMonth() === d.getMonth();
+      });
+      
+      const totalRequested = monthApps.reduce((sum, app) => sum + (app.amount_requested || 0), 0);
+      const grossRevenue = totalRequested * 0.03;
+      const expenses = grossRevenue * 0.35;
+      const netRevenue = grossRevenue - expenses;
+      
+      monthlyFinancials.push({
+        month: monthName,
+        grossRevenue: Math.round(grossRevenue / 1000),
+        netRevenue: Math.round(netRevenue / 1000),
+        expenses: Math.round(expenses / 1000)
+      });
+    }
+
+    return monthlyFinancials;
+  }, [applications, selectedPeriod]);
 
   if (isLoading) {
     return (
@@ -242,12 +307,32 @@ export const EnhancedDashboardCharts = ({
       {/* Monthly Revenue Trend - Enhanced Area Chart with 3 Lines */}
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
-          <PremiumCardTitle className="flex items-center gap-2 text-base">
-            <div className="p-1.5 rounded-lg bg-primary/10">
-              <TrendingUp className="h-4 w-4 text-primary" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <PremiumCardTitle className="flex items-center gap-2 text-base">
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <TrendingUp className="h-4 w-4 text-primary" />
+              </div>
+              Monthly Trend
+            </PremiumCardTitle>
+            
+            {/* Period Selector */}
+            <div className="flex gap-1 bg-muted/50 p-1 rounded-lg">
+              {periodOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setSelectedPeriod(option.value)}
+                  className={cn(
+                    "px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200",
+                    selectedPeriod === option.value
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
-            Monthly Trend
-          </PremiumCardTitle>
+          </div>
         </PremiumCardHeader>
         <PremiumCardContent className="px-5 pb-5 pt-4">
           {/* Legend */}
