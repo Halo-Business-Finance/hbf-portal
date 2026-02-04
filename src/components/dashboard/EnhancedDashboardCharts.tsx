@@ -214,9 +214,7 @@ export const EnhancedDashboardCharts = ({
       <PremiumCard variant="elevated" size="none">
         <PremiumCardHeader className="px-5 pt-5 pb-0">
           <PremiumCardTitle className="flex items-center gap-2 text-base">
-            <div className="p-1.5 rounded-lg bg-primary/10">
-              <Building2 className="h-4 w-4 text-primary" />
-            </div>
+            <Building2 className="h-4 w-4 text-primary" />
             Linked Accounts
           </PremiumCardTitle>
         </PremiumCardHeader>
@@ -309,9 +307,7 @@ export const EnhancedDashboardCharts = ({
         <PremiumCardHeader className="px-5 pt-5 pb-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <PremiumCardTitle className="flex items-center gap-2 text-base">
-              <div className="p-1.5 rounded-lg bg-primary/10">
-                <TrendingUp className="h-4 w-4 text-primary" />
-              </div>
+              <TrendingUp className="h-4 w-4 text-primary" />
               Monthly Trend
             </PremiumCardTitle>
             
