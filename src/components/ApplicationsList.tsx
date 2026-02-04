@@ -340,16 +340,26 @@ const ApplicationsList = ({
                     />
 
                     {/* Actions */}
-                    <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
-                      {application.status === 'draft' && programId && (
-                        <Button 
-                          variant="default" 
-                          size="sm"
-                          onClick={() => navigate(`/?program=${programId}&applicationId=${application.id}`)}
-                        >
-                          Continue Application
-                        </Button>
-                      )}
+                    <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
+                      <Button 
+                        variant="default" 
+                        onClick={() => {
+                          const pid = getProgramIdForLoanType(application.loan_type);
+                          if (pid) {
+                            navigate(`/?program=${pid}&applicationId=${application.id}`);
+                          } else {
+                            navigate(`/loan-applications?id=${application.id}`);
+                          }
+                        }}
+                      >
+                        {application.status === 'draft' ? 'Continue Application' : 'View Application'}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => navigate('/support')}
+                      >
+                        Contact Support
+                      </Button>
                     </div>
                   </CollapsibleContent>
                 </CardContent>
