@@ -342,7 +342,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Loan Program</p>
+                          <p className="text-xs text-black">Loan Program</p>
                           <p className="text-sm font-medium">
                             {getLoanTypeDisplay(application.loan_type)}
                           </p>
@@ -351,7 +351,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Loan Amount</p>
+                          <p className="text-xs text-black">Loan Amount</p>
                           <p className="text-sm font-medium">
                             {formatCurrency(application.amount_requested || 0)}
                           </p>
@@ -360,7 +360,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Loan Term</p>
+                          <p className="text-xs text-black">Loan Term</p>
                           <p className="text-sm font-medium">
                             {(() => {
                           const details = application.loan_details as any;
@@ -373,7 +373,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Loan Started</p>
+                          <p className="text-xs text-black">Loan Started</p>
                           <p className="text-sm font-medium">
                             {format(new Date(application.created_at), 'MMM d, yyyy')}
                           </p>
@@ -382,7 +382,7 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <div>
-                          <p className="text-xs text-muted-foreground">Loan Funded</p>
+                          <p className="text-xs text-black">Loan Funded</p>
                           <p className="text-sm font-medium">
                             {application.status === 'funded' && application.funded_date ? format(new Date(application.funded_date), 'MMM d, yyyy') : 'TBD'}
                           </p>
