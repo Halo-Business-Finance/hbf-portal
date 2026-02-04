@@ -306,7 +306,9 @@
     animation: gradient-spin 2s ease infinite paused;
   }
 
-  .animated-gradient-border:hover::before {
+  .animated-gradient-border:hover::before,
+  .animated-gradient-border:focus-within::before,
+  .animated-gradient-border:focus-visible::before {
     opacity: 1;
     animation-play-state: running;
   }
@@ -331,7 +333,9 @@
     animation: gradient-shift-subtle 3s ease-in-out infinite paused;
   }
 
-  .animated-gradient-border-subtle:hover::before {
+  .animated-gradient-border-subtle:hover::before,
+  .animated-gradient-border-subtle:focus-within::before,
+  .animated-gradient-border-subtle:focus-visible::before {
     opacity: 1;
     animation-play-state: running;
   }
@@ -356,7 +360,9 @@
     animation: gradient-shimmer 4s ease-in-out infinite paused;
   }
 
-  .animated-gradient-border-minimal:hover::before {
+  .animated-gradient-border-minimal:hover::before,
+  .animated-gradient-border-minimal:focus-within::before,
+  .animated-gradient-border-minimal:focus-visible::before {
     opacity: 1;
     animation-play-state: running;
   }
