@@ -226,7 +226,7 @@ const Navbar = () => {
               Log out
             </button>
             {lastLogin && (
-              <span className="absolute top-full right-0 mt-1 text-[10px] text-foreground whitespace-nowrap">
+              <span className="absolute top-full right-0 mt-3 text-[10px] text-foreground whitespace-nowrap">
                 Last login: {lastLogin}
               </span>
             )}
