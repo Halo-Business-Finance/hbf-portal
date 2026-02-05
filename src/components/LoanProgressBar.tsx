@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Calendar, ChevronDown, Clock } from 'lucide-react';
+import { Calendar, Check, ChevronDown, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
@@ -201,7 +201,7 @@ export const LoanProgressBar = ({
                           "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
                           isCompleted ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                         )}>
-                          {index + 1}
+                          {isCompleted ? <Check className="w-3 h-3" /> : index + 1}
                         </div>
                         <span className={cn(
                           "font-medium text-left",
