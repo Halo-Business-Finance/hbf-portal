@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { FormRow } from "@/components/ui/form-section";
 
 const equipmentFinancingSchema = z.object({
   // Personal Information
@@ -157,9 +158,9 @@ export default function EquipmentFinancingForm() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-6">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">Personal Information</h3>
+            <FormRow cols={2}>
               <FormField
                 control={form.control}
                 name="firstName"
@@ -186,9 +187,9 @@ export default function EquipmentFinancingForm() {
                   </FormItem>
                 )}
               />
-            </div>
+            </FormRow>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormRow cols={2}>
               <FormField
                 control={form.control}
                 name="email"
@@ -215,14 +216,14 @@ export default function EquipmentFinancingForm() {
                   </FormItem>
                 )}
               />
-            </div>
+            </FormRow>
           </div>
         );
 
       case 2:
         return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-foreground">Business Information</h3>
+          <div className="space-y-4 sm:space-y-6">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">Business Information</h3>
             <FormField
               control={form.control}
               name="businessName"
@@ -251,7 +252,7 @@ export default function EquipmentFinancingForm() {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormRow cols={3}>
               <FormField
                 control={form.control}
                 name="businessCity"
@@ -291,9 +292,9 @@ export default function EquipmentFinancingForm() {
                   </FormItem>
                 )}
               />
-            </div>
+            </FormRow>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormRow cols={2}>
               <FormField
                 control={form.control}
                 name="businessType"
@@ -335,15 +336,15 @@ export default function EquipmentFinancingForm() {
                   </FormItem>
                 )}
               />
-            </div>
+            </FormRow>
           </div>
         );
 
       case 3:
         return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-foreground">Equipment Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-6">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">Equipment Details</h3>
+            <FormRow cols={2}>
               <FormField
                 control={form.control}
                 name="equipmentType"
@@ -390,7 +391,7 @@ export default function EquipmentFinancingForm() {
                   </FormItem>
                 )}
               />
-            </div>
+            </FormRow>
 
             <FormField
               control={form.control}
@@ -415,7 +416,7 @@ export default function EquipmentFinancingForm() {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormRow cols={3}>
               <FormField
                 control={form.control}
                 name="equipmentManufacturer"
@@ -460,7 +461,7 @@ export default function EquipmentFinancingForm() {
                   </FormItem>
                 )}
               />
-            </div>
+            </FormRow>
 
             <FormField
               control={form.control}

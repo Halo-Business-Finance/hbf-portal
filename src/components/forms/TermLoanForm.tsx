@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { useNavigate } from "react-router-dom";
+import { FormRow } from "@/components/ui/form-section";
 
 interface TermLoanFormData {
   loanAmount: string;
@@ -123,9 +124,9 @@ export const TermLoanForm: React.FC = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Loan Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-5">
+            <h3 className="text-base sm:text-lg font-semibold">Loan Details</h3>
+            <FormRow cols={2}>
               <div>
                 <Label htmlFor="loanAmount">Loan Amount Requested</Label>
                 <Input
@@ -179,7 +180,7 @@ export const TermLoanForm: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            </FormRow>
             <div>
               <Label htmlFor="loanPurpose">Loan Purpose</Label>
               <Textarea
@@ -194,9 +195,9 @@ export const TermLoanForm: React.FC = () => {
 
       case 2:
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Business Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-5">
+            <h3 className="text-base sm:text-lg font-semibold">Business Information</h3>
+            <FormRow cols={2}>
               <div>
                 <Label htmlFor="businessName">Business Name</Label>
                 <Input
@@ -250,15 +251,15 @@ export const TermLoanForm: React.FC = () => {
                 />
                 {errors.numberOfEmployees && <p className="text-sm text-destructive">{errors.numberOfEmployees.message}</p>}
               </div>
-            </div>
+            </FormRow>
           </div>
         );
 
       case 3:
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Owner Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-5">
+            <h3 className="text-base sm:text-lg font-semibold">Owner Information</h3>
+            <FormRow cols={2}>
               <div>
                 <Label htmlFor="ownerFirstName">Owner First Name</Label>
                 <Input
@@ -296,15 +297,15 @@ export const TermLoanForm: React.FC = () => {
                 />
                 {errors.ownershipPercentage && <p className="text-sm text-destructive">{errors.ownershipPercentage.message}</p>}
               </div>
-            </div>
+            </FormRow>
           </div>
         );
 
       case 4:
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Contact Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-5">
+            <h3 className="text-base sm:text-lg font-semibold">Contact Information</h3>
+            <FormRow cols={2}>
               <div>
                 <Label htmlFor="businessAddress">Business Address</Label>
                 <Input
@@ -360,7 +361,7 @@ export const TermLoanForm: React.FC = () => {
                 />
                 {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
               </div>
-            </div>
+            </FormRow>
           </div>
         );
 
@@ -370,10 +371,10 @@ export const TermLoanForm: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto mx-4 sm:mx-auto">
       <CardHeader>
-        <CardTitle>Term Loan Application</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-xl sm:text-2xl">Term Loan Application</CardTitle>
+        <CardDescription className="text-sm">
           Step {currentStep} of {totalSteps}: Complete your term loan application
         </CardDescription>
         <div className="w-full bg-muted rounded-full h-2">
@@ -384,25 +385,26 @@ export const TermLoanForm: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
           {renderStep()}
           
-          <div className="flex justify-between pt-6">
+          <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 pt-4 sm:pt-6">
             <Button
               type="button"
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 1}
+              className="w-full sm:w-auto"
             >
               Previous
             </Button>
             
             {currentStep < totalSteps ? (
-              <Button type="button" onClick={nextStep}>
+              <Button type="button" onClick={nextStep} className="w-full sm:w-auto">
                 Next
               </Button>
             ) : (
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? "Submitting..." : "Submit Application"}
               </Button>
             )}

@@ -12,6 +12,8 @@ import { useFormAutoSave } from '@/hooks/useFormAutoSave';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FormSection, FormRow } from '@/components/ui/form-section';
+import { DollarSign, User, Building2, MapPin, FileText } from 'lucide-react';
 
 interface BridgeLoanFormData {
   amount_requested: number;
@@ -108,13 +110,13 @@ const BridgeLoanForm = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto px-4 py-4 sm:p-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
-              <CardTitle className="text-2xl">Bridge Loan Application</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-xl sm:text-2xl">Bridge Loan Application</CardTitle>
+              <CardDescription className="text-sm">
                 Complete this form to apply for short-term bridge financing
               </CardDescription>
             </div>
@@ -122,9 +124,10 @@ const BridgeLoanForm = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Loan Amount */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+            {/* Loan Details Section */}
+            <FormSection title="Loan Details" description="Specify your funding requirements" icon={DollarSign}>
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="amount_requested">Loan Amount Requested *</Label>
                 <Input
@@ -156,10 +159,12 @@ const BridgeLoanForm = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            </FormRow>
+            </FormSection>
 
-            {/* Personal Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Personal Information Section */}
+            <FormSection title="Personal Information" description="Your contact details" icon={User}>
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="first_name">First Name *</Label>
                 <Input
@@ -183,9 +188,9 @@ const BridgeLoanForm = () => {
                   <p className="text-sm text-destructive">{errors.last_name.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number *</Label>
                 <Input
@@ -209,9 +214,11 @@ const BridgeLoanForm = () => {
                   <p className="text-sm text-destructive">{errors.business_name.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
+            </FormSection>
 
-            {/* Business Address */}
+            {/* Business Address Section */}
+            <FormSection title="Business Address" description="Your business location" icon={Building2}>
             <div className="space-y-2">
               <Label htmlFor="business_address">Business Address *</Label>
               <Input
@@ -224,7 +231,7 @@ const BridgeLoanForm = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormRow cols={3}>
               <div className="space-y-2">
                 <Label htmlFor="business_city">City *</Label>
                 <Input
@@ -260,10 +267,12 @@ const BridgeLoanForm = () => {
                   <p className="text-sm text-destructive">{errors.business_zip.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
+            </FormSection>
 
-            {/* Property Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Property Information Section */}
+            <FormSection title="Property Information" description="Details about the property" icon={MapPin}>
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="property_type">Property Type *</Label>
                 <Select onValueChange={(value) => setValue('property_type', value)}>
@@ -298,7 +307,7 @@ const BridgeLoanForm = () => {
                   <p className="text-sm text-destructive">{errors.property_value.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
 
             <div className="space-y-2">
               <Label htmlFor="years_in_business">Years in Business *</Label>
@@ -315,7 +324,10 @@ const BridgeLoanForm = () => {
                 <p className="text-sm text-destructive">{errors.years_in_business.message}</p>
               )}
             </div>
+            </FormSection>
 
+            {/* Exit Strategy Section */}
+            <FormSection title="Exit Strategy" description="Your repayment plan" icon={FileText}>
             <div className="space-y-2">
               <Label htmlFor="exit_strategy">Exit Strategy *</Label>
               <Select onValueChange={(value) => setValue('exit_strategy', value)}>
@@ -344,12 +356,13 @@ const BridgeLoanForm = () => {
                 <p className="text-sm text-destructive">{errors.project_description.message}</p>
               )}
             </div>
+            </FormSection>
 
-            <div className="flex justify-center pt-6">
+            <div className="flex justify-center pt-4 sm:pt-6">
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full md:w-auto px-8 py-3 text-lg"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg"
               >
                 {isLoading ? "Submitting..." : "Submit Application"}
               </Button>
