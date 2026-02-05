@@ -482,9 +482,30 @@ async function updateApplicationStatus(
       throw fetchError;
     }
 
-    // Safely merge status_notes into loan_details without using raw SQL
-    // This prevents SQL injection by using parameterized updates
-    const sanitizedNotes = notes ? notes.replace(/[<>'"\\;]/g, '') : '';
+    // Comprehensive input sanitization for notes field
+    // Prevents XSS and injection attacks by:
+    // 1. Trimming whitespace
+    // 2. Removing control characters
+    // 3. HTML entity encoding dangerous characters
+    // 4. Truncating to max length
+    const sanitizeNotes = (input: string | undefined): string => {
+      if (!input) return '';
+      
+      return input
+        .trim()
+        .slice(0, 1000) // Enforce max length
+        .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;')
+        .replace(/\\/g, '&#x5C;')
+        .replace(/`/g, '&#x60;');
+    };
+    
+    const sanitizedNotes = sanitizeNotes(notes);
     const updatedLoanDetails = {
       ...(currentApp?.loan_details || {}),
       status_notes: sanitizedNotes
