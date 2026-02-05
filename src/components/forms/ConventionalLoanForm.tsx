@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { useNavigate } from "react-router-dom";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 interface ConventionalLoanFormData {
   loanAmount: string;
@@ -350,11 +351,9 @@ export const ConventionalLoanForm: React.FC = () => {
               </div>
               <div>
                 <Label htmlFor="phoneNumber">Phone Number</Label>
-                <SecureInput
-                  id="phoneNumber"
-                  type="phone"
-                  placeholder="(555) 123-4567"
-                  {...register("phoneNumber", { required: "Phone number is required" })}
+                 <PhoneInput
+                   value={watch("phoneNumber") || ""}
+                   onChange={(value) => setValue("phoneNumber", value)}
                 />
                 {errors.phoneNumber && <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>}
               </div>

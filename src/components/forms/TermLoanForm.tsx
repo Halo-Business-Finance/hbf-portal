@@ -13,6 +13,7 @@ import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { useNavigate } from "react-router-dom";
 import { FormRow } from "@/components/ui/form-section";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 interface TermLoanFormData {
   loanAmount: string;
@@ -344,10 +345,9 @@ export const TermLoanForm: React.FC = () => {
               </div>
               <div>
                 <Label htmlFor="phoneNumber">Phone Number</Label>
-                <Input
-                  id="phoneNumber"
-                  placeholder="Phone number"
-                  {...register("phoneNumber", { required: "Phone number is required" })}
+                 <PhoneInput
+                   value={watch("phoneNumber") || ""}
+                   onChange={(value) => setValue("phoneNumber", value)}
                 />
                 {errors.phoneNumber && <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>}
               </div>

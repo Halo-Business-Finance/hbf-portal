@@ -15,6 +15,7 @@ import { useLoanApplication } from '@/hooks/useLoanApplication';
 import { useFormAutoSave } from '@/hooks/useFormAutoSave';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 // Zod schema for SBA Express Loan validation
 const sbaExpressSchema = z.object({
@@ -222,7 +223,10 @@ const SBAExpressLoanForm: React.FC = () => {
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                       <PhoneInput 
+                         value={field.value}
+                         onChange={field.onChange}
+                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

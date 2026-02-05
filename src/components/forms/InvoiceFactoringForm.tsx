@@ -15,6 +15,7 @@ import { useLoanApplication } from '@/hooks/useLoanApplication';
 import { useFormAutoSave } from '@/hooks/useFormAutoSave';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, FileText, DollarSign } from 'lucide-react';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 // Zod schema for AR/Invoice Factoring validation
 const invoiceFactoringSchema = z.object({
@@ -412,7 +413,10 @@ const InvoiceFactoringForm: React.FC = () => {
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                       <PhoneInput 
+                         value={field.value}
+                         onChange={field.onChange}
+                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

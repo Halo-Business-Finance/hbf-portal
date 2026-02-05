@@ -24,7 +24,6 @@ import {
   TrendingUp, 
   FileCheck,
   Mail,
-  Phone,
   MapPin,
   Hash,
   Briefcase,
@@ -34,6 +33,7 @@ import {
   Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 const sba7aSchema = z.object({
   // Personal Information
@@ -293,10 +293,9 @@ export default function SBA7aLoanForm() {
                   <FormItem>
                     <FormLabel required>Phone Number</FormLabel>
                     <FormControl>
-                      <Input 
-                        icon={Phone}
-                        placeholder="(555) 555-5555" 
-                        {...field} 
+                       <PhoneInput 
+                         value={field.value}
+                         onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage />

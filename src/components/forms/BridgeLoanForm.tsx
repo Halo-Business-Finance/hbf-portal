@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FormSection, FormRow } from '@/components/ui/form-section';
 import { DollarSign, User, Building2, MapPin, FileText } from 'lucide-react';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 interface BridgeLoanFormData {
   amount_requested: number;
@@ -38,7 +39,7 @@ const STORAGE_KEY = 'bridge-loan-draft';
 const BridgeLoanForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<BridgeLoanFormData>();
-  const { register, handleSubmit, formState: { errors }, setValue } = form;
+   const { register, handleSubmit, formState: { errors }, setValue, watch } = form;
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -193,10 +194,9 @@ const BridgeLoanForm = () => {
             <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number *</Label>
-                <Input
-                  id="phone"
-                  placeholder="Enter phone number"
-                  {...register('phone', { required: 'Phone number is required' })}
+                 <PhoneInput
+                   value={watch('phone') || ''}
+                   onChange={(value) => setValue('phone', value)}
                 />
                 {errors.phone && (
                   <p className="text-sm text-destructive">{errors.phone.message}</p>
