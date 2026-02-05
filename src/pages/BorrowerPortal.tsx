@@ -23,7 +23,6 @@ import {
   AlertCircle,
   User,
   Mail,
-  Phone,
   Edit,
   Save,
   X,
@@ -31,6 +30,7 @@ import {
 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PageHeader } from '@/components/PageHeader';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 const profileSchema = z.object({
   first_name: z.string().trim().min(1, "First name is required").max(100, "First name must be less than 100 characters"),
@@ -289,16 +289,13 @@ const BorrowerPortal = () => {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2 text-sm">
-                            <Phone className="w-4 h-4" />
-                            Phone
-                          </FormLabel>
+                           <FormLabel className="text-sm">Phone</FormLabel>
                           <FormControl>
-                            <Input 
-                              {...field}
+                             <PhoneInput 
+                               value={field.value}
+                               onChange={field.onChange}
                               disabled={!isEditing}
                               className={`h-10 sm:h-9 ${!isEditing ? "bg-muted/50" : ""}`}
-                              placeholder="Not provided"
                             />
                           </FormControl>
                           <FormMessage />

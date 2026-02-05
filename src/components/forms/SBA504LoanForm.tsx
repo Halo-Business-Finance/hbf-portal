@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 const sba504Schema = z.object({
   // Personal Information
@@ -211,7 +212,10 @@ export default function SBA504LoanForm() {
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter phone number" {...field} />
+                       <PhoneInput 
+                         value={field.value}
+                         onChange={field.onChange}
+                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

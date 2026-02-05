@@ -16,6 +16,7 @@ import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { FormRow } from "@/components/ui/form-section";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 const equipmentFinancingSchema = z.object({
   // Personal Information
@@ -210,7 +211,10 @@ export default function EquipmentFinancingForm() {
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter phone number" {...field} />
+                       <PhoneInput 
+                         value={field.value}
+                         onChange={field.onChange}
+                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
