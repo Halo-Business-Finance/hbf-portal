@@ -233,7 +233,10 @@ export const EnterpriseDashboard = ({
                   </div>
                 </div>
                 <div className="space-y-2 text-center sm:text-left">
-                  <p className="font-semibold text-foreground text-sm sm:text-base">Link your accounts to see your full financial picture.</p>
+                  <p className="font-semibold text-foreground text-sm sm:text-base">
+                    <span className="sm:hidden">Link accounts to see your finances.</span>
+                    <span className="hidden sm:inline">Link your accounts to see your full financial picture.</span>
+                  </p>
                   <div className="flex flex-col gap-1 items-center sm:items-start">
                     <Button 
                       variant="link" 
