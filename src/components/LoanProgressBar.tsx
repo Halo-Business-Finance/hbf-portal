@@ -114,15 +114,15 @@ export const LoanProgressBar = ({
   // Calculate estimated completion for current stage
   const estimatedDates = startDate && currentStageIndex >= 0 && !isFunded ? calculateEstimatedDate(startDate, currentStageIndex) : null;
   return <div className={cn('space-y-3', className)}>
-      <div className="flex items-center justify-between text-xs sm:text-sm">
-        <span className="uppercase tracking-wide font-semibold text-muted-foreground text-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
+        <span className="uppercase tracking-wide font-semibold text-muted-foreground text-xs whitespace-nowrap">
           Loan Progress
         </span>
         
         {/* Estimated completion indicator */}
-        {estimatedDates && !isRejected && !isPaused && <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-white text-black">
+        {estimatedDates && !isRejected && !isPaused && <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted/50 text-foreground w-fit">
             <Clock className="w-3 h-3" />
-            <span className="font-medium">
+            <span className="font-medium whitespace-nowrap">
               Est. completion: {formatDateRange(estimatedDates.min, estimatedDates.max)}
             </span>
           </div>}
