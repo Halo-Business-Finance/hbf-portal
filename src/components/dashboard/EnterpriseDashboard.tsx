@@ -220,7 +220,7 @@ export const EnterpriseDashboard = ({
           {/* Link Accounts Banner */}
           <Card className="border border-border bg-muted/30 animated-gradient-border-minimal">
             <CardContent className="p-4 md:p-6">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
                 <div className="flex -space-x-2">
                   <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white">
                     <Building2 className="w-5 h-5" />
@@ -232,12 +232,12 @@ export const EnterpriseDashboard = ({
                     <Link2 className="w-5 h-5" />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground">Link your accounts to see your full financial picture.</p>
-                  <div className="flex flex-col gap-1">
+                <div className="space-y-2 text-center sm:text-left">
+                  <p className="font-semibold text-foreground text-sm sm:text-base">Link your accounts to see your full financial picture.</p>
+                  <div className="flex flex-col gap-1 items-center sm:items-start">
                     <Button 
                       variant="link" 
-                      className="text-primary p-0 h-auto font-medium text-sm justify-start group transition-all duration-200 hover:translate-x-1" 
+                      className="text-primary p-0 h-auto font-medium text-sm justify-center sm:justify-start group transition-all duration-200 hover:translate-x-1" 
                       onClick={() => navigate('/my-documents?folder=Tax Documents')}
                     >
                       <FileText className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
@@ -246,7 +246,7 @@ export const EnterpriseDashboard = ({
                     </Button>
                     <Button 
                       variant="link" 
-                      className="text-primary p-0 h-auto font-medium text-sm justify-start group transition-all duration-200 hover:translate-x-1" 
+                      className="text-primary p-0 h-auto font-medium text-sm justify-center sm:justify-start group transition-all duration-200 hover:translate-x-1" 
                       onClick={() => navigate('/credit-reports')}
                     >
                       <FileBarChart className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
@@ -255,7 +255,7 @@ export const EnterpriseDashboard = ({
                     </Button>
                     <Button 
                       variant="link" 
-                      className="text-primary p-0 h-auto font-medium text-sm justify-start group transition-all duration-200 hover:translate-x-1" 
+                      className="text-primary p-0 h-auto font-medium text-sm justify-center sm:justify-start group transition-all duration-200 hover:translate-x-1" 
                       onClick={() => navigate('/bank-accounts')}
                     >
                       <Building2 className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
