@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from '@/components/ui/premium-card';
@@ -12,6 +13,8 @@ import { AnimatedCurrency } from '@/components/ui/animated-counter';
 import { StatusIndicator } from '@/components/ui/status-indicator';
 import { EnhancedDashboardCharts } from './EnhancedDashboardCharts';
 import ApplicationsList from '@/components/ApplicationsList';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh-indicator';
 interface LoanApplication {
   id: string;
   application_number: string;
@@ -53,6 +56,14 @@ export const EnterpriseDashboard = ({
     pendingAmount: 0
   });
   
+  const handleRefresh = useCallback(async () => {
+    await fetchDashboardData();
+  }, [user]);
+
+  const { containerRef, pullDistance, progress, isRefreshing } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  });
+
   useEffect(() => {
     if (user) {
       fetchDashboardData();
@@ -159,7 +170,12 @@ export const EnterpriseDashboard = ({
         </div>
       </div>;
   }
-  return <div>
+  return <div ref={containerRef}>
+      <PullToRefreshIndicator
+        pullDistance={pullDistance}
+        progress={progress}
+        isRefreshing={isRefreshing}
+      />
       {/* Welcome Banner - Full Width US Bank Style */}
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 text-primary-foreground">
         <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
