@@ -163,10 +163,10 @@ export const EnterpriseDashboard = ({
       {/* Welcome Banner - Full Width US Bank Style */}
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 text-primary-foreground">
         <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
-          <h1 className="md:text-3xl font-bold mb-1 text-lg">
+          <h1 className="text-base md:text-3xl font-bold mb-1">
             Welcome back, {firstName || 'there'}.
           </h1>
-          <p className="text-primary-foreground/80 text-sm md:text-base">
+          <p className="text-primary-foreground/80 text-xs md:text-base">
             We look forward to helping you today.
           </p>
         </div>
