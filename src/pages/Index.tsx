@@ -745,7 +745,7 @@ const Index = () => {
               </div>
 
               {/* Save ID Toggle - stacked vertically */}
-              {isLogin && <div className="flex flex-col items-start gap-1">
+              {isLogin && <div className="flex flex-col items-center md:items-start gap-1">
                   <span id="save-id-label" className="text-sm font-medium text-gray-700">Save User ID</span>
                   <button type="button" onClick={() => setRememberMe(!rememberMe)} className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-blue-600' : 'bg-blue-800'}`} role="switch" aria-checked={rememberMe} aria-labelledby="save-id-label">
                     {/* Striped thumb */}
@@ -832,7 +832,7 @@ const Index = () => {
               </div>
 
               {/* Sign up / Sign in toggle */}
-              <div className="text-center text-sm text-black pt-2">
+              <div className="text-center text-sm text-black pt-2 px-4">
                 {isLogin ? <>
                     Don't have an account?{" "}
                     <button type="button" onClick={() => switchMode("signup")} className="text-black hover:text-gray-700 font-medium hover:underline focus:outline-none">
@@ -848,7 +848,7 @@ const Index = () => {
             </form>
 
             {/* Forgot Password Link */}
-            {isLogin && <div className="mt-8 text-center">
+            {isLogin && <div className="mt-8 text-center px-4">
                 <button type="button" onClick={() => navigate('/forgot-password')} className="inline-flex items-center gap-2 text-black hover:text-gray-700 text-sm font-medium hover:underline focus:outline-none">
                   <ArrowRight className="w-4 h-4" />
                   Forgot email or password?
@@ -858,12 +858,12 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm text-black">
-            <span className="text-center sm:text-left order-2 sm:order-1">
+        <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between text-xs sm:text-sm text-black">
+            <span className="text-center order-2 sm:order-1 sm:text-left">
               © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
             </span>
-            <div className="flex items-center gap-3 sm:gap-6 order-1 sm:order-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 order-1 sm:order-2">
               <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy</a>
               <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms</a>
               <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Support</a>
