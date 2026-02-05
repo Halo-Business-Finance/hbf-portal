@@ -144,7 +144,7 @@ export const LoanProgressBar = ({
         </div>}
 
       <TooltipProvider>
-        <div className="flex justify-between text-xs text-muted-foreground font-medium">
+        <div className="hidden sm:flex justify-between text-xs text-muted-foreground font-medium">
           {stages.map((stage, index) => {
           const isCompleted = index <= currentStageIndex;
           const isCurrent = index === currentStageIndex;
@@ -164,6 +164,26 @@ export const LoanProgressBar = ({
                 </TooltipContent>
               </Tooltip>;
         })}
+        </div>
+        
+        {/* Mobile: Show only current stage prominently */}
+        <div className="flex sm:hidden flex-col items-center gap-1 text-xs">
+          {currentStageIndex >= 0 && !isRejected && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-primary font-bold cursor-help">
+                  {stages[currentStageIndex]?.label}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-[220px] text-center">
+                <p className="font-medium">{stages[currentStageIndex]?.description}</p>
+                <p className="text-xs text-muted-foreground mt-1">{stages[currentStageIndex]?.timeframe}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          <span className="text-muted-foreground">
+            Step {Math.max(currentStageIndex + 1, 1)} of {stages.length}
+          </span>
         </div>
       </TooltipProvider>
     </div>;
