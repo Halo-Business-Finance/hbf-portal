@@ -279,28 +279,28 @@ export const EnterpriseDashboard = ({
 
           {/* Credit Scores Widget */}
           <PremiumCard variant="elevated" size="none">
-            <PremiumCardHeader className="px-5 pt-5 pb-0">
+            <PremiumCardHeader className="px-4 sm:px-5 pt-4 sm:pt-5 pb-0">
               <div className="flex items-center justify-between">
-                <PremiumCardTitle className="flex items-center gap-2 text-base">Credit Scores</PremiumCardTitle>
+                <PremiumCardTitle className="flex items-center gap-2 text-sm sm:text-base">Credit Scores</PremiumCardTitle>
               </div>
             </PremiumCardHeader>
-            <PremiumCardContent className="px-5 pb-5 space-y-4">
+            <PremiumCardContent className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-3 sm:space-y-4">
               {/* Personal Credit Scores */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="w-4 h-4" />
                   <span className="font-medium">Personal</span>
                 </div>
                 {personalScores.length === 0 ? (
-                  <p className="text-sm text-muted-foreground pl-6">No personal scores available</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground pl-6">No personal scores available</p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 pl-6">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 pl-4 sm:pl-6">
                     {personalScores.slice(0, 2).map((score) => (
-                      <div key={score.id} className="text-center p-3 rounded-lg bg-muted/30 border border-border/50">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                      <div key={score.id} className="text-center p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5 sm:mb-1">
                           {score.bureau}
                         </p>
-                        <p className="text-2xl font-bold text-foreground">{score.score}</p>
+                        <p className="text-xl sm:text-2xl font-bold text-foreground">{score.score}</p>
                       </div>
                     ))}
                   </div>
@@ -308,32 +308,32 @@ export const EnterpriseDashboard = ({
               </div>
 
               {/* Business Credit Scores */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Briefcase className="w-4 h-4" />
                   <span className="font-medium">Business</span>
                 </div>
                 {businessScores.length === 0 ? (
-                  <p className="text-sm text-muted-foreground pl-6">No business scores available</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground pl-6">No business scores available</p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 pl-6">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 pl-4 sm:pl-6">
                     {businessScores.slice(0, 2).map((score) => (
-                      <div key={score.id} className="text-center p-3 rounded-lg bg-muted/30 border border-border/50">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                      <div key={score.id} className="text-center p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5 sm:mb-1">
                           {score.bureau}
                         </p>
-                        <p className="text-2xl font-bold text-foreground">{score.score}</p>
+                        <p className="text-xl sm:text-2xl font-bold text-foreground">{score.score}</p>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              <p className="text-xs text-muted-foreground">Scores checked daily with VantageScore 3.0</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Scores checked daily with VantageScore 3.0</p>
               
               <Button 
                 variant="outline" 
-                className="w-full border-primary text-primary transition-all duration-200" 
+                className="w-full border-primary text-primary transition-all duration-200 text-xs sm:text-sm h-9 sm:h-10" 
                 onClick={() => navigate('/credit-reports')}
               >
                 View All Credit Reports
