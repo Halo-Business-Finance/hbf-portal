@@ -674,7 +674,7 @@ const Index = () => {
           <div className="relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl p-6 sm:p-8 md:p-10">
 
             {/* Welcome back message for returning users */}
-            {isLogin && returningUser && <div className="mb-6 p-4 border rounded-lg bg-white border-blue-950">
+            {isLogin && returningUser && <div className="mb-6 p-4 rounded-lg bg-white">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
                     <CheckCircle className="w-5 h-5 text-blue-600" />
