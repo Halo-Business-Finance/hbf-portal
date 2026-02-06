@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FormSection, FormRow } from '@/components/ui/form-section';
 import { DollarSign, User, Building2, MapPin, FileText } from 'lucide-react';
-import { PhoneInput } from '@/components/ui/phone-input';
+import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 
 interface BridgeLoanFormData {
   amount_requested: number;
@@ -54,6 +54,15 @@ const BridgeLoanForm = () => {
       toast({
         title: "Authentication Required",
         description: "Please log in to submit your application.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidPhoneNumber(data.phone || "")) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid 10-digit phone number.",
         variant: "destructive",
       });
       return;
@@ -196,7 +205,7 @@ const BridgeLoanForm = () => {
                 <Label htmlFor="phone">Phone Number *</Label>
                  <PhoneInput
                    value={watch('phone') || ''}
-                   onChange={(value) => setValue('phone', value)}
+                   onChange={(value) => setValue('phone', value, { shouldValidate: true })}
                 />
                 {errors.phone && (
                   <p className="text-sm text-destructive">{errors.phone.message}</p>

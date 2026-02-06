@@ -15,7 +15,7 @@ import { useLoanApplication } from '@/hooks/useLoanApplication';
 import { useFormAutoSave } from '@/hooks/useFormAutoSave';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
-import { PhoneInput } from '@/components/ui/phone-input';
+import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 
 // Zod schema for SBA Express Loan validation
 const sbaExpressSchema = z.object({
@@ -23,7 +23,7 @@ const sbaExpressSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  phone: z.string().refine((val) => isValidPhoneNumber(val), { message: "Phone number must be exactly 10 digits" }),
   ssn: z.string().min(9, 'SSN must be 9 digits'),
   dateOfBirth: z.string().min(1, 'Date of birth is required'),
   address: z.string().min(5, 'Address is required'),

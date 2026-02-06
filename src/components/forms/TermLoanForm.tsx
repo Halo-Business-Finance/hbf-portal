@@ -13,7 +13,7 @@ import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { useNavigate } from "react-router-dom";
 import { FormRow } from "@/components/ui/form-section";
-import { PhoneInput } from "@/components/ui/phone-input";
+import { PhoneInput, isValidPhoneNumber } from "@/components/ui/phone-input";
 
 interface TermLoanFormData {
   loanAmount: string;
@@ -62,6 +62,15 @@ export const TermLoanForm: React.FC = () => {
       toast({
         title: "Authentication required",
         description: "Please log in to submit your application.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidPhoneNumber(data.phoneNumber || "")) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid 10-digit phone number.",
         variant: "destructive",
       });
       return;
@@ -347,9 +356,11 @@ export const TermLoanForm: React.FC = () => {
                 <Label htmlFor="phoneNumber">Phone Number</Label>
                  <PhoneInput
                    value={watch("phoneNumber") || ""}
-                   onChange={(value) => setValue("phoneNumber", value)}
+                   onChange={(value) => setValue("phoneNumber", value, { shouldValidate: true })}
                 />
-                {errors.phoneNumber && <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>}
+                {!isValidPhoneNumber(watch("phoneNumber") || "") && watch("phoneNumber") && (
+                  <p className="text-sm text-destructive">Phone number must be exactly 10 digits</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>

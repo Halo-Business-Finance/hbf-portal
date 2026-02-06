@@ -30,12 +30,12 @@ import {
 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PageHeader } from '@/components/PageHeader';
-import { PhoneInput } from '@/components/ui/phone-input';
+import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 
 const profileSchema = z.object({
   first_name: z.string().trim().min(1, "First name is required").max(100, "First name must be less than 100 characters"),
   last_name: z.string().trim().min(1, "Last name is required").max(100, "Last name must be less than 100 characters"),
-  phone: z.string().trim().min(10, "Phone number must be at least 10 digits").max(20, "Phone number must be less than 20 characters").optional().or(z.literal('')),
+  phone: z.string().trim().refine((val) => val === '' || isValidPhoneNumber(val), { message: "Phone number must be exactly 10 digits" }).optional().or(z.literal('')),
 });
 
 const BorrowerPortal = () => {
