@@ -766,7 +766,13 @@ const Index = () => {
                     // Blur first, then toggle, then refocus after remount.
                     passwordInputRef.current?.blur();
 
-                    setShowPassword((prev) => !prev);
+                    const newShowState = !showPassword;
+                    setShowPassword(newShowState);
+
+                    // Track anonymous telemetry (no PII)
+                    import('@/services/telemetryService').then(({ telemetryService }) => {
+                      telemetryService.trackPasswordToggle(newShowState);
+                    });
 
                     window.setTimeout(() => {
                       const el = passwordInputRef.current;

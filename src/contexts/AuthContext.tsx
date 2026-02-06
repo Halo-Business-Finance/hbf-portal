@@ -2,12 +2,17 @@ import React, { createContext, useState, useEffect, useContext, useRef, useCallb
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { telemetryService } from '@/services/telemetryService';
+import { auditService } from '@/services/auditService';
 
 // Rate limiting configuration
 const RATE_LIMIT_CONFIG = {
   login: { maxAttempts: 5, windowMs: 60000, lockoutMs: 300000 },
   signup: { maxAttempts: 3, windowMs: 60000, lockoutMs: 600000 },
 };
+
+// Track consecutive failed login attempts for telemetry
+const REPEATED_FAILURE_THRESHOLD = 3;
 
 interface RateLimitEntry {
   count: number;
@@ -143,6 +148,9 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     // Check rate limit before attempting sign in
     const rateLimitCheck = checkRateLimit('login');
     if (!rateLimitCheck.allowed) {
+      // Track rate limit triggered (anonymous telemetry)
+      telemetryService.trackRateLimitTriggered();
+      
       toast({
         title: "Too Many Attempts",
         description: rateLimitCheck.message,
@@ -156,8 +164,21 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       password,
     });
     
-    // Reset rate limit on successful login
-    if (!error) {
+    if (error) {
+      // Track failed login attempt (anonymous aggregate only)
+      telemetryService.trackFailedLogin();
+      
+      // Check if this constitutes repeated failures (3+ in current session)
+      const currentEntry = rateLimitsRef.current['login'];
+      if (currentEntry && currentEntry.count >= REPEATED_FAILURE_THRESHOLD) {
+        telemetryService.trackRepeatedFailedLogin();
+        
+        // Log audit event for security monitoring (with user context for investigation)
+        // Note: We only have the email at this point, not user_id
+        console.warn(`Security alert: ${REPEATED_FAILURE_THRESHOLD}+ failed login attempts for email`);
+      }
+    } else {
+      // Reset rate limit on successful login
       resetAuthRateLimit('login');
     }
     
