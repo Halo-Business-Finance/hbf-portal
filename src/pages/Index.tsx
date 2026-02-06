@@ -890,7 +890,7 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+        <footer className="relative z-20 bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between text-xs sm:text-sm text-black">
             <span className="text-center order-2 sm:order-1 sm:text-left">
               © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
