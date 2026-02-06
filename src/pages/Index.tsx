@@ -673,25 +673,6 @@ const Index = () => {
           {/* Login Card - no shadow on mobile for cleaner look */}
           <div className="relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl p-6 sm:p-8 md:p-10">
 
-            {/* Welcome back message for returning users */}
-            {isLogin && returningUser && <div className="mb-6 p-4 rounded-lg bg-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
-                    <CheckCircle className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-blue-900">Welcome back!</p>
-                    <p className="text-xs text-black">
-                      Last login: {new Date(returningUser).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit'
-                  })}
-                    </p>
-                  </div>
-                </div>
-              </div>}
 
             {/* Lockout warning */}
             {isLockedOut && <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -799,6 +780,25 @@ const Index = () => {
                     Remember me
                   </label>
                 </div>}
+              
+              {/* Welcome back message for returning users - aligned under Remember me */}
+              {isLogin && returningUser && (
+                <div className="flex items-center gap-2 -mt-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <div className="flex items-center gap-1 text-sm">
+                    <span className="font-medium text-blue-900">Welcome back!</span>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-xs text-muted-foreground">
+                      Last login: {new Date(returningUser).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {!isLogin && <div className="relative">
                   <Input id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Confirm password" aria-required="true" autoComplete="new-password" className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
