@@ -12,6 +12,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, HelpCircle, LogIn, Home, Building2, CreditCard, Store, Banknote, TrendingUp, Sparkles, CheckCircle, ArrowRight, Shield, Building, Settings, HardHat, Handshake, FileText, RotateCcw, Zap, DollarSign, Clock, Eye, EyeOff, Lock, Loader2, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -744,24 +745,21 @@ const Index = () => {
                 </button>
               </div>
 
-              {/* Save ID Toggle - stacked vertically */}
-              {isLogin && <div className="flex flex-col items-center md:items-start gap-1">
-                  <span id="save-id-label" className="text-sm font-medium text-gray-700">Save User ID</span>
-                  <button type="button" onClick={() => setRememberMe(!rememberMe)} className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-blue-600' : 'bg-blue-800'}`} role="switch" aria-checked={rememberMe} aria-labelledby="save-id-label">
-                    {/* Striped thumb */}
-                    <span className={`inline-flex h-6 w-8 transform items-center justify-center rounded-md bg-white shadow-md transition-transform ${rememberMe ? 'translate-x-11' : 'translate-x-1'}`} aria-hidden="true">
-                      {/* Vertical stripes */}
-                      <span className="flex gap-0.5">
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                      </span>
-                    </span>
-                    {/* YES/NO text */}
-                    <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'left-2 opacity-100' : 'left-2 opacity-0'}`} aria-hidden="true">YES</span>
-                    <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'right-2 opacity-0' : 'right-2 opacity-100'}`} aria-hidden="true">NO</span>
-                  </button>
+              {/* Remember Me Checkbox */}
+              {isLogin && <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="remember-me" 
+                    checked={rememberMe} 
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                    className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black"
+                    aria-label="Remember me"
+                  />
+                  <label 
+                    htmlFor="remember-me" 
+                    className="text-sm font-medium text-gray-700 cursor-pointer select-none"
+                  >
+                    Remember me
+                  </label>
                 </div>}
 
               {!isLogin && <div className="relative">
