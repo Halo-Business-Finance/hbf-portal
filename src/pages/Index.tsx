@@ -845,7 +845,7 @@ const Index = () => {
             {isLogin && <div className="mt-8 text-center px-4">
                 <button type="button" onClick={() => navigate('/forgot-password')} className="inline-flex items-center gap-2 text-black hover:text-gray-700 text-sm font-medium hover:underline focus:outline-none">
                   <ArrowRight className="w-4 h-4" />
-                  Forgot User ID or password?
+                  Forgot User ID or Password?
                 </button>
               </div>}
           </div>
