@@ -878,6 +878,33 @@ export type Database = {
         }
         Relationships: []
       }
+      security_telemetry: {
+        Row: {
+          count: number
+          created_at: string
+          id: string
+          metric_date: string
+          metric_name: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          id?: string
+          metric_date?: string
+          metric_name: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          id?: string
+          metric_date?: string
+          metric_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           category: string
@@ -1030,6 +1057,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_security_telemetry: {
+        Args: { _increment_by?: number; _metric_name: string }
+        Returns: undefined
       }
       is_assigned_to_user: {
         Args: { _admin_id: string; _borrower_user_id: string }
