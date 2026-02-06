@@ -751,7 +751,7 @@ const Index = () => {
                     id="remember-me" 
                     checked={rememberMe} 
                     onCheckedChange={(checked) => setRememberMe(checked === true)}
-                    className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black"
+                    className="rounded-none border-black data-[state=checked]:bg-black data-[state=checked]:border-black"
                     aria-label="Remember me"
                   />
                   <label 
