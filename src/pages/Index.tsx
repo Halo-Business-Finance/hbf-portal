@@ -7,7 +7,7 @@
  * - New loan application forms
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -212,6 +212,7 @@ const Index = () => {
   const [lastName, setLastName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -739,8 +740,48 @@ const Index = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Password" aria-required="true" autoComplete={isLogin ? "current-password" : "new-password"} className="h-14 bg-white border border-black rounded-xl px-5 pr-16 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1" disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                <Input
+                  ref={passwordInputRef}
+                  key={showPassword ? "pw-text" : "pw-password"}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  disabled={authLoading || isLockedOut}
+                  aria-label="Password"
+                  aria-required="true"
+                  autoComplete={isLogin ? "current-password" : "new-password"}
+                  className="h-14 bg-white border border-black rounded-xl px-5 pr-16 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
+                />
+                <button
+                  type="button"
+                  onPointerDown={(e) => {
+                    // iOS Safari can ignore password->text toggles while focused.
+                    // Prevent default so the click doesn't move focus unexpectedly.
+                    e.preventDefault();
+                    passwordInputRef.current?.blur();
+                  }}
+                  onClick={() => {
+                    setShowPassword((prev) => !prev);
+                    window.setTimeout(() => {
+                      const el = passwordInputRef.current;
+                      if (!el) return;
+                      try {
+                        // Re-focus after the input remounts so Safari updates rendering.
+                        (el as any).focus?.({ preventScroll: true });
+                        const len = el.value?.length ?? 0;
+                        el.setSelectionRange?.(len, len);
+                      } catch {
+                        // no-op
+                      }
+                    }, 0);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1"
+                  disabled={authLoading}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
