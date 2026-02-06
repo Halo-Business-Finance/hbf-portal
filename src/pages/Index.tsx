@@ -644,13 +644,6 @@ const Index = () => {
     resetForm();
   };
 
-  // Time-based greeting
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
 
   // Show auth forms for unauthenticated users - Wells Fargo style
   if (!authenticated) {
@@ -679,10 +672,6 @@ const Index = () => {
           
           {/* Login Card - no shadow on mobile for cleaner look */}
           <div className="relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl p-6 sm:p-8 md:p-10">
-            {/* Greeting */}
-            <h1 className="text-3xl sm:text-4xl font-serif text-center text-black mb-8">
-              {getGreeting()}
-            </h1>
 
             {/* Welcome back message for returning users */}
             {isLogin && returningUser && <div className="mb-6 p-4 border rounded-lg bg-white border-blue-950">
