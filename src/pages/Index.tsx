@@ -757,19 +757,21 @@ const Index = () => {
                 />
                 <button
                   type="button"
-                  onPointerDown={(e) => {
-                    // iOS Safari can ignore password->text toggles while focused.
-                    // Prevent default so the click doesn't move focus unexpectedly.
+                  onClick={(e) => {
+                    // Some browsers can drop the click if pointer/touch handlers call preventDefault.
+                    // Keep this logic in a single onClick for maximum reliability.
                     e.preventDefault();
+
+                    // iOS Safari can ignore password->text toggles while focused.
+                    // Blur first, then toggle, then refocus after remount.
                     passwordInputRef.current?.blur();
-                  }}
-                  onClick={() => {
+
                     setShowPassword((prev) => !prev);
+
                     window.setTimeout(() => {
                       const el = passwordInputRef.current;
                       if (!el) return;
                       try {
-                        // Re-focus after the input remounts so Safari updates rendering.
                         (el as any).focus?.({ preventScroll: true });
                         const len = el.value?.length ?? 0;
                         el.setSelectionRange?.(len, len);
