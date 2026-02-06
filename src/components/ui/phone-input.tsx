@@ -32,11 +32,19 @@
    }
  }
  
- /**
-  * Extracts only digits from a formatted phone number
-  */
- export function unformatPhoneNumber(value: string): string {
-   return value.replace(/\D/g, '')
+/**
+ * Extracts only digits from a formatted phone number
+ */
+export function unformatPhoneNumber(value: string): string {
+  return value.replace(/\D/g, '')
+}
+
+/**
+ * Validates that a phone number has exactly 10 digits
+ */
+export function isValidPhoneNumber(value: string): boolean {
+  const digits = value.replace(/\D/g, '')
+  return digits.length === 10
  }
  
  const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(

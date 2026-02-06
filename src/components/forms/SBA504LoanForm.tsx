@@ -15,14 +15,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { PhoneInput } from "@/components/ui/phone-input";
+import { PhoneInput, isValidPhoneNumber } from "@/components/ui/phone-input";
 
 const sba504Schema = z.object({
   // Personal Information
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  phone: z.string().refine((val) => isValidPhoneNumber(val), { message: "Phone number must be exactly 10 digits" }),
   
   // Business Information
   businessName: z.string().min(1, "Business name is required"),
