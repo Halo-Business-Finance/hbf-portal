@@ -727,7 +727,7 @@ const Index = () => {
 
               {/* Email/User ID Input */}
               <div className="relative">
-                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border border-black rounded-xl px-5 pr-12 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" tabIndex={-1} aria-label="Clear email field">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
@@ -738,7 +738,7 @@ const Index = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Password" aria-required="true" autoComplete={isLogin ? "current-password" : "new-password"} className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-16 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Password" aria-required="true" autoComplete={isLogin ? "current-password" : "new-password"} className="h-14 bg-white border border-black rounded-xl px-5 pr-16 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1" disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
                   {showPassword ? "Hide" : "Show"}
                 </button>
