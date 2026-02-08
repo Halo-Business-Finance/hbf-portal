@@ -24,24 +24,24 @@ const FormSection = React.forwardRef<HTMLDivElement, FormSectionProps>(
         {...props}
       >
         {/* Section Header */}
-        <div className="mb-6 pb-4 border-b border-border">
+        <div className="mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-border">
           <div className="flex items-center gap-3">
             {Icon && (
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary">
-                <Icon className="h-5 w-5" />
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 text-primary flex-shrink-0">
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
             )}
             <div>
-              <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">{title}</h3>
               {description && (
-                <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">{description}</p>
               )}
             </div>
           </div>
         </div>
 
         {/* Section Content */}
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           {children}
         </div>
       </div>
@@ -62,11 +62,11 @@ const FormRow = React.forwardRef<HTMLDivElement, FormRowProps>(
       <div
         ref={ref}
         className={cn(
-          "grid gap-4",
+          "grid gap-3 sm:gap-4",
           cols === 1 && "grid-cols-1",
           cols === 2 && "grid-cols-1 md:grid-cols-2",
-          cols === 3 && "grid-cols-1 md:grid-cols-3",
-          cols === 4 && "grid-cols-1 sm:grid-cols-2 md:grid-cols-4",
+          cols === 3 && "grid-cols-1 sm:grid-cols-2 md:grid-cols-3",
+          cols === 4 && "grid-cols-2 sm:grid-cols-2 md:grid-cols-4",
           className
         )}
         {...props}

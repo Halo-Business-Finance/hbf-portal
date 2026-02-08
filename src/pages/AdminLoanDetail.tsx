@@ -12,6 +12,7 @@ import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { adminService } from '@/services/adminService';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { 
   ArrowLeft, 
   FileText, 
@@ -322,9 +323,9 @@ const AdminLoanDetail = () => {
                       Phone Number
                     </Label>
                     {isEditing ? (
-                      <Input
+                       <PhoneInput
                         value={editData.phone || ''}
-                        onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                         onChange={(value) => setEditData({...editData, phone: value})}
                       />
                     ) : (
                       <p className="text-sm font-medium mt-1">{application.phone}</p>

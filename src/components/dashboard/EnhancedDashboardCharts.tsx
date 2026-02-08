@@ -219,21 +219,21 @@ export const EnhancedDashboardCharts = ({
     <div className={cn("grid grid-cols-1 gap-5", className)}>
       {/* Monthly Revenue Trend - Enhanced Area Chart with 3 Lines */}
       <PremiumCard variant="elevated" size="none">
-        <PremiumCardHeader className="px-5 pt-5 pb-0">
+        <PremiumCardHeader className="px-4 sm:px-5 pt-4 sm:pt-5 pb-0">
           <div className="flex items-center justify-between gap-3">
-            <PremiumCardTitle className="flex items-center gap-2 text-base whitespace-nowrap">
-              <TrendingUp className="h-4 w-4 text-primary flex-shrink-0" />
+            <PremiumCardTitle className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base whitespace-nowrap">
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
               Monthly Trend
             </PremiumCardTitle>
             
             {/* Period Selector Dropdown */}
             <Select value={selectedPeriod} onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}>
-              <SelectTrigger className="w-[120px] h-8 text-xs bg-background border-border">
+              <SelectTrigger className="w-[100px] sm:w-[120px] h-7 sm:h-8 text-[10px] sm:text-xs bg-background border-border">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent className="bg-background border-border z-50">
                 {periodOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                  <SelectItem key={option.value} value={option.value} className="text-[10px] sm:text-xs">
                     {option.label}
                   </SelectItem>
                 ))}
@@ -241,27 +241,27 @@ export const EnhancedDashboardCharts = ({
             </Select>
           </div>
         </PremiumCardHeader>
-        <PremiumCardContent className="px-5 pb-5 pt-4">
+        <PremiumCardContent className="px-3 sm:px-5 pb-4 sm:pb-5 pt-3 sm:pt-4">
           {/* Legend */}
-          <div className="flex flex-wrap gap-4 mb-3 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(142 76% 36%)' }} />
-              <span className="text-muted-foreground">Gross Revenue</span>
+          <div className="flex flex-wrap gap-2 sm:gap-4 mb-2 sm:mb-3 text-[10px] sm:text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: 'hsl(142 76% 36%)' }} />
+              <span className="text-muted-foreground">Gross</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(213 94% 50%)' }} />
-              <span className="text-muted-foreground">Net Revenue</span>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: 'hsl(213 94% 50%)' }} />
+              <span className="text-muted-foreground">Net</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(0 84% 60%)' }} />
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: 'hsl(0 84% 60%)' }} />
               <span className="text-muted-foreground">Expenses</span>
             </div>
           </div>
           
           {monthlyData.some(d => d.grossRevenue > 0 || d.netRevenue > 0 || d.expenses > 0) ? (
-            <div className="h-36">
+            <div className="h-28 sm:h-36">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <AreaChart data={monthlyData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorGrossRevenue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(142 76% 36%)" stopOpacity={0.3} />
@@ -286,7 +286,8 @@ export const EnhancedDashboardCharts = ({
                     dataKey="month" 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
+                    interval="preserveStartEnd"
                   />
                   <YAxis 
                     hide 
@@ -298,36 +299,36 @@ export const EnhancedDashboardCharts = ({
                     dataKey="grossRevenue"
                     name="Gross Revenue"
                     stroke="hsl(142 76% 36%)"
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     fill="url(#colorGrossRevenue)"
-                    dot={{ fill: 'hsl(142 76% 36%)', strokeWidth: 2, r: 3, stroke: 'white' }}
-                    activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
+                    dot={{ fill: 'hsl(142 76% 36%)', strokeWidth: 1, r: 2, stroke: 'white' }}
+                    activeDot={{ r: 4, stroke: 'white', strokeWidth: 2 }}
                   />
                   <Area
                     type="monotone"
                     dataKey="netRevenue"
                     name="Net Revenue"
                     stroke="hsl(213 94% 50%)"
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     fill="url(#colorNetRevenue)"
-                    dot={{ fill: 'hsl(213 94% 50%)', strokeWidth: 2, r: 3, stroke: 'white' }}
-                    activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
+                    dot={{ fill: 'hsl(213 94% 50%)', strokeWidth: 1, r: 2, stroke: 'white' }}
+                    activeDot={{ r: 4, stroke: 'white', strokeWidth: 2 }}
                   />
                   <Area
                     type="monotone"
                     dataKey="expenses"
                     name="Expenses"
                     stroke="hsl(0 84% 60%)"
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     fill="url(#colorExpenses)"
-                    dot={{ fill: 'hsl(0 84% 60%)', strokeWidth: 2, r: 3, stroke: 'white' }}
-                    activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
+                    dot={{ fill: 'hsl(0 84% 60%)', strokeWidth: 1, r: 2, stroke: 'white' }}
+                    activeDot={{ r: 4, stroke: 'white', strokeWidth: 2 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
+            <div className="h-24 sm:h-32 flex items-center justify-center text-muted-foreground text-xs sm:text-sm">
               No financial data yet
             </div>
           )}
@@ -336,44 +337,44 @@ export const EnhancedDashboardCharts = ({
 
       {/* Bank Accounts Widget */}
       <PremiumCard variant="elevated" size="none">
-        <PremiumCardHeader className="px-5 pt-5 pb-0">
+        <PremiumCardHeader className="px-4 sm:px-5 pt-4 sm:pt-5 pb-0">
           <div className="flex items-center justify-between">
-            <PremiumCardTitle className="flex items-center gap-2 text-base">
-              <Building2 className="h-4 w-4 text-primary" />
+            <PremiumCardTitle className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+              <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
               Linked Accounts
             </PremiumCardTitle>
           </div>
         </PremiumCardHeader>
-        <PremiumCardContent className="px-5 pb-5 pt-4 space-y-4">
+        <PremiumCardContent className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 sm:pt-4 space-y-3 sm:space-y-4">
           {/* Personal Accounts */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
               <User className="w-4 h-4" />
               <span className="font-medium">Personal</span>
             </div>
             {personalAccounts.length === 0 ? (
-              <p className="text-sm text-muted-foreground pl-6">No personal accounts linked</p>
+              <p className="text-xs sm:text-sm text-muted-foreground pl-5 sm:pl-6">No personal accounts linked</p>
             ) : (
-              <div className="pl-6 space-y-2">
+              <div className="pl-4 sm:pl-6 space-y-1.5 sm:space-y-2">
                 {personalAccounts.slice(0, 2).map((account) => (
-                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <div key={account.id} className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
                     <div>
-                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
+                      <p className="text-xs sm:text-sm font-medium text-foreground truncate max-w-[120px] sm:max-w-none">{account.account_name}</p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase">{account.institution}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">
+                      <p className="text-base sm:text-lg font-bold text-foreground">
                         <AnimatedCurrency value={account.balance} />
                       </p>
                     </div>
                   </div>
                 ))}
                 {personalAccounts.length > 2 && (
-                  <p className="text-xs text-muted-foreground">+{personalAccounts.length - 2} more account(s)</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">+{personalAccounts.length - 2} more</p>
                 )}
-                <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs text-muted-foreground">Total Personal</span>
-                  <span className="text-sm font-bold text-foreground">
+                <div className="flex justify-between items-center pt-0.5 sm:pt-1">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">Total Personal</span>
+                  <span className="text-xs sm:text-sm font-bold text-foreground">
                     <AnimatedCurrency value={personalTotal} />
                   </span>
                 </div>
@@ -382,34 +383,34 @@ export const EnhancedDashboardCharts = ({
           </div>
 
           {/* Business Accounts */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
               <Building2 className="w-4 h-4" />
               <span className="font-medium">Business</span>
             </div>
             {businessAccounts.length === 0 ? (
-              <p className="text-sm text-muted-foreground pl-6">No business accounts linked</p>
+              <p className="text-xs sm:text-sm text-muted-foreground pl-5 sm:pl-6">No business accounts linked</p>
             ) : (
-              <div className="pl-6 space-y-2">
+              <div className="pl-4 sm:pl-6 space-y-1.5 sm:space-y-2">
                 {businessAccounts.slice(0, 2).map((account) => (
-                  <div key={account.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <div key={account.id} className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
                     <div>
-                      <p className="text-sm font-medium text-foreground">{account.account_name}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">{account.institution}</p>
+                      <p className="text-xs sm:text-sm font-medium text-foreground truncate max-w-[120px] sm:max-w-none">{account.account_name}</p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase">{account.institution}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">
+                      <p className="text-base sm:text-lg font-bold text-foreground">
                         <AnimatedCurrency value={account.balance} />
                       </p>
                     </div>
                   </div>
                 ))}
                 {businessAccounts.length > 2 && (
-                  <p className="text-xs text-muted-foreground">+{businessAccounts.length - 2} more account(s)</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">+{businessAccounts.length - 2} more</p>
                 )}
-                <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs text-muted-foreground">Total Business</span>
-                  <span className="text-sm font-bold text-foreground">
+                <div className="flex justify-between items-center pt-0.5 sm:pt-1">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">Total Business</span>
+                  <span className="text-xs sm:text-sm font-bold text-foreground">
                     <AnimatedCurrency value={businessTotal} />
                   </span>
                 </div>
@@ -419,7 +420,7 @@ export const EnhancedDashboardCharts = ({
           
           <Button 
             variant="outline" 
-            className="w-full border-primary text-primary transition-all duration-200" 
+            className="w-full border-primary text-primary transition-all duration-200 text-xs sm:text-sm h-9 sm:h-10" 
             onClick={() => navigate('/bank-accounts')}
           >
             Manage Bank Accounts
