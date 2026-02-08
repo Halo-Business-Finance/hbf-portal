@@ -12,6 +12,9 @@ import { useFormAutoSave } from '@/hooks/useFormAutoSave';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FormSection, FormRow } from '@/components/ui/form-section';
+import { DollarSign, User, Building2, MapPin } from 'lucide-react';
+import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 
 interface RefinanceFormData {
   amount_requested: number;
@@ -36,7 +39,7 @@ const STORAGE_KEY = 'refinance-draft';
 const RefinanceForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<RefinanceFormData>();
-  const { register, handleSubmit, formState: { errors }, setValue } = form;
+   const { register, handleSubmit, formState: { errors }, setValue, watch } = form;
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -83,6 +86,15 @@ const RefinanceForm = () => {
       toast({
         title: "Authentication Required",
         description: "Please log in to submit your application.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidPhoneNumber(data.phone || "")) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid 10-digit phone number.",
         variant: "destructive",
       });
       return;
@@ -161,18 +173,19 @@ const RefinanceForm = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto px-4 py-4 sm:p-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Refinance Application</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl sm:text-2xl">Refinance Application</CardTitle>
+          <CardDescription className="text-sm">
             Complete this form to apply for a property refinance loan
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Loan Amount */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+            {/* Loan Amount Section */}
+            <FormSection title="Loan Details" description="Specify your refinance amount" icon={DollarSign}>
+            <FormRow cols={1}>
               <div className="space-y-2">
                 <Label htmlFor="amount_requested">Loan Amount Requested *</Label>
                 <Input
@@ -188,10 +201,12 @@ const RefinanceForm = () => {
                   <p className="text-sm text-destructive">{errors.amount_requested.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
+            </FormSection>
 
-            {/* Personal Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Personal Information Section */}
+            <FormSection title="Personal Information" description="Your contact details" icon={User}>
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="first_name">First Name *</Label>
                 <Input
@@ -215,15 +230,14 @@ const RefinanceForm = () => {
                   <p className="text-sm text-destructive">{errors.last_name.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number *</Label>
-                <Input
-                  id="phone"
-                  placeholder="Enter phone number"
-                  {...register('phone', { required: 'Phone number is required' })}
+                 <PhoneInput
+                   value={watch('phone') || ''}
+                   onChange={(value) => setValue('phone', value, { shouldValidate: true })}
                 />
                 {errors.phone && (
                   <p className="text-sm text-destructive">{errors.phone.message}</p>
@@ -241,9 +255,11 @@ const RefinanceForm = () => {
                   <p className="text-sm text-destructive">{errors.business_name.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
+            </FormSection>
 
-            {/* Business Address */}
+            {/* Business Address Section */}
+            <FormSection title="Business Address" description="Your business location" icon={Building2}>
             <div className="space-y-2">
               <Label htmlFor="business_address">Business Address *</Label>
               <Input
@@ -256,7 +272,7 @@ const RefinanceForm = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormRow cols={3}>
               <div className="space-y-2">
                 <Label htmlFor="business_city">City *</Label>
                 <Input
@@ -292,10 +308,12 @@ const RefinanceForm = () => {
                   <p className="text-sm text-destructive">{errors.business_zip.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
+            </FormSection>
 
-            {/* Property Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Property Information Section */}
+            <FormSection title="Property Information" description="Details about the property" icon={MapPin}>
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="property_type">Property Type *</Label>
                 <Select onValueChange={(value) => setValue('property_type', value)}>
@@ -328,9 +346,9 @@ const RefinanceForm = () => {
                   <p className="text-sm text-destructive">{errors.property_value.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormRow cols={2}>
               <div className="space-y-2">
                 <Label htmlFor="existing_loan_amount">Existing Loan Balance *</Label>
                 <Input
@@ -362,7 +380,7 @@ const RefinanceForm = () => {
                   <p className="text-sm text-destructive">{errors.years_in_business.message}</p>
                 )}
               </div>
-            </div>
+            </FormRow>
 
             <div className="space-y-2">
               <Label htmlFor="monthly_income">Monthly Business Income *</Label>
@@ -391,12 +409,13 @@ const RefinanceForm = () => {
                 <p className="text-sm text-destructive">{errors.property_address.message}</p>
               )}
             </div>
+            </FormSection>
 
-            <div className="flex justify-center pt-6">
+            <div className="flex justify-center pt-4 sm:pt-6">
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full md:w-auto px-8 py-3 text-lg"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg"
               >
                 {isLoading ? "Submitting..." : "Submit Application"}
               </Button>

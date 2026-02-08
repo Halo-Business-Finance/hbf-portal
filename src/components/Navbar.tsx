@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, FileText, Bell, ChevronDown, Grid3X3, HelpCircle } from 'lucide-react';
+import { LogOut, FileText, Bell, ChevronDown, Grid3X3, HelpCircle, Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { LoanCalculatorDialog } from '@/components/LoanCalculatorDialog';
+import { LoanTypeSelector } from '@/components/dashboard/LoanTypeSelector';
 import { userNotificationService, Notification } from '@/services/userNotificationService';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -23,15 +24,29 @@ const Navbar = () => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [loanSelectorOpen, setLoanSelectorOpen] = useState(false);
+  const [lastLogin, setLastLogin] = useState<string | null>(null);
   useEffect(() => {
     if (authenticated) {
       loadNotifications();
+      loadLastLogin();
       const unsubscribe = userNotificationService.subscribeToNotifications(() => {
         loadNotifications();
       });
       return unsubscribe;
     }
   }, [authenticated]);
+
+  const loadLastLogin = () => {
+    const stored = localStorage.getItem('hbf_last_login');
+    if (stored) {
+      setLastLogin(new Date(stored).toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }) + ' CT');
+    }
+  };
   const loadNotifications = async () => {
     try {
       const count = await userNotificationService.getUnreadCount();
@@ -205,10 +220,20 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Log out */}
-          <button onClick={handleSignOut} className="hidden md:block text-sm text-foreground hover:text-primary transition-colors">
-            Log out
-          </button>
+          {/* Log out with Last Login */}
+          <div className="hidden md:block relative">
+            <button
+              onClick={handleSignOut}
+              className="relative -top-0.5 text-sm text-foreground hover:text-primary transition-colors"
+            >
+              Log out
+            </button>
+            {lastLogin && (
+              <span className="absolute top-full right-0 mt-0.5 text-[10px] text-foreground whitespace-nowrap">
+                Last login: {lastLogin}
+              </span>
+            )}
+          </div>
 
           {/* Mobile Menu */}
           <DropdownMenu>
@@ -249,82 +274,29 @@ const Navbar = () => {
           <button onClick={() => navigate('/')} className={cn("pl-0 pr-4 py-2 text-sm font-medium transition-colors", isActiveRoute('/') ? "text-primary" : "text-foreground hover:text-primary")}>
             Dashboard
           </button>
-          {isActiveRoute('/') && <span className="absolute bottom-0 left-0 right-4 h-0.5 bg-primary rounded-full" />}
+          {isActiveRoute('/') && <span className="absolute bottom-2 left-0 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
-        {/* Loan Programs Dropdown */}
+        {/* New Loan Application Button */}
         <div className="relative h-full flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/loan-applications' && location.search.includes('type=') ? "text-primary" : "text-foreground hover:text-primary")}>
-                Select Loan Program
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 bg-white border shadow-xl">
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_7a')} className="cursor-pointer py-2.5">
-                SBA 7(a) Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_504')} className="cursor-pointer py-2.5">
-                SBA 504 Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=sba_express')} className="cursor-pointer py-2.5">
-                SBA Express Loan
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=term_loan')} className="cursor-pointer py-2.5">
-                Term Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=bridge_loan')} className="cursor-pointer py-2.5">
-                Bridge Loan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=conventional')} className="cursor-pointer py-2.5">
-                Conventional Loan
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=working_capital')} className="cursor-pointer py-2.5">
-                Working Capital
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=business_loc')} className="cursor-pointer py-2.5">
-                Business Line of Credit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=equipment')} className="cursor-pointer py-2.5">
-                Equipment Financing
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=invoice_factoring')} className="cursor-pointer py-2.5">
-                Invoice Factoring
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=refinance')} className="cursor-pointer py-2.5">
-                Refinance
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?type=usda_bi')} className="cursor-pointer py-2.5">
-                USDA B&I Loan
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {location.pathname === '/loan-applications' && location.search.includes('type=') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          <button 
+            onClick={() => setLoanSelectorOpen(true)}
+            className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors text-foreground hover:text-primary")}
+          >
+            <Plus className="h-4 w-4" />
+            New Loan Application
+          </button>
         </div>
 
-        {/* Applications Dropdown */}
+        {/* Existing Loans - Direct Link */}
         <div className="relative h-full flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/loan-applications' && !location.search.includes('type=') ? "text-primary" : "text-foreground hover:text-primary")}>
-                Loan Applications
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48 bg-white border shadow-xl">
-              <DropdownMenuItem onClick={() => navigate('/loan-applications')} className="cursor-pointer py-2.5">
-                View All Applications
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/loan-applications?new=true')} className="cursor-pointer py-2.5">
-                Start New Application
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {location.pathname === '/loan-applications' && !location.search.includes('type=') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          <button 
+            onClick={() => navigate('/existing-loans')}
+            className={cn("flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors", location.pathname === '/existing-loans' ? "text-primary" : "text-foreground hover:text-primary")}
+          >
+            Existing Loans
+          </button>
+          {location.pathname === '/existing-loans' && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Accounts Dropdown */}
@@ -345,7 +317,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {location.pathname === '/bank-accounts' && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {location.pathname === '/bank-accounts' && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Documents Dropdown */}
@@ -366,7 +338,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {(location.pathname === '/my-documents' || location.pathname === '/document-storage') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {(location.pathname === '/my-documents' || location.pathname === '/document-storage') && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
 
         {/* Business Tools Dropdown */}
@@ -399,12 +371,17 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {(location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') && <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />}
+          {(location.pathname === '/credit-reports' || location.pathname === '/loan-calculator' || location.pathname === '/credit-score-simulator') && <span className="absolute bottom-2 left-4 right-4 h-0.5 bg-primary rounded-full" />}
         </div>
         </div>
       </div>
 
       <LoanCalculatorDialog open={calculatorOpen} onOpenChange={setCalculatorOpen} />
+      <LoanTypeSelector 
+        open={loanSelectorOpen} 
+        onClose={() => setLoanSelectorOpen(false)} 
+        onSelect={(id) => console.log('Selected loan type:', id)} 
+      />
     </header>;
 };
 export default Navbar;

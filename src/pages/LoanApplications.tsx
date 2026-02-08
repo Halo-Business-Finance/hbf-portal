@@ -3,8 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ApplicationsList from '@/components/ApplicationsList';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Filter, ArrowUpDown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Filter, ArrowUpDown } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
@@ -14,7 +13,6 @@ const LoanApplications = () => {
   const navigate = useNavigate();
   const [applications, setApplications] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date_desc');
 
@@ -48,16 +46,6 @@ const LoanApplications = () => {
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...applications];
 
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(app => 
-        app.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.application_number?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
     // Filter by status
     if (statusFilter !== 'all') {
       filtered = filtered.filter(app => app.status === statusFilter);
@@ -80,7 +68,7 @@ const LoanApplications = () => {
     });
 
     return filtered;
-  }, [applications, searchTerm, statusFilter, sortBy]);
+  }, [applications, statusFilter, sortBy]);
 
   if (loading || loadingData) {
     return (
@@ -103,23 +91,13 @@ const LoanApplications = () => {
   return (
     <div className="min-h-screen bg-background">
       <PageHeader 
-        title="Loan Applications" 
-        subtitle={`Showing ${filteredAndSortedApplications.length} of ${applications.length} application${applications.length !== 1 ? 's' : ''}`}
+        title="Existing Loan Applications" 
+        subtitle={`Showing ${filteredAndSortedApplications.length} Loan application${filteredAndSortedApplications.length !== 1 ? 's' : ''}`}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <Card className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, business, or number..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <Filter className="h-4 w-4 mr-2" />
@@ -128,6 +106,7 @@ const LoanApplications = () => {
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="paused">Paused</SelectItem>
                 <SelectItem value="submitted">Submitted</SelectItem>
                 <SelectItem value="under_review">Under Review</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>

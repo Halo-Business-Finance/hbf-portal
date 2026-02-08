@@ -24,7 +24,6 @@ import {
   TrendingUp, 
   FileCheck,
   Mail,
-  Phone,
   MapPin,
   Hash,
   Briefcase,
@@ -34,13 +33,14 @@ import {
   Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PhoneInput, isValidPhoneNumber } from "@/components/ui/phone-input";
 
 const sba7aSchema = z.object({
   // Personal Information
   firstName: z.string().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
   lastName: z.string().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
   email: z.string().email("Valid email is required").max(255, "Email must be less than 255 characters"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits").max(20, "Phone number is too long"),
+  phone: z.string().refine((val) => isValidPhoneNumber(val), { message: "Phone number must be exactly 10 digits" }),
   ssn: z.string().min(9, "SSN is required").max(11, "SSN format is invalid"),
   address: z.string().min(1, "Address is required").max(200, "Address is too long"),
   city: z.string().min(1, "City is required").max(100, "City name is too long"),
@@ -293,10 +293,9 @@ export default function SBA7aLoanForm() {
                   <FormItem>
                     <FormLabel required>Phone Number</FormLabel>
                     <FormControl>
-                      <Input 
-                        icon={Phone}
-                        placeholder="(555) 555-5555" 
-                        {...field} 
+                       <PhoneInput 
+                         value={field.value}
+                         onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage />
@@ -614,7 +613,7 @@ export default function SBA7aLoanForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="working_capital">Working Capital</SelectItem>
+                      <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                       <SelectItem value="equipment">Equipment Purchase</SelectItem>
                       <SelectItem value="real_estate">Real Estate Purchase</SelectItem>
                       <SelectItem value="business_acquisition">Business Acquisition</SelectItem>

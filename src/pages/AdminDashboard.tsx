@@ -159,7 +159,7 @@ const AdminDashboard = () => {
                 className="cursor-pointer"
                 onClick={section.onClick}
               >
-                <Card className="h-full hover:shadow-md transition-shadow border">
+                <Card className="h-full hover:shadow-md transition-shadow border animated-gradient-border">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">

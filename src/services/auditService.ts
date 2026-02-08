@@ -14,7 +14,10 @@ export type AuditAction =
   | 'MANAGE_USER_ROLES'
   | 'ASSIGN_APPLICATION'
   | 'UPDATE_ASSIGNMENT'
-  | 'DELETE_ASSIGNMENT';
+  | 'DELETE_ASSIGNMENT'
+  | 'REPEATED_FAILED_LOGIN'
+  | 'RATE_LIMIT_TRIGGERED'
+  | 'SESSION_TIMEOUT';
 
 export type ResourceType = 
   | 'bank_account'

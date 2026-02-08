@@ -200,7 +200,7 @@ const AllApplications = () => {
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="refinance">Refinance</SelectItem>
                   <SelectItem value="bridge_loan">Bridge Loan</SelectItem>
-                  <SelectItem value="working_capital">Working Capital</SelectItem>
+                  <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -21,20 +21,11 @@ export const QuickActions = ({
 }: QuickActionsProps) => {
   const navigate = useNavigate();
   const actions: QuickAction[] = [{
-    id: 'new-application',
-    label: 'New Application',
-    description: 'Start a new loan application',
-    icon: FileText,
-    action: () => {
-      if (onNewApplication) {
-        onNewApplication();
-      } else {
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: 'smooth'
-        });
-      }
-    },
+    id: 'upload-docs',
+    label: 'Upload Documents',
+    description: 'Submit required documents',
+    icon: Upload,
+    action: () => navigate('/my-documents'),
     variant: 'primary'
   }, {
     id: 'upload-docs',

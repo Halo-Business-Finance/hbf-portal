@@ -1,0 +1,433 @@
+import { useState, useEffect, useMemo } from "react";
+import { 
+  AreaChart, Area, 
+  XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
+} from "recharts";
+import { TrendingUp, Building2, User, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from "@/components/ui/premium-card";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { AnimatedCurrency } from "@/components/ui/animated-counter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface BankAccount {
+  id: string;
+  account_name: string;
+  account_type: string;
+  institution: string;
+  balance: number;
+  is_business: boolean;
+}
+
+interface Application {
+  created_at: string;
+  amount_requested: number | null;
+}
+
+type PeriodOption = '30d' | '3m' | '6m' | '12m';
+
+interface EnhancedDashboardChartsProps {
+  userId?: string;
+  className?: string;
+}
+
+export const EnhancedDashboardCharts = ({
+  userId,
+  className
+}: EnhancedDashboardChartsProps) => {
+  const navigate = useNavigate();
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('6m');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const periodOptions: { value: PeriodOption; label: string }[] = [
+    { value: '30d', label: '30 Days' },
+    { value: '3m', label: '3 Months' },
+    { value: '6m', label: '6 Months' },
+    { value: '12m', label: '12 Months' },
+  ];
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      if (!userId) {
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        // Fetch bank accounts
+        const { data: accounts, error: accountsError } = await supabase
+          .from('bank_accounts')
+          .select('id, account_name, account_type, institution, balance, is_business')
+          .eq('user_id', userId);
+        
+        if (accountsError) throw accountsError;
+        setBankAccounts(accounts || []);
+
+        // Fetch applications for monthly trend
+        const { data: apps } = await supabase
+          .from('loan_applications')
+          .select('created_at, amount_requested')
+          .eq('user_id', userId);
+
+        setApplications(apps || []);
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchChartData();
+  }, [userId]);
+
+  // Generate monthly data based on selected period
+  const monthlyData = useMemo(() => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const now = new Date();
+    
+    // Determine number of periods based on selection
+    let periodsBack: number;
+    let isDays = false;
+    
+    switch (selectedPeriod) {
+      case '30d':
+        periodsBack = 30;
+        isDays = true;
+        break;
+      case '3m':
+        periodsBack = 3;
+        break;
+      case '6m':
+        periodsBack = 6;
+        break;
+      case '12m':
+        periodsBack = 12;
+        break;
+      default:
+        periodsBack = 6;
+    }
+
+    if (isDays) {
+      // For 30 days, group by week
+      const weeklyData: { month: string; grossRevenue: number; netRevenue: number; expenses: number }[] = [];
+      
+      for (let i = 4; i >= 0; i--) {
+        const weekEnd = new Date(now);
+        weekEnd.setDate(weekEnd.getDate() - (i * 7));
+        const weekStart = new Date(weekEnd);
+        weekStart.setDate(weekStart.getDate() - 7);
+        
+        const weekLabel = i === 0 ? 'This Week' : i === 1 ? 'Last Week' : `${i} Weeks Ago`;
+        
+        const weekApps = applications.filter(app => {
+          const appDate = new Date(app.created_at);
+          return appDate >= weekStart && appDate <= weekEnd;
+        });
+        
+        const totalRequested = weekApps.reduce((sum, app) => sum + (app.amount_requested || 0), 0);
+        const grossRevenue = totalRequested * 0.03;
+        const expenses = grossRevenue * 0.35;
+        const netRevenue = grossRevenue - expenses;
+        
+        weeklyData.push({
+          month: weekLabel,
+          grossRevenue: Math.round(grossRevenue / 1000),
+          netRevenue: Math.round(netRevenue / 1000),
+          expenses: Math.round(expenses / 1000)
+        });
+      }
+      
+      return weeklyData;
+    }
+
+    // For months
+    const monthlyFinancials: { month: string; grossRevenue: number; netRevenue: number; expenses: number }[] = [];
+    
+    for (let i = periodsBack - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthName = monthNames[d.getMonth()];
+      
+      const monthApps = applications.filter(app => {
+        const appDate = new Date(app.created_at);
+        return appDate.getFullYear() === d.getFullYear() && appDate.getMonth() === d.getMonth();
+      });
+      
+      const totalRequested = monthApps.reduce((sum, app) => sum + (app.amount_requested || 0), 0);
+      const grossRevenue = totalRequested * 0.03;
+      const expenses = grossRevenue * 0.35;
+      const netRevenue = grossRevenue - expenses;
+      
+      monthlyFinancials.push({
+        month: monthName,
+        grossRevenue: Math.round(grossRevenue / 1000),
+        netRevenue: Math.round(netRevenue / 1000),
+        expenses: Math.round(expenses / 1000)
+      });
+    }
+
+    return monthlyFinancials;
+  }, [applications, selectedPeriod]);
+
+  if (isLoading) {
+    return (
+      <div className={cn("grid grid-cols-1 lg:grid-cols-2 gap-5", className)}>
+        {[1, 2].map(i => (
+          <PremiumCard key={i} variant="glass" className="animate-pulse">
+            <div className="p-6">
+              <div className="h-6 bg-muted rounded w-1/3 mb-4" />
+              <div className="h-44 bg-muted/50 rounded-lg" />
+            </div>
+          </PremiumCard>
+        ))}
+      </div>
+    );
+  }
+
+  // Separate personal and business accounts
+  const personalAccounts = bankAccounts.filter(a => !a.is_business);
+  const businessAccounts = bankAccounts.filter(a => a.is_business);
+  const personalTotal = personalAccounts.reduce((sum, a) => sum + a.balance, 0);
+  const businessTotal = businessAccounts.reduce((sum, a) => sum + a.balance, 0);
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3">
+          <p className="text-sm font-medium text-foreground mb-1">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: <span className="font-semibold">${entry.value}K</span>
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className={cn("grid grid-cols-1 gap-5", className)}>
+      {/* Monthly Revenue Trend - Enhanced Area Chart with 3 Lines */}
+      <PremiumCard variant="elevated" size="none">
+        <PremiumCardHeader className="px-4 sm:px-5 pt-4 sm:pt-5 pb-0">
+          <div className="flex items-center justify-between gap-3">
+            <PremiumCardTitle className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base whitespace-nowrap">
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
+              Monthly Trend
+            </PremiumCardTitle>
+            
+            {/* Period Selector Dropdown */}
+            <Select value={selectedPeriod} onValueChange={(value: PeriodOption) => setSelectedPeriod(value)}>
+              <SelectTrigger className="w-[100px] sm:w-[120px] h-7 sm:h-8 text-[10px] sm:text-xs bg-background border-border">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border z-50">
+                {periodOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value} className="text-[10px] sm:text-xs">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </PremiumCardHeader>
+        <PremiumCardContent className="px-3 sm:px-5 pb-4 sm:pb-5 pt-3 sm:pt-4">
+          {/* Legend */}
+          <div className="flex flex-wrap gap-2 sm:gap-4 mb-2 sm:mb-3 text-[10px] sm:text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: 'hsl(142 76% 36%)' }} />
+              <span className="text-muted-foreground">Gross</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: 'hsl(213 94% 50%)' }} />
+              <span className="text-muted-foreground">Net</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: 'hsl(0 84% 60%)' }} />
+              <span className="text-muted-foreground">Expenses</span>
+            </div>
+          </div>
+          
+          {monthlyData.some(d => d.grossRevenue > 0 || d.netRevenue > 0 || d.expenses > 0) ? (
+            <div className="h-28 sm:h-36">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={monthlyData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorGrossRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(142 76% 36%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(142 76% 36%)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorNetRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(213 94% 50%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(213 94% 50%)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(0 84% 60%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(0 84% 60%)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    vertical={false} 
+                    stroke="hsl(var(--border))" 
+                    strokeOpacity={0.5}
+                  />
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis 
+                    hide 
+                    domain={[0, 'dataMax + 1']} 
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="grossRevenue"
+                    name="Gross Revenue"
+                    stroke="hsl(142 76% 36%)"
+                    strokeWidth={2}
+                    fill="url(#colorGrossRevenue)"
+                    dot={{ fill: 'hsl(142 76% 36%)', strokeWidth: 1, r: 2, stroke: 'white' }}
+                    activeDot={{ r: 4, stroke: 'white', strokeWidth: 2 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="netRevenue"
+                    name="Net Revenue"
+                    stroke="hsl(213 94% 50%)"
+                    strokeWidth={2}
+                    fill="url(#colorNetRevenue)"
+                    dot={{ fill: 'hsl(213 94% 50%)', strokeWidth: 1, r: 2, stroke: 'white' }}
+                    activeDot={{ r: 4, stroke: 'white', strokeWidth: 2 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="expenses"
+                    name="Expenses"
+                    stroke="hsl(0 84% 60%)"
+                    strokeWidth={2}
+                    fill="url(#colorExpenses)"
+                    dot={{ fill: 'hsl(0 84% 60%)', strokeWidth: 1, r: 2, stroke: 'white' }}
+                    activeDot={{ r: 4, stroke: 'white', strokeWidth: 2 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-24 sm:h-32 flex items-center justify-center text-muted-foreground text-xs sm:text-sm">
+              No financial data yet
+            </div>
+          )}
+        </PremiumCardContent>
+      </PremiumCard>
+
+      {/* Bank Accounts Widget */}
+      <PremiumCard variant="elevated" size="none">
+        <PremiumCardHeader className="px-4 sm:px-5 pt-4 sm:pt-5 pb-0">
+          <div className="flex items-center justify-between">
+            <PremiumCardTitle className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+              <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+              Linked Accounts
+            </PremiumCardTitle>
+          </div>
+        </PremiumCardHeader>
+        <PremiumCardContent className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 sm:pt-4 space-y-3 sm:space-y-4">
+          {/* Personal Accounts */}
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+              <User className="w-4 h-4" />
+              <span className="font-medium">Personal</span>
+            </div>
+            {personalAccounts.length === 0 ? (
+              <p className="text-xs sm:text-sm text-muted-foreground pl-5 sm:pl-6">No personal accounts linked</p>
+            ) : (
+              <div className="pl-4 sm:pl-6 space-y-1.5 sm:space-y-2">
+                {personalAccounts.slice(0, 2).map((account) => (
+                  <div key={account.id} className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div>
+                      <p className="text-xs sm:text-sm font-medium text-foreground truncate max-w-[120px] sm:max-w-none">{account.account_name}</p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase">{account.institution}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-base sm:text-lg font-bold text-foreground">
+                        <AnimatedCurrency value={account.balance} />
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {personalAccounts.length > 2 && (
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">+{personalAccounts.length - 2} more</p>
+                )}
+                <div className="flex justify-between items-center pt-0.5 sm:pt-1">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">Total Personal</span>
+                  <span className="text-xs sm:text-sm font-bold text-foreground">
+                    <AnimatedCurrency value={personalTotal} />
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Business Accounts */}
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+              <Building2 className="w-4 h-4" />
+              <span className="font-medium">Business</span>
+            </div>
+            {businessAccounts.length === 0 ? (
+              <p className="text-xs sm:text-sm text-muted-foreground pl-5 sm:pl-6">No business accounts linked</p>
+            ) : (
+              <div className="pl-4 sm:pl-6 space-y-1.5 sm:space-y-2">
+                {businessAccounts.slice(0, 2).map((account) => (
+                  <div key={account.id} className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div>
+                      <p className="text-xs sm:text-sm font-medium text-foreground truncate max-w-[120px] sm:max-w-none">{account.account_name}</p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase">{account.institution}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-base sm:text-lg font-bold text-foreground">
+                        <AnimatedCurrency value={account.balance} />
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {businessAccounts.length > 2 && (
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">+{businessAccounts.length - 2} more</p>
+                )}
+                <div className="flex justify-between items-center pt-0.5 sm:pt-1">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">Total Business</span>
+                  <span className="text-xs sm:text-sm font-bold text-foreground">
+                    <AnimatedCurrency value={businessTotal} />
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="w-full border-primary text-primary transition-all duration-200 text-xs sm:text-sm h-9 sm:h-10" 
+            onClick={() => navigate('/bank-accounts')}
+          >
+            Manage Bank Accounts
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
+        </PremiumCardContent>
+      </PremiumCard>
+    </div>
+  );
+};
