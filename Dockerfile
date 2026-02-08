@@ -2,11 +2,6 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install Bun for deterministic, bun.lockb-driven dependency installs
-RUN apk add --no-cache curl \
-    && curl -fsSL https://bun.sh/install | bash \
-    && ln -s /root/.bun/bin/bun /usr/local/bin/bun
-
 # Accept build-time environment variables from Code Engine --build-env
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_PUBLISHABLE_KEY
@@ -15,11 +10,13 @@ ARG VITE_SUPABASE_PUBLISHABLE_KEY
 ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 
-COPY package*.json bun.lockb ./
+# Copy package files first for better layer caching
+COPY package*.json ./
 
-# Use bun install with bun.lockb for reproducible dependency installation
-RUN bun install --frozen-lockfile
+# Install dependencies using npm (more reliable in Docker alpine)
+RUN npm ci --legacy-peer-deps
 
+# Copy source code
 COPY . .
 
 # Build the Vite application with environment variables
