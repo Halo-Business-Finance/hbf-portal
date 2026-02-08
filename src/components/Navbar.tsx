@@ -221,12 +221,15 @@ const Navbar = () => {
           </DropdownMenu>
 
           {/* Log out with Last Login */}
-          <div className="hidden md:flex items-center relative">
-            <button onClick={handleSignOut} className="text-sm text-foreground hover:text-primary transition-colors">
+          <div className="hidden md:block relative">
+            <button
+              onClick={handleSignOut}
+              className="relative -top-0.5 text-sm text-foreground hover:text-primary transition-colors"
+            >
               Log out
             </button>
             {lastLogin && (
-              <span className="absolute top-full right-0 mt-2 text-[10px] text-foreground whitespace-nowrap">
+              <span className="absolute top-full right-0 mt-0.5 text-[10px] text-foreground whitespace-nowrap">
                 Last login: {lastLogin}
               </span>
             )}

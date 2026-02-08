@@ -15,6 +15,7 @@ import { useLoanApplication } from '@/hooks/useLoanApplication';
 import { useFormAutoSave } from '@/hooks/useFormAutoSave';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, FileText, DollarSign } from 'lucide-react';
+import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 
 // Zod schema for AR/Invoice Factoring validation
 const invoiceFactoringSchema = z.object({
@@ -34,7 +35,7 @@ const invoiceFactoringSchema = z.object({
   contactName: z.string().min(2, 'Contact name is required'),
   contactTitle: z.string().min(1, 'Contact title is required'),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  phone: z.string().refine((val) => isValidPhoneNumber(val), { message: "Phone number must be exactly 10 digits" }),
 
   // Factoring Details
   monthlyInvoiceVolume: z.number().min(10000, 'Minimum monthly invoice volume is $10,000'),
@@ -412,7 +413,10 @@ const InvoiceFactoringForm: React.FC = () => {
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                       <PhoneInput 
+                         value={field.value}
+                         onChange={field.onChange}
+                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -338,12 +338,65 @@ const ApplicationsList = ({
                     <Separator className="mb-4" />
                     
                     {/* Details Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3 mb-4">
+                    {/* Mobile Stacked Layout */}
+                    <div className="sm:hidden space-y-2 mb-4">
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Program</span>
+                        <span className="text-xs font-medium text-foreground truncate max-w-[180px]">
+                          {getLoanTypeDisplay(application.loan_type)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Amount</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {formatCurrency(application.amount_requested || 0)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Term</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {(() => {
+                            const details = application.loan_details as any;
+                            const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
+                            if (!term) return 'TBD';
+                            const numericTerm = typeof term === 'string' ? term.replace(/_months|_month/gi, '').replace(/_/g, '') : term;
+                            return `${numericTerm}-Mo`;
+                          })()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Rate</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {(() => {
+                            const details = application.loan_details as any;
+                            const rate = details?.interestRate || details?.interest_rate || details?.rate;
+                            return rate ? `${rate}%` : 'TBD';
+                          })()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Started</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {format(new Date(application.created_at), 'MMM d, yyyy')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5">
+                        <span className="text-xs text-muted-foreground">Funded</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {application.status === 'funded' && application.funded_date 
+                            ? format(new Date(application.funded_date), 'MMM d, yyyy') 
+                            : 'TBD'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Desktop/Tablet Grid Layout */}
+                    <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3 mb-4">
                       <div className="flex items-center gap-1.5">
                         <FileText className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[10px] lg:text-xs text-muted-foreground">Program</p>
-                          <p className="text-xs lg:text-sm font-medium truncate">
+                          <p className="text-xs text-muted-foreground">Program</p>
+                          <p className="text-sm font-medium truncate">
                             {getLoanTypeDisplay(application.loan_type)}
                           </p>
                         </div>
@@ -351,8 +404,8 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[10px] lg:text-xs text-muted-foreground">Amount</p>
-                          <p className="text-xs lg:text-sm font-medium truncate">
+                          <p className="text-xs text-muted-foreground">Amount</p>
+                          <p className="text-sm font-medium truncate">
                             {formatCurrency(application.amount_requested || 0)}
                           </p>
                         </div>
@@ -360,8 +413,8 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[10px] lg:text-xs text-muted-foreground">Term</p>
-                          <p className="text-xs lg:text-sm font-medium truncate">
+                          <p className="text-xs text-muted-foreground">Term</p>
+                          <p className="text-sm font-medium truncate">
                             {(() => {
                           const details = application.loan_details as any;
                           const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
@@ -375,8 +428,8 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-1.5">
                         <Percent className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[10px] lg:text-xs text-muted-foreground">Rate</p>
-                          <p className="text-xs lg:text-sm font-medium truncate">
+                          <p className="text-xs text-muted-foreground">Rate</p>
+                          <p className="text-sm font-medium truncate">
                             {(() => {
                           const details = application.loan_details as any;
                           const rate = details?.interestRate || details?.interest_rate || details?.rate;
@@ -388,8 +441,8 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[10px] lg:text-xs text-muted-foreground">Started</p>
-                          <p className="text-xs lg:text-sm font-medium truncate">
+                          <p className="text-xs text-muted-foreground">Started</p>
+                          <p className="text-sm font-medium truncate">
                             {format(new Date(application.created_at), 'MMM d, yyyy')}
                           </p>
                         </div>
@@ -397,16 +450,16 @@ const ApplicationsList = ({
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[10px] lg:text-xs text-muted-foreground">Funded</p>
-                          <p className="text-xs lg:text-sm font-medium truncate">
+                          <p className="text-xs text-muted-foreground">Funded</p>
+                          <p className="text-sm font-medium truncate">
                             {application.status === 'funded' && application.funded_date ? format(new Date(application.funded_date), 'MMM d, yyyy') : 'TBD'}
                           </p>
                         </div>
                       </div>
                     </div>
                     {/* Actions */}
-                                    <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
-                                      <Button variant="outline" onClick={() => {
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 mt-4 pt-4 border-t">
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
                     const pid = getProgramIdForLoanType(application.loan_type);
                     if (pid) {
                       navigate(`/?program=${pid}&applicationId=${application.id}`);
@@ -414,13 +467,13 @@ const ApplicationsList = ({
                       navigate(`/loan-applications?id=${application.id}`);
                     }
                   }}>
-                                        <ArrowRight className="w-4 h-4 mr-2" />
-                                        Continue Application
-                                      </Button>
-                                      <Button variant="outline" onClick={() => navigate('/support')}>
-                                        <Headphones className="w-4 h-4 mr-2" />
-                                        Contact Support
-                                      </Button>
+                        <ArrowRight className="w-4 h-4 mr-2" />
+                        Continue Application
+                      </Button>
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => navigate('/support')}>
+                        <Headphones className="w-4 h-4 mr-2" />
+                        Contact Support
+                      </Button>
                       
                       {/* Pause/Resume Application - show for draft, submitted, or under_review */}
                       {(application.status === 'draft' || application.status === 'submitted' || application.status === 'under_review') && <AlertDialog>
