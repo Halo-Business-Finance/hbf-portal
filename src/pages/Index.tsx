@@ -7,11 +7,12 @@
  * - New loan application forms
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, HelpCircle, LogIn, Home, Building2, CreditCard, Store, Banknote, TrendingUp, Sparkles, CheckCircle, ArrowRight, Shield, Building, Settings, HardHat, Handshake, FileText, RotateCcw, Zap, DollarSign, Clock, Eye, EyeOff, Lock, Loader2, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -211,6 +212,7 @@ const Index = () => {
   const [lastName, setLastName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -642,13 +644,6 @@ const Index = () => {
     resetForm();
   };
 
-  // Time-based greeting
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
 
   // Show auth forms for unauthenticated users - Wells Fargo style
   if (!authenticated) {
@@ -677,30 +672,7 @@ const Index = () => {
           
           {/* Login Card - no shadow on mobile for cleaner look */}
           <div className="relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl p-6 sm:p-8 md:p-10">
-            {/* Greeting */}
-            <h1 className="text-3xl sm:text-4xl font-serif text-center text-black mb-8">
-              {getGreeting()}
-            </h1>
 
-            {/* Welcome back message for returning users */}
-            {isLogin && returningUser && <div className="mb-6 p-4 border rounded-lg bg-white border-blue-950">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
-                    <CheckCircle className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-blue-900">Welcome back!</p>
-                    <p className="text-xs text-black">
-                      Last login: {new Date(returningUser).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit'
-                  })}
-                    </p>
-                  </div>
-                </div>
-              </div>}
 
             {/* Lockout warning */}
             {isLockedOut && <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -727,7 +699,7 @@ const Index = () => {
 
               {/* Email/User ID Input */}
               <div className="relative">
-                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-12 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border border-black rounded-xl px-5 pr-12 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" tabIndex={-1} aria-label="Clear email field">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
@@ -738,31 +710,95 @@ const Index = () => {
 
               {/* Password Input */}
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Password" aria-required="true" autoComplete={isLogin ? "current-password" : "new-password"} className="h-14 bg-white border border-gray-300 rounded-xl px-5 pr-16 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1" disabled={authLoading} aria-label={showPassword ? "Hide password" : "Show password"}>
+                <Input
+                  ref={passwordInputRef}
+                  key={showPassword ? "pw-text" : "pw-password"}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  disabled={authLoading || isLockedOut}
+                  aria-label="Password"
+                  aria-required="true"
+                  autoComplete={isLogin ? "current-password" : "new-password"}
+                  className="h-14 bg-white border border-black rounded-xl px-5 pr-16 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    // Some browsers can drop the click if pointer/touch handlers call preventDefault.
+                    // Keep this logic in a single onClick for maximum reliability.
+                    e.preventDefault();
+
+                    // iOS Safari can ignore password->text toggles while focused.
+                    // Blur first, then toggle, then refocus after remount.
+                    passwordInputRef.current?.blur();
+
+                    const newShowState = !showPassword;
+                    setShowPassword(newShowState);
+
+                    // Track anonymous telemetry (no PII)
+                    import('@/services/telemetryService').then(({ telemetryService }) => {
+                      telemetryService.trackPasswordToggle(newShowState);
+                    });
+
+                    window.setTimeout(() => {
+                      const el = passwordInputRef.current;
+                      if (!el) return;
+                      try {
+                        (el as any).focus?.({ preventScroll: true });
+                        const len = el.value?.length ?? 0;
+                        el.setSelectionRange?.(len, len);
+                      } catch {
+                        // no-op
+                      }
+                    }, 0);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-gray-500 hover:text-gray-700 text-sm font-medium focus:outline-none focus:underline focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1"
+                  disabled={authLoading}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
 
-              {/* Save ID Toggle - stacked vertically */}
-              {isLogin && <div className="flex flex-col items-start gap-1">
-                  <span id="save-id-label" className="text-sm font-medium text-gray-700">Save User ID</span>
-                  <button type="button" onClick={() => setRememberMe(!rememberMe)} className={`relative inline-flex h-8 w-20 items-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${rememberMe ? 'bg-blue-600' : 'bg-blue-800'}`} role="switch" aria-checked={rememberMe} aria-labelledby="save-id-label">
-                    {/* Striped thumb */}
-                    <span className={`inline-flex h-6 w-8 transform items-center justify-center rounded-md bg-white shadow-md transition-transform ${rememberMe ? 'translate-x-11' : 'translate-x-1'}`} aria-hidden="true">
-                      {/* Vertical stripes */}
-                      <span className="flex gap-0.5">
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                        <span className="w-0.5 h-4 bg-gray-300 rounded-full"></span>
-                      </span>
-                    </span>
-                    {/* YES/NO text */}
-                    <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'left-2 opacity-100' : 'left-2 opacity-0'}`} aria-hidden="true">YES</span>
-                    <span className={`absolute text-xs font-bold text-white transition-opacity ${rememberMe ? 'right-2 opacity-0' : 'right-2 opacity-100'}`} aria-hidden="true">NO</span>
-                  </button>
+              {/* Remember Me Checkbox */}
+              {isLogin && <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="remember-me" 
+                    checked={rememberMe} 
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                    className="rounded-none border-black data-[state=checked]:bg-black data-[state=checked]:border-black"
+                    aria-label="Remember me"
+                  />
+                  <label 
+                    htmlFor="remember-me" 
+                    className="text-sm font-medium text-gray-700 cursor-pointer select-none"
+                  >
+                    Remember me
+                  </label>
                 </div>}
+              
+              {/* Welcome back message for returning users - aligned under Remember me */}
+              {isLogin && returningUser && (
+                <div className="flex items-center gap-2 -mt-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <div className="flex items-center gap-1 text-sm">
+                    <span className="font-medium text-blue-900">Welcome back!</span>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-xs text-muted-foreground">
+                      Last login: {new Date(returningUser).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {!isLogin && <div className="relative">
                   <Input id="confirmPassword" type="password" placeholder="Confirm password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Confirm password" aria-required="true" autoComplete="new-password" className="h-14 bg-white border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
@@ -791,48 +827,44 @@ const Index = () => {
 
               {/* Divider */}
               <div className="text-center text-gray-500 text-sm">
-                or
+                or continue with
               </div>
 
-              {/* Alternative Login Buttons */}
-              <div className="space-y-3">
-                <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleGoogleSignIn} disabled={authLoading} aria-label="Sign in with Google">
+              {/* Social Login Icon Buttons */}
+              <div className="flex items-center justify-center gap-4">
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleGoogleSignIn} disabled={authLoading} aria-label="Sign in with Google">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
                     <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
                     <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
                     <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
                   </svg>
-                  Continue with Google
                 </Button>
 
-                <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleAppleSignIn} disabled={authLoading} aria-label="Sign in with Apple">
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleAppleSignIn} disabled={authLoading} aria-label="Sign in with Apple">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black" aria-hidden="true">
                     <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                   </svg>
-                  Continue with Apple
                 </Button>
 
-                <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleMicrosoftSignIn} disabled={authLoading} aria-label="Sign in with Microsoft">
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleMicrosoftSignIn} disabled={authLoading} aria-label="Sign in with Microsoft">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="#F25022" d="M1 1h10v10H1z" />
                     <path fill="#00A4EF" d="M1 13h10v10H1z" />
                     <path fill="#7FBA00" d="M13 1h10v10H13z" />
                     <path fill="#FFB900" d="M13 13h10v10H13z" />
                   </svg>
-                  Continue with Microsoft
                 </Button>
 
-                <Button type="button" variant="outline" className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleLinkedInSignIn} disabled={authLoading} aria-label="Sign in with LinkedIn">
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleLinkedInSignIn} disabled={authLoading} aria-label="Sign in with LinkedIn">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2" aria-hidden="true">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
-                  Continue with LinkedIn
                 </Button>
               </div>
 
               {/* Sign up / Sign in toggle */}
-              <div className="text-center text-sm text-black pt-2">
+              <div className="text-center text-sm text-black pt-2 px-4">
                 {isLogin ? <>
                     Don't have an account?{" "}
                     <button type="button" onClick={() => switchMode("signup")} className="text-black hover:text-gray-700 font-medium hover:underline focus:outline-none">
@@ -848,22 +880,22 @@ const Index = () => {
             </form>
 
             {/* Forgot Password Link */}
-            {isLogin && <div className="mt-8 text-center">
+            {isLogin && <div className="mt-8 text-center px-4">
                 <button type="button" onClick={() => navigate('/forgot-password')} className="inline-flex items-center gap-2 text-black hover:text-gray-700 text-sm font-medium hover:underline focus:outline-none">
                   <ArrowRight className="w-4 h-4" />
-                  Forgot email or password?
+                  Forgot User ID or Password?
                 </button>
               </div>}
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm text-black">
-            <span className="text-center sm:text-left order-2 sm:order-1">
+        <footer className="relative z-20 bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between text-xs sm:text-sm text-black">
+            <span className="text-center order-2 sm:order-1 sm:text-left">
               © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
             </span>
-            <div className="flex items-center gap-3 sm:gap-6 order-1 sm:order-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 order-1 sm:order-2">
               <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy</a>
               <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms</a>
               <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Support</a>

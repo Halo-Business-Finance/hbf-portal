@@ -7,6 +7,10 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+     
+     <!-- Security: Content-Security-Policy meta tag (X-Frame-Options can only be set via HTTP header) -->
+     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://js.stripe.com https://*.lovable.dev https://*.lovableproject.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co https://*.lovable.app https://*.lovableproject.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.lovable.dev https://*.lovableproject.com; frame-src 'self' https://js.stripe.com; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" />
+     
     <title>Halo Business Finance | SBA & Commercial Business Loans</title>
     <meta name="description" content="Fast business financing solutions. SBA 7(a), SBA 504, equipment financing, working capital loans. 95% approval rate, $2.5B+ funded, 24-hour processing. Apply now." />
     <meta name="keywords" content="business loans, SBA loans, commercial financing, working capital, equipment financing, business funding" />

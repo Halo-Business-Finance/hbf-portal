@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Check, ChevronDown, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useState } from 'react';
 interface LoanProgressBarProps {
   status: string;
   className?: string;
@@ -110,19 +112,20 @@ export const LoanProgressBar = ({
   const isPaused = status === 'paused';
   const isDraft = status === 'draft';
   const isFunded = status === 'funded';
+  const [expandedStage, setExpandedStage] = useState<number | null>(null);
 
   // Calculate estimated completion for current stage
   const estimatedDates = startDate && currentStageIndex >= 0 && !isFunded ? calculateEstimatedDate(startDate, currentStageIndex) : null;
   return <div className={cn('space-y-3', className)}>
-      <div className="flex items-center justify-between text-xs sm:text-sm">
-        <span className="uppercase tracking-wide font-semibold text-muted-foreground text-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
+        <span className="uppercase tracking-wide font-semibold text-muted-foreground text-xs whitespace-nowrap">
           Loan Progress
         </span>
         
         {/* Estimated completion indicator */}
-        {estimatedDates && !isRejected && !isPaused && <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-white text-black">
+        {estimatedDates && !isRejected && !isPaused && <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted/50 text-foreground w-fit">
             <Clock className="w-3 h-3" />
-            <span className="font-medium">
+            <span className="font-medium whitespace-nowrap">
               Est. completion: {formatDateRange(estimatedDates.min, estimatedDates.max)}
             </span>
           </div>}
@@ -144,7 +147,7 @@ export const LoanProgressBar = ({
         </div>}
 
       <TooltipProvider>
-        <div className="flex justify-between text-xs text-muted-foreground font-medium">
+        <div className="hidden sm:flex justify-between text-xs text-muted-foreground font-medium">
           {stages.map((stage, index) => {
           const isCompleted = index <= currentStageIndex;
           const isCurrent = index === currentStageIndex;
@@ -164,6 +167,72 @@ export const LoanProgressBar = ({
                 </TooltipContent>
               </Tooltip>;
         })}
+        </div>
+        
+        {/* Mobile: Show only current stage prominently */}
+        <div className="flex sm:hidden flex-col items-center gap-1 text-xs">
+          <span className="text-muted-foreground">
+            Step {Math.max(currentStageIndex + 1, 1)} of {stages.length}
+          </span>
+          
+          {/* Tappable stages list */}
+          <div className="w-full mt-3 space-y-1">
+            {stages.map((stage, index) => {
+              const isCompleted = index <= currentStageIndex;
+              const isCurrent = index === currentStageIndex;
+              const isExpanded = expandedStage === index;
+              const stageEstimate = startDate ? calculateEstimatedDate(startDate, index) : null;
+              
+              return (
+                <Collapsible
+                  key={stage.key}
+                  open={isExpanded}
+                  onOpenChange={(open) => setExpandedStage(open ? index : null)}
+                >
+                  <CollapsibleTrigger className="w-full">
+                    <div className={cn(
+                      "flex items-center justify-between px-3 py-2 rounded-lg transition-colors",
+                      isCompleted && !isCurrent && "bg-primary/10",
+                      isCurrent && "bg-primary/20 ring-1 ring-primary/30",
+                      !isCompleted && !isCurrent && "bg-muted/30 opacity-60"
+                    )}>
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
+                          isCompleted ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                        )}>
+                          {isCompleted ? <Check className="w-3 h-3" /> : index + 1}
+                        </div>
+                        <span className={cn(
+                          "font-medium text-left",
+                          isCurrent && "text-primary",
+                          isCompleted && !isCurrent && "text-foreground",
+                          !isCompleted && "text-muted-foreground"
+                        )}>
+                          {stage.label}
+                        </span>
+                      </div>
+                      <ChevronDown className={cn(
+                        "w-4 h-4 text-muted-foreground transition-transform duration-200",
+                        isExpanded && "rotate-180"
+                      )} />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="px-3 py-2 ml-7 text-left space-y-1 bg-muted/20 rounded-b-lg -mt-1">
+                      <p className="text-xs text-foreground">{stage.description}</p>
+                      <p className="text-[10px] text-muted-foreground">{stage.timeframe}</p>
+                      {stageEstimate && (
+                        <p className="text-[10px] text-primary font-medium">
+                          Target: {formatDateRange(stageEstimate.min, stageEstimate.max)}
+                        </p>
+                      )}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            })}
+          </div>
         </div>
       </TooltipProvider>
     </div>;

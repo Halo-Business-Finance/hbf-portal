@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from '@/components/ui/premium-card';
@@ -12,6 +13,8 @@ import { AnimatedCurrency } from '@/components/ui/animated-counter';
 import { StatusIndicator } from '@/components/ui/status-indicator';
 import { EnhancedDashboardCharts } from './EnhancedDashboardCharts';
 import ApplicationsList from '@/components/ApplicationsList';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh-indicator';
 interface LoanApplication {
   id: string;
   application_number: string;
@@ -53,6 +56,14 @@ export const EnterpriseDashboard = ({
     pendingAmount: 0
   });
   
+  const handleRefresh = useCallback(async () => {
+    await fetchDashboardData();
+  }, [user]);
+
+  const { containerRef, pullDistance, progress, isRefreshing } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  });
+
   useEffect(() => {
     if (user) {
       fetchDashboardData();
@@ -159,14 +170,19 @@ export const EnterpriseDashboard = ({
         </div>
       </div>;
   }
-  return <div>
+  return <div ref={containerRef}>
+      <PullToRefreshIndicator
+        pullDistance={pullDistance}
+        progress={progress}
+        isRefreshing={isRefreshing}
+      />
       {/* Welcome Banner - Full Width US Bank Style */}
       <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 text-primary-foreground">
         <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
-          <h1 className="md:text-3xl font-bold mb-1 text-lg">
+          <h1 className="text-base md:text-3xl font-bold mb-1">
             Welcome back, {firstName || 'there'}.
           </h1>
-          <p className="text-primary-foreground/80 text-sm md:text-base">
+          <p className="text-primary-foreground/80 text-xs md:text-base">
             We look forward to helping you today.
           </p>
         </div>
@@ -175,8 +191,8 @@ export const EnterpriseDashboard = ({
       {/* Content with padding */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         {/* Quick Action Buttons - US Bank Style Pills */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:flex lg:flex-wrap lg:items-center lg:justify-start gap-2 md:gap-3">
-          {quickActions.map((action, index) => <Button key={index} variant="default" size="sm" className="rounded-full px-3 sm:px-4 py-2 h-9 font-medium bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm justify-center transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95" onClick={action.action}>
+        <div className="flex flex-wrap justify-center sm:justify-start gap-2 md:gap-3">
+          {quickActions.map((action, index) => <Button key={index} variant="default" size="sm" className="rounded-full px-4 py-2 h-9 font-medium bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm justify-center transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 whitespace-nowrap" onClick={action.action}>
               {action.label}
               {action.chevron && <ChevronRight className="w-4 h-4 ml-1 hidden sm:inline" />}
             </Button>)}
@@ -220,7 +236,7 @@ export const EnterpriseDashboard = ({
           {/* Link Accounts Banner */}
           <Card className="border border-border bg-muted/30 animated-gradient-border-minimal">
             <CardContent className="p-4 md:p-6">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
                 <div className="flex -space-x-2">
                   <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white">
                     <Building2 className="w-5 h-5" />
@@ -232,12 +248,15 @@ export const EnterpriseDashboard = ({
                     <Link2 className="w-5 h-5" />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground">Link your accounts to see your full financial picture.</p>
-                  <div className="flex flex-col gap-1">
+                <div className="space-y-2 text-center sm:text-left">
+                  <p className="font-semibold text-foreground text-sm sm:text-base">
+                    <span className="sm:hidden">Link accounts to see your finances.</span>
+                    <span className="hidden sm:inline">Link your accounts to see your full financial picture.</span>
+                  </p>
+                  <div className="flex flex-col gap-1 items-center sm:items-start">
                     <Button 
                       variant="link" 
-                      className="text-primary p-0 h-auto font-medium text-sm justify-start group transition-all duration-200 hover:translate-x-1" 
+                      className="text-primary p-0 h-auto font-medium text-sm justify-center sm:justify-start group transition-all duration-200 hover:translate-x-1" 
                       onClick={() => navigate('/my-documents?folder=Tax Documents')}
                     >
                       <FileText className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
@@ -246,7 +265,7 @@ export const EnterpriseDashboard = ({
                     </Button>
                     <Button 
                       variant="link" 
-                      className="text-primary p-0 h-auto font-medium text-sm justify-start group transition-all duration-200 hover:translate-x-1" 
+                      className="text-primary p-0 h-auto font-medium text-sm justify-center sm:justify-start group transition-all duration-200 hover:translate-x-1" 
                       onClick={() => navigate('/credit-reports')}
                     >
                       <FileBarChart className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
@@ -255,7 +274,7 @@ export const EnterpriseDashboard = ({
                     </Button>
                     <Button 
                       variant="link" 
-                      className="text-primary p-0 h-auto font-medium text-sm justify-start group transition-all duration-200 hover:translate-x-1" 
+                      className="text-primary p-0 h-auto font-medium text-sm justify-center sm:justify-start group transition-all duration-200 hover:translate-x-1" 
                       onClick={() => navigate('/bank-accounts')}
                     >
                       <Building2 className="w-4 h-4 mr-1.5 transition-transform duration-200 group-hover:scale-110" />
@@ -276,28 +295,28 @@ export const EnterpriseDashboard = ({
 
           {/* Credit Scores Widget */}
           <PremiumCard variant="elevated" size="none">
-            <PremiumCardHeader className="px-5 pt-5 pb-0">
+            <PremiumCardHeader className="px-4 sm:px-5 pt-4 sm:pt-5 pb-0">
               <div className="flex items-center justify-between">
-                <PremiumCardTitle className="flex items-center gap-2 text-base">Credit Scores</PremiumCardTitle>
+                <PremiumCardTitle className="flex items-center gap-2 text-sm sm:text-base">Credit Scores</PremiumCardTitle>
               </div>
             </PremiumCardHeader>
-            <PremiumCardContent className="px-5 pb-5 space-y-4">
+            <PremiumCardContent className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-3 sm:space-y-4">
               {/* Personal Credit Scores */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="w-4 h-4" />
                   <span className="font-medium">Personal</span>
                 </div>
                 {personalScores.length === 0 ? (
-                  <p className="text-sm text-muted-foreground pl-6">No personal scores available</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground pl-6">No personal scores available</p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 pl-6">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 pl-4 sm:pl-6">
                     {personalScores.slice(0, 2).map((score) => (
-                      <div key={score.id} className="text-center p-3 rounded-lg bg-muted/30 border border-border/50">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                      <div key={score.id} className="text-center p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5 sm:mb-1">
                           {score.bureau}
                         </p>
-                        <p className="text-2xl font-bold text-foreground">{score.score}</p>
+                        <p className="text-xl sm:text-2xl font-bold text-foreground">{score.score}</p>
                       </div>
                     ))}
                   </div>
@@ -305,32 +324,32 @@ export const EnterpriseDashboard = ({
               </div>
 
               {/* Business Credit Scores */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Briefcase className="w-4 h-4" />
                   <span className="font-medium">Business</span>
                 </div>
                 {businessScores.length === 0 ? (
-                  <p className="text-sm text-muted-foreground pl-6">No business scores available</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground pl-6">No business scores available</p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 pl-6">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 pl-4 sm:pl-6">
                     {businessScores.slice(0, 2).map((score) => (
-                      <div key={score.id} className="text-center p-3 rounded-lg bg-muted/30 border border-border/50">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                      <div key={score.id} className="text-center p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50">
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5 sm:mb-1">
                           {score.bureau}
                         </p>
-                        <p className="text-2xl font-bold text-foreground">{score.score}</p>
+                        <p className="text-xl sm:text-2xl font-bold text-foreground">{score.score}</p>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              <p className="text-xs text-muted-foreground">Scores checked daily with VantageScore 3.0</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Scores checked daily with VantageScore 3.0</p>
               
               <Button 
                 variant="outline" 
-                className="w-full border-primary text-primary transition-all duration-200" 
+                className="w-full border-primary text-primary transition-all duration-200 text-xs sm:text-sm h-9 sm:h-10" 
                 onClick={() => navigate('/credit-reports')}
               >
                 View All Credit Reports
