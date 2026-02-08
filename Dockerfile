@@ -2,14 +2,19 @@ FROM node:25-alpine AS builder
 
 WORKDIR /app
 
+# Install Bun for deterministic, bun.lockb-driven dependency installs
+RUN apk add --no-cache curl \
+    && curl -fsSL https://bun.sh/install | bash \
+    && ln -s /root/.bun/bin/bun /usr/local/bin/bun
+
 # Code Engine passes build-time environment variables via --build-env
 # These are automatically available as ENV during build
 # No ARG declarations needed - the vars come from the build environment
 
 COPY package*.json ./
 
-# Use npm install instead of npm ci (project uses bun.lockb, not package-lock.json)
-RUN npm install
+# Use bun install with bun.lockb for reproducible dependency installation
+RUN bun install
 
 COPY . .
 
