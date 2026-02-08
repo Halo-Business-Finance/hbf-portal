@@ -2,7 +2,7 @@ import { Lock } from 'lucide-react';
 
 export const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200 py-4 mb-16 md:mb-0">
+    <footer className="relative z-40 bg-white border-t border-gray-200 py-4 mb-[calc(4rem+env(safe-area-inset-bottom))] md:mb-0">
       <div className="max-w-7xl mx-auto px-[30px] sm:px-6 lg:px-[34px] flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 md:gap-4">
         <span className="text-sm text-center whitespace-nowrap text-muted-foreground">
           © {new Date().getFullYear()} Halo Business Finance. All rights reserved.

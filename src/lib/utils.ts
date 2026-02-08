@@ -56,5 +56,6 @@ export function validateEmail(email: string): boolean {
 
 export function validatePhone(phone: string): boolean {
   const cleanPhone = phone.replace(/\D/g, '');
-  return cleanPhone.length >= 10 && cleanPhone.length <= 15;
+   // Validate US phone numbers (10 digits)
+   return cleanPhone.length === 10;
 }

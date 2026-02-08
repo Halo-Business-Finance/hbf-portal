@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as TabsList, ModernTabsTrigger as TabsTrigger } from '@/components/ui/modern-tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { 
   Users, 
   Plus, 
@@ -21,7 +22,7 @@ import {
   ShieldCheck, 
   UserPlus,
   Mail,
-  Phone,
+   Phone,
   Building,
   Calendar,
   MoreHorizontal,
@@ -388,10 +389,9 @@ const AdminUserManagement = () => {
                 </div>
                 <div>
                   <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
+                   <PhoneInput
                     value={newUser.phone}
-                    onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
+                     onChange={(value) => setNewUser({...newUser, phone: value})}
                   />
                 </div>
                 <div>

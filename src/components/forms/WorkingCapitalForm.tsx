@@ -19,12 +19,13 @@ import { TrendingUp, Building, DollarSign, FileText, Check } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 
 const workingCapitalSchema = z.object({
   // Personal Information
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  phone: z.string().refine((val) => isValidPhoneNumber(val), { message: "Phone number must be exactly 10 digits" }),
   
   // Business Information
   businessName: z.string().min(2, 'Business name is required'),
@@ -205,7 +206,10 @@ const WorkingCapitalForm = () => {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="(555) 123-4567" {...field} />
+                     <PhoneInput 
+                       value={field.value}
+                       onChange={field.onChange}
+                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

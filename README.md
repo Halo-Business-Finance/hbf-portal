@@ -1,4 +1,8 @@
-# Welcome to your Lovable project
+ # Welcome to your Lovable project
+ 
+ [![Security Policy](https://img.shields.io/badge/Security-Policy%20Documented-brightgreen?style=flat-square&logo=shield)](./SECURITY.md)
+ [![HSTS Preload Ready](https://img.shields.io/badge/HSTS-Preload%20Ready-blue?style=flat-square&logo=letsencrypt)](./SECURITY.md#security-headers)
+ [![RLS Protected](https://img.shields.io/badge/Database-RLS%20Protected-purple?style=flat-square&logo=postgresql)](./SECURITY.md#database-security)
 
 ## Project info
 
