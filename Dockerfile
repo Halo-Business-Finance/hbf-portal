@@ -7,19 +7,22 @@ RUN apk add --no-cache curl \
     && curl -fsSL https://bun.sh/install | bash \
     && ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
-# Code Engine passes build-time environment variables via --build-env
-# These are automatically available as ENV during build
-# No ARG declarations needed - the vars come from the build environment
+# Accept build-time environment variables from Code Engine --build-env
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
 
-COPY package*.json ./
+# Make them available as environment variables during build
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+
+COPY package*.json bun.lockb ./
 
 # Use bun install with bun.lockb for reproducible dependency installation
-RUN bun install
+RUN bun install --frozen-lockfile
 
 COPY . .
 
-# VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY are passed via --build-env
-# and are available as environment variables during build
+# Build the Vite application with environment variables
 RUN npm run build
 
 FROM nginx:alpine
