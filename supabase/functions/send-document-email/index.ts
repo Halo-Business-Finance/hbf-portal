@@ -6,6 +6,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Security: HTML escape function to prevent XSS injection
+function escapeHtml(unsafe: string): string {
+  if (!unsafe) return '';
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Security: Validate URL format and protocol
+function validateUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    // Only allow HTTPS for security
+    return parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+// Security: Validate email format
+function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -42,8 +70,39 @@ serve(async (req) => {
 
     const { recipientEmail, documentName, shareableLink, senderName, documentId } = await req.json();
 
+    // SECURITY: Validate all required inputs
+    if (!recipientEmail || !documentName || !shareableLink || !senderName) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // SECURITY: Validate email format
+    if (!validateEmail(recipientEmail)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid recipient email format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // SECURITY: Validate URL format and protocol
+    if (!validateUrl(shareableLink)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid shareable link - must be HTTPS' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // SECURITY: Validate input lengths to prevent abuse
+    if (senderName.length > 100 || documentName.length > 255) {
+      return new Response(
+        JSON.stringify({ error: 'Input exceeds maximum allowed length' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // SECURITY: Verify document ownership before allowing email sharing
-    // Use service role to bypass RLS for ownership check
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!serviceRoleKey) {
       console.error('Service role key not configured');
@@ -133,20 +192,26 @@ serve(async (req) => {
 
     const { access_token } = await tokenResponse.json();
 
-    // Send email via Microsoft Graph API
+    // SECURITY: Sanitize all user inputs before inserting into HTML to prevent XSS
+    const safeSenderName = escapeHtml(senderName.substring(0, 100));
+    const safeDocumentName = escapeHtml(documentName.substring(0, 255));
+    // For the URL, we validate it above but also escape for the HTML attribute
+    const safeShareableLink = escapeHtml(shareableLink);
+
+    // Send email via Microsoft Graph API with sanitized inputs
     const emailBody = {
       message: {
-        subject: `${senderName} shared a document with you: ${documentName}`,
+        subject: `${safeSenderName} shared a document with you: ${safeDocumentName}`,
         body: {
           contentType: 'HTML',
           content: `
             <html>
               <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                 <h2 style="color: #0078d4;">Document Shared With You</h2>
-                <p><strong>${senderName}</strong> has shared a document with you.</p>
-                <p><strong>Document:</strong> ${documentName}</p>
+                <p><strong>${safeSenderName}</strong> has shared a document with you.</p>
+                <p><strong>Document:</strong> ${safeDocumentName}</p>
                 <p style="margin: 30px 0;">
-                  <a href="${shareableLink}" 
+                  <a href="${safeShareableLink}" 
                      style="background-color: #0078d4; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
                     View Document
                   </a>
@@ -196,9 +261,8 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'An unexpected error occurred' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
