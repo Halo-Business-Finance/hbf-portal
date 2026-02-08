@@ -132,13 +132,16 @@ class AdminService {
         }
       });
 
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://zosgzkpfgaaadadezpxo.supabase.co';
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
       const response = await fetch(
-        `https://zosgzkpfgaaadadezpxo.supabase.co/functions/v1/admin-dashboard?${searchParams}`,
+        `${supabaseUrl}/functions/v1/admin-dashboard?${searchParams}`,
         {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY'
+            'apikey': supabaseKey || ''
           }
         }
       );

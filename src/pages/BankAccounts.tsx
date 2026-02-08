@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { BankBalanceWidget } from '@/components/BankBalanceWidget';
+import { PageHeader } from '@/components/PageHeader';
 import { Landmark, TrendingUp, DollarSign, Calendar, Building2, User, Plus, Trash2, Search, Filter, ArrowUpDown } from 'lucide-react';
 
 interface BankAccount {
@@ -327,10 +328,17 @@ const BankAccounts = () => {
 
   if (loading || loadingData) {
     return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-background">
+        {/* Loading skeleton with banner */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
+          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
+            <div className="h-8 bg-white/20 rounded w-48 mb-2"></div>
+            <div className="h-4 bg-white/10 rounded w-64"></div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading bank accounts...</p>
+          <p className="text-muted-foreground text-center">Loading bank accounts...</p>
         </div>
       </div>
     );
@@ -338,111 +346,108 @@ const BankAccounts = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 md:p-8">
-        {/* Bank Balance Summary Widget */}
-        <div className="mb-6">
-          <BankBalanceWidget />
-        </div>
+      <PageHeader 
+        title="Bank Accounts" 
+        subtitle="View and manage your personal and business bank accounts"
+      >
+        <Button 
+          onClick={() => setIsAddDialogOpen(true)}
+          className="flex items-center gap-2 bg-white text-blue-950 hover:bg-white/90"
+        >
+          <Plus className="h-4 w-4" />
+          Add Account
+        </Button>
+      </PageHeader>
 
-        <div className="mb-6 flex items-start justify-between">
-          <div>
-            <h1 className="text-xl font-bold tracking-tight mb-2">Bank Accounts</h1>
-            <p className="text-muted-foreground">
-              View and manage your personal and business bank accounts
-            </p>
-          </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Add Account
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Add Bank Account</DialogTitle>
-                <DialogDescription>
-                  Add a new personal or business bank account
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="account_name">Account Name *</Label>
-                  <Input
-                    id="account_name"
-                    placeholder="e.g., Personal Checking"
-                    value={newAccount.account_name}
-                    onChange={(e) => setNewAccount({ ...newAccount, account_name: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="institution">Institution *</Label>
-                  <Input
-                    id="institution"
-                    placeholder="e.g., Chase Bank"
-                    value={newAccount.institution}
-                    onChange={(e) => setNewAccount({ ...newAccount, institution: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="account_number">Account Number *</Label>
-                  <Input
-                    id="account_number"
-                    placeholder="e.g., ****1234"
-                    value={newAccount.account_number}
-                    onChange={(e) => setNewAccount({ ...newAccount, account_number: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="account_type">Account Type</Label>
-                  <Select
-                    value={newAccount.account_type}
-                    onValueChange={(value) => setNewAccount({ ...newAccount, account_type: value })}
-                  >
-                    <SelectTrigger id="account_type">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Checking">Checking</SelectItem>
-                      <SelectItem value="Savings">Savings</SelectItem>
-                      <SelectItem value="Business Checking">Business Checking</SelectItem>
-                      <SelectItem value="Business Savings">Business Savings</SelectItem>
-                      <SelectItem value="Money Market">Money Market</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="balance">Current Balance</Label>
-                  <Input
-                    id="balance"
-                    type="number"
-                    placeholder="0.00"
-                    value={newAccount.balance}
-                    onChange={(e) => setNewAccount({ ...newAccount, balance: e.target.value })}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="is_business"
-                    checked={newAccount.is_business}
-                    onChange={(e) => setNewAccount({ ...newAccount, is_business: e.target.checked })}
-                    className="h-4 w-4"
-                  />
-                  <Label htmlFor="is_business" className="cursor-pointer">
-                    This is a business account
-                  </Label>
-                </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+        {/* Bank Balance Summary Widget */}
+        <BankBalanceWidget />
+
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add Bank Account</DialogTitle>
+              <DialogDescription>
+                Add a new personal or business bank account
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="account_name">Account Name *</Label>
+                <Input
+                  id="account_name"
+                  placeholder="e.g., Personal Checking"
+                  value={newAccount.account_name}
+                  onChange={(e) => setNewAccount({ ...newAccount, account_name: e.target.value })}
+                />
               </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleAddAccount}>Add Account</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <div className="grid gap-2">
+                <Label htmlFor="institution">Institution *</Label>
+                <Input
+                  id="institution"
+                  placeholder="e.g., Chase Bank"
+                  value={newAccount.institution}
+                  onChange={(e) => setNewAccount({ ...newAccount, institution: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="account_number">Account Number *</Label>
+                <Input
+                  id="account_number"
+                  placeholder="e.g., ****1234"
+                  value={newAccount.account_number}
+                  onChange={(e) => setNewAccount({ ...newAccount, account_number: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="account_type">Account Type</Label>
+                <Select
+                  value={newAccount.account_type}
+                  onValueChange={(value) => setNewAccount({ ...newAccount, account_type: value })}
+                >
+                  <SelectTrigger id="account_type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Checking">Checking</SelectItem>
+                    <SelectItem value="Savings">Savings</SelectItem>
+                    <SelectItem value="Business Checking">Business Checking</SelectItem>
+                    <SelectItem value="Business Savings">Business Savings</SelectItem>
+                    <SelectItem value="Money Market">Money Market</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="balance">Current Balance</Label>
+                <Input
+                  id="balance"
+                  type="number"
+                  placeholder="0.00"
+                  value={newAccount.balance}
+                  onChange={(e) => setNewAccount({ ...newAccount, balance: e.target.value })}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="is_business"
+                  checked={newAccount.is_business}
+                  onChange={(e) => setNewAccount({ ...newAccount, is_business: e.target.checked })}
+                  className="h-4 w-4"
+                />
+                <Label htmlFor="is_business" className="cursor-pointer">
+                  This is a business account
+                </Label>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleAddAccount}>Add Account</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <AlertDialog open={!!deleteAccountId} onOpenChange={() => setDeleteAccountId(null)}>
           <AlertDialogContent>

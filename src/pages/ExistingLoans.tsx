@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PageHeader } from '@/components/PageHeader';
 
 interface ExistingLoan {
   id: string;
@@ -73,44 +74,46 @@ const ExistingLoans = () => {
         return;
       }
 
-      const { data: loans, error } = await supabase
-        .from('existing_loans')
+      // Fetch funded loan applications
+      const { data: fundedApplications, error: appError } = await supabase
+        .from('loan_applications')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .eq('status', 'funded')
+        .order('funded_date', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching existing loans:', error);
-        toast.error('Failed to load existing loans');
+      if (appError) {
+        console.error('Error fetching funded applications:', appError);
+        toast.error('Failed to load funded loans');
         return;
       }
 
-      // Transform database records to component format
-      const transformedLoans: ExistingLoan[] = (loans || []).map(loan => ({
-        id: loan.id,
-        loanType: loan.loan_type as 'commercial' | 'business',
-        loanName: loan.loan_name,
-        lender: loan.lender,
-        loanBalance: Number(loan.loan_balance),
-        originalAmount: Number(loan.original_amount),
-        monthlyPayment: Number(loan.monthly_payment),
-        interestRate: Number(loan.interest_rate),
-        termMonths: loan.term_months,
-        remainingMonths: loan.remaining_months,
-        maturityDate: loan.maturity_date,
-        originationDate: loan.origination_date,
-        hasPrepaymentPenalty: loan.has_prepayment_penalty,
-        prepaymentPeriodEndDate: loan.prepayment_period_end_date,
-        status: loan.status as 'current' | 'funded_by_us' | 'partner_funded',
-        loanPurpose: loan.loan_purpose
-      }));
+      // Transform funded applications to ExistingLoan format
+      const transformedLoans: ExistingLoan[] = (fundedApplications || []).map(app => {
+        const loanDetails = app.loan_details as any || {};
+        return {
+          id: app.id,
+          loanType: 'commercial' as 'commercial' | 'business',
+          loanName: `${app.loan_type?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())} - ${app.business_name || 'Business Loan'}`,
+          lender: 'Halo Business Finance',
+          loanBalance: Number(app.amount_requested || 0),
+          originalAmount: Number(app.amount_requested || 0),
+          monthlyPayment: Number(loanDetails.monthly_payment || 0),
+          interestRate: Number(loanDetails.interest_rate || 0),
+          termMonths: Number(loanDetails.term_months || 0),
+          remainingMonths: Number(loanDetails.term_months || 0),
+          maturityDate: loanDetails.maturity_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          originationDate: app.funded_date || app.created_at,
+          hasPrepaymentPenalty: loanDetails.has_prepayment_penalty || false,
+          prepaymentPeriodEndDate: loanDetails.prepayment_period_end_date,
+          status: 'funded_by_us' as 'current' | 'funded_by_us' | 'partner_funded',
+          loanPurpose: app.loan_type?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Business Loan'
+        };
+      });
 
-      // Separate by loan type
-      const commercial = transformedLoans.filter(loan => loan.loanType === 'commercial');
-      const business = transformedLoans.filter(loan => loan.loanType === 'business');
-
-      setCommercialLoans(commercial);
-      setBusinessLoans(business);
+      // For now, all funded loans go to commercial (can be expanded later)
+      setCommercialLoans(transformedLoans);
+      setBusinessLoans([]);
     } catch (error) {
       console.error('Error loading existing loans:', error);
       toast.error('An unexpected error occurred');
@@ -323,10 +326,17 @@ const ExistingLoans = () => {
 
   if (loading || loadingData) {
     return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-background">
+        {/* Loading skeleton with banner */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
+          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
+            <div className="h-8 bg-white/20 rounded w-48 mb-2"></div>
+            <div className="h-4 bg-white/10 rounded w-72"></div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading existing loans...</p>
+          <p className="text-muted-foreground text-center">Loading existing loans...</p>
         </div>
       </div>
     );
@@ -334,14 +344,12 @@ const ExistingLoans = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 md:p-8">
-        <div className="mb-6">
-          <h1 className="text-xl font-bold tracking-tight mb-2">Existing Loans</h1>
-          <p className="text-muted-foreground">
-            View your commercial and business loans funded by us, partners, or third parties
-          </p>
-        </div>
+      <PageHeader 
+        title="Existing Loans" 
+        subtitle="View your commercial and business loans funded by us, partners, or third parties"
+      />
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <Tabs defaultValue="commercial" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="commercial" count={filteredCommercialLoans.length}>Commercial Loans</TabsTrigger>

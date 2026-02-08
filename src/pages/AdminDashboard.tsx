@@ -17,18 +17,10 @@ import {
   BarChart3,
   CreditCard,
   Building2,
-  Plug,
-  Home
+  Plug
 } from 'lucide-react';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
 import { SecurityOverview } from '@/components/SecurityOverview';
+import { PageHeader } from '@/components/PageHeader';
 
 
 const AdminDashboard = () => {
@@ -45,10 +37,15 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-background">
+        <PageHeader 
+          title="Admin Dashboard" 
+          subtitle="Manage applications, users, and system settings"
+          loading={true}
+        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading admin dashboard...</p>
+          <p className="text-muted-foreground text-center">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -142,34 +139,13 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Breadcrumb */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="flex items-center gap-1">
-                <Home className="h-4 w-4" />
-                Home
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Admin Dashboard</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Admin Dashboard" 
+        subtitle="Manage applications, users, and system settings"
+      />
 
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold mb-2">
-            Admin Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Manage applications, users, and system settings
-          </p>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8">
         {/* Security Overview Widget */}
         <SecurityOverview />
 
@@ -183,7 +159,7 @@ const AdminDashboard = () => {
                 className="cursor-pointer"
                 onClick={section.onClick}
               >
-                <Card className="h-full hover:shadow-md transition-shadow border">
+                <Card className="h-full hover:shadow-md transition-shadow border animated-gradient-border">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">

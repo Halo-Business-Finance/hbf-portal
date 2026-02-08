@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
+import { PageHeader } from '@/components/PageHeader';
 import { 
   assignmentService, 
   ApplicationAssignment, 
@@ -26,21 +27,12 @@ import {
   Edit, 
   Users,
   FileText,
-  Home,
   RefreshCw,
   AlertCircle,
   CheckCircle,
   Clock,
   Shield
 } from 'lucide-react';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -279,45 +271,24 @@ const ApplicationAssignments = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Breadcrumb */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="flex items-center gap-1">
-                <Home className="h-4 w-4" />
-                Home
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/admin">Admin Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Application Assignments</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        {/* Header */}
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <div>
-            <h1 className="text-xl font-bold">Application Assignments</h1>
-            <p className="text-muted-foreground">Assign underwriters to loan applications for review</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={loadData}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-            <Button onClick={() => setIsAssignDialogOpen(true)}>
-              <UserPlus className="w-4 h-4 mr-2" />
-              New Assignment
-            </Button>
-          </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Application Assignments" 
+        subtitle="Assign underwriters to loan applications for review"
+      >
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={loadData} className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
+          <Button onClick={() => setIsAssignDialogOpen(true)} className="bg-white text-blue-950 hover:bg-white/90">
+            <UserPlus className="w-4 h-4 mr-2" />
+            New Assignment
+          </Button>
         </div>
+      </PageHeader>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

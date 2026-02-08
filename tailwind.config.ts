@@ -20,7 +20,7 @@ export default {
     	extend: {
     		fontFamily: {
     			sans: [
-    				'Plus Jakarta Sans',
+    				'Open Sans',
     				'ui-sans-serif',
     				'system-ui',
     				'sans-serif',
@@ -37,6 +37,7 @@ export default {
     				'sans-serif'
     			],
     			serif: [
+    				'Source Serif Pro',
     				'ui-serif',
     				'Georgia',
     				'Cambria',
@@ -45,6 +46,7 @@ export default {
     				'serif'
     			],
     			mono: [
+    				'IBM Plex Mono',
     				'ui-monospace',
     				'SFMono-Regular',
     				'Menlo',
@@ -305,6 +307,28 @@ export default {
     				'100%': {
     					backgroundPosition: '200% 0'
     				}
+    			},
+    			'bounce-top': {
+    				'0%': {
+    					transform: 'translateY(0)'
+    				},
+    				'50%': {
+    					transform: 'translateY(8px)'
+    				},
+    				'100%': {
+    					transform: 'translateY(0)'
+    				}
+    			},
+    			'bounce-bottom': {
+    				'0%': {
+    					transform: 'translateY(0)'
+    				},
+    				'50%': {
+    					transform: 'translateY(-8px)'
+    				},
+    				'100%': {
+    					transform: 'translateY(0)'
+    				}
     			}
     		},
     		animation: {
@@ -317,7 +341,9 @@ export default {
     			'slide-in-left': 'slide-in-left 0.4s ease-out',
     			'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
     			float: 'float 3s ease-in-out infinite',
-    			shimmer: 'shimmer 2s linear infinite'
+    			shimmer: 'shimmer 2s linear infinite',
+    			'bounce-top': 'bounce-top 0.3s ease-out',
+    			'bounce-bottom': 'bounce-bottom 0.3s ease-out'
     		},
     		transitionTimingFunction: {
     			smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',

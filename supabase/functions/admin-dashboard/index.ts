@@ -158,9 +158,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in admin-dashboard:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    // Return generic error message to prevent information leakage
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -221,11 +221,9 @@ async function getApplicationStats(supabase: any): Promise<Response> {
 
   } catch (error) {
     console.error('Error getting application stats:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
-        error: 'Failed to get application stats',
-        message: errorMessage 
+        error: 'Failed to get application stats'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -329,11 +327,9 @@ async function getFilteredApplications(supabase: any, filters: ApplicationFilter
 
   } catch (error) {
     console.error('Error getting filtered applications:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
-        error: 'Failed to get applications',
-        message: errorMessage 
+        error: 'Failed to get applications'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -406,11 +402,9 @@ async function updateApplicationStatus(
 
   } catch (error) {
     console.error('Error updating application status:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
-        error: 'Failed to update application status',
-        message: errorMessage 
+        error: 'Failed to update application status'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

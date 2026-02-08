@@ -15,33 +15,36 @@ const SelectTrigger = React.forwardRef<
     error?: boolean;
   }
 >(({ className, children, error, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      // Base styles
-      "flex h-11 w-full items-center justify-between rounded-lg border bg-background text-sm text-foreground",
-      "px-4 ring-offset-background transition-all duration-200",
-      "placeholder:text-muted-foreground",
-      // Focus styles
-      "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-0 focus:border-primary",
-      // Shadow and hover
-      "shadow-sm hover:shadow-md hover:border-muted-foreground/30",
-      // Disabled styles
-      "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-sm",
-      // Error state
-      error && "border-destructive focus:ring-destructive/30 focus:border-destructive",
-      // Default border
-      !error && "border-border",
-      "[&>span]:line-clamp-1",
-      className
-    )}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
+  <div className="relative w-full input-animated-focus">
+    <SelectPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        // Base styles
+        "flex h-11 w-full items-center justify-between rounded-lg border bg-background text-base md:text-sm text-foreground",
+        "px-4 ring-offset-background transition-all duration-200",
+        "placeholder:text-muted-foreground",
+        // Focus styles
+        "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-0 focus:border-primary",
+        // Shadow and hover
+        "shadow-sm hover:shadow-md hover:border-muted-foreground/30",
+        // Disabled styles
+        "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-sm",
+        // Error state
+        error && "border-destructive focus:ring-destructive/30 focus:border-destructive",
+        // Default border
+        !error && "border-border",
+        "[&>span]:line-clamp-1",
+        "relative z-[1]",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <SelectPrimitive.Icon asChild>
+        <ChevronDown className="h-4 w-4 opacity-50 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+      </SelectPrimitive.Icon>
+    </SelectPrimitive.Trigger>
+  </div>
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
@@ -135,7 +138,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-md py-2.5 pl-9 pr-3 text-sm outline-none",
+      "relative flex w-full cursor-pointer select-none items-center rounded-md py-2.5 pl-9 pr-3 text-base md:text-sm outline-none",
       "transition-colors duration-150",
       "focus:bg-accent focus:text-accent-foreground",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",

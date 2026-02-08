@@ -12,6 +12,7 @@ import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { adminService } from '@/services/adminService';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { 
   ArrowLeft, 
   FileText, 
@@ -53,6 +54,7 @@ interface LoanApplication {
   created_at: string;
   updated_at: string;
   application_submitted_date: string;
+  funded_date: string | null;
   loan_details: any;
 }
 
@@ -321,9 +323,9 @@ const AdminLoanDetail = () => {
                       Phone Number
                     </Label>
                     {isEditing ? (
-                      <Input
+                       <PhoneInput
                         value={editData.phone || ''}
-                        onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                         onChange={(value) => setEditData({...editData, phone: value})}
                       />
                     ) : (
                       <p className="text-sm font-medium mt-1">{application.phone}</p>
@@ -428,7 +430,7 @@ const AdminLoanDetail = () => {
                           <SelectItem value="refinance">Refinance</SelectItem>
                           <SelectItem value="bridge">Bridge Loan</SelectItem>
                           <SelectItem value="purchase">Purchase</SelectItem>
-                          <SelectItem value="working_capital">Working Capital</SelectItem>
+                          <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : (
@@ -540,7 +542,17 @@ const AdminLoanDetail = () => {
                   <div>
                     <Label>Submitted Date</Label>
                     <p className="text-sm font-medium mt-1">
-                      {new Date(application.application_submitted_date).toLocaleDateString()} at {new Date(application.application_submitted_date).toLocaleTimeString()}
+                      {application.application_submitted_date 
+                        ? `${new Date(application.application_submitted_date).toLocaleDateString()} at ${new Date(application.application_submitted_date).toLocaleTimeString()}`
+                        : 'Not yet submitted'}
+                    </p>
+                  </div>
+                  <div>
+                    <Label>Funded Date</Label>
+                    <p className="text-sm font-medium mt-1">
+                      {application.funded_date 
+                        ? `${new Date(application.funded_date).toLocaleDateString()} at ${new Date(application.funded_date).toLocaleTimeString()}`
+                        : <span className="text-muted-foreground">Not yet funded</span>}
                     </p>
                   </div>
                 </CardContent>

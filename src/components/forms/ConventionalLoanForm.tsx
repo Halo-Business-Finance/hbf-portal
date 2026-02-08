@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLoanApplication } from "@/hooks/useLoanApplication";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { useNavigate } from "react-router-dom";
+import { PhoneInput, isValidPhoneNumber } from "@/components/ui/phone-input";
 
 interface ConventionalLoanFormData {
   loanAmount: string;
@@ -61,6 +62,15 @@ export const ConventionalLoanForm: React.FC = () => {
       toast({
         title: "Authentication required",
         description: "Please log in to submit your application.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidPhoneNumber(data.phoneNumber || "")) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid 10-digit phone number.",
         variant: "destructive",
       });
       return;
@@ -144,7 +154,7 @@ export const ConventionalLoanForm: React.FC = () => {
                     <SelectValue placeholder="Select loan purpose" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="working_capital">Working Capital</SelectItem>
+                    <SelectItem value="working_capital">Working Capital Loan</SelectItem>
                     <SelectItem value="equipment_purchase">Equipment Purchase</SelectItem>
                     <SelectItem value="real_estate">Real Estate</SelectItem>
                     <SelectItem value="business_expansion">Business Expansion</SelectItem>
@@ -350,13 +360,13 @@ export const ConventionalLoanForm: React.FC = () => {
               </div>
               <div>
                 <Label htmlFor="phoneNumber">Phone Number</Label>
-                <SecureInput
-                  id="phoneNumber"
-                  type="phone"
-                  placeholder="(555) 123-4567"
-                  {...register("phoneNumber", { required: "Phone number is required" })}
+                 <PhoneInput
+                   value={watch("phoneNumber") || ""}
+                   onChange={(value) => setValue("phoneNumber", value, { shouldValidate: true })}
                 />
-                {errors.phoneNumber && <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>}
+                {!isValidPhoneNumber(watch("phoneNumber") || "") && watch("phoneNumber") && (
+                  <p className="text-sm text-destructive">Phone number must be exactly 10 digits</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>

@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Mail, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Mail, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -182,19 +182,21 @@ const ChangeEmail = () => {
             </Alert>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Change email form">
                 <FormField
                   control={form.control}
                   name="currentEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Current Email</FormLabel>
+                      <FormLabel className="text-sm text-black">Current Email</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="email"
                           readOnly
-                          className="bg-muted/50"
+                          aria-label="Current email address (read-only)"
+                          aria-readonly="true"
+                          className="h-14 bg-muted/50 border border-gray-300 rounded-xl px-5 focus:border-gray-400 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
                         />
                       </FormControl>
                       <FormMessage />
@@ -204,34 +206,54 @@ const ChangeEmail = () => {
                 <FormField
                   control={form.control}
                   name="newEmail"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>New Email Address</FormLabel>
+                      <FormLabel className="text-sm text-black">New Email Address</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="email"
                           placeholder="Enter new email address"
+                          aria-label="New email address"
+                          aria-required="true"
+                          aria-invalid={!!fieldState.error}
+                          aria-describedby={fieldState.error ? "newEmail-error" : undefined}
+                          autoComplete="email"
+                          className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
+                            fieldState.error 
+                              ? 'border-red-500 focus:border-red-500' 
+                              : 'border-gray-300 focus:border-gray-400'
+                          }`}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage id="newEmail-error" />
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
                   name="confirmEmail"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>Confirm New Email</FormLabel>
+                      <FormLabel className="text-sm text-black">Confirm New Email</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="email"
                           placeholder="Confirm new email address"
+                          aria-label="Confirm new email address"
+                          aria-required="true"
+                          aria-invalid={!!fieldState.error}
+                          aria-describedby={fieldState.error ? "confirmEmail-error" : undefined}
+                          autoComplete="email"
+                          className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
+                            fieldState.error 
+                              ? 'border-red-500 focus:border-red-500' 
+                              : 'border-gray-300 focus:border-gray-400'
+                          }`}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage id="confirmEmail-error" />
                     </FormItem>
                   )}
                 />
@@ -240,8 +262,16 @@ const ChangeEmail = () => {
                     type="submit"
                     className="w-full"
                     disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                   >
-                    {isSubmitting ? "Sending Verification..." : "Change Email Address"}
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" />
+                        Sending Verification...
+                      </>
+                    ) : (
+                      "Change Email Address"
+                    )}
                   </Button>
                 </div>
               </form>

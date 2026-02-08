@@ -19,12 +19,13 @@ import { TrendingUp, Building, DollarSign, FileText, Check } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 
 const workingCapitalSchema = z.object({
   // Personal Information
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  phone: z.string().refine((val) => isValidPhoneNumber(val), { message: "Phone number must be exactly 10 digits" }),
   
   // Business Information
   businessName: z.string().min(2, 'Business name is required'),
@@ -35,7 +36,7 @@ const workingCapitalSchema = z.object({
   yearsInBusiness: z.number().min(1, 'Years in business must be at least 1'),
   industry: z.string().min(2, 'Industry is required'),
   
-  // Working Capital Details
+  // Working Capital Loan Details
   amountRequested: z.number().min(10000, 'Minimum amount is $10,000'),
   purposeOfFunds: z.string().min(10, 'Purpose must be at least 10 characters'),
   monthlyRevenue: z.number().min(1000, 'Monthly revenue is required'),
@@ -142,7 +143,7 @@ const WorkingCapitalForm = () => {
         clearOnSubmit();
         toast({
           title: "Application Submitted Successfully!",
-          description: `Your working capital application #${result.application_number} has been submitted for review.`
+          description: `Your working capital loan application #${result.application_number} has been submitted for review.`
         });
         form.reset();
         setCurrentStep(1);
@@ -205,7 +206,10 @@ const WorkingCapitalForm = () => {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="(555) 123-4567" {...field} />
+                     <PhoneInput 
+                       value={field.value}
+                       onChange={field.onChange}
+                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -337,7 +341,7 @@ const WorkingCapitalForm = () => {
           <div className="space-y-4">
             <div className="text-center mb-6">
               <DollarSign className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-semibold">Working Capital Details</h3>
+              <h3 className="text-xl font-semibold">Working Capital Loan Details</h3>
               <p className="text-muted-foreground">Specify your funding requirements</p>
             </div>
             
@@ -535,7 +539,7 @@ const WorkingCapitalForm = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="w-6 h-6" />
-          Working Capital Application
+          Working Capital Loan Application
         </CardTitle>
         <CardDescription>
           Step {currentStep} of {totalSteps} - Secure working capital for your business operations

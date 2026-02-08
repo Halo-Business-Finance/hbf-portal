@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, DollarSign, FileText, User, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Clock, Percent } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { LoanProgressBar } from '@/components/LoanProgressBar';
-import { LoanTimeline } from '@/components/LoanTimeline';
-import { generateApplicationPDF } from '@/utils/pdfGenerator';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 interface LoanApplication {
   id: string;
   loan_type: string;
@@ -24,7 +23,9 @@ interface LoanApplication {
   business_name: string;
   application_started_date: string;
   application_submitted_date: string;
+  funded_date: string | null;
   created_at: string;
+  loan_details?: unknown;
 }
 interface ApplicationsListProps {
   statusFilter?: string | null;
@@ -54,6 +55,76 @@ const ApplicationsList = ({
       }
       return newSet;
     });
+  };
+  const handleDeleteApplication = async (applicationId: string) => {
+    try {
+      const {
+        error
+      } = await supabase.from('loan_applications').delete().eq('id', applicationId);
+      if (error) throw error;
+      setApplications(prev => prev.filter(app => app.id !== applicationId));
+      toast({
+        title: "Application Deleted",
+        description: "Your loan application has been permanently deleted."
+      });
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the application. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  const handlePauseApplication = async (applicationId: string) => {
+    try {
+      const {
+        error
+      } = await supabase.from('loan_applications').update({
+        status: 'paused'
+      }).eq('id', applicationId);
+      if (error) throw error;
+      setApplications(prev => prev.map(app => app.id === applicationId ? {
+        ...app,
+        status: 'paused'
+      } : app));
+      toast({
+        title: "Application Paused",
+        description: "Your loan application has been paused. You can resume it anytime within 90 days."
+      });
+    } catch (error) {
+      console.error('Error pausing application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to pause the application. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  const handleResumeApplication = async (applicationId: string) => {
+    try {
+      const {
+        error
+      } = await supabase.from('loan_applications').update({
+        status: 'draft'
+      }).eq('id', applicationId);
+      if (error) throw error;
+      setApplications(prev => prev.map(app => app.id === applicationId ? {
+        ...app,
+        status: 'draft'
+      } : app));
+      toast({
+        title: "Application Resumed",
+        description: "Your loan application has been resumed. You can continue where you left off."
+      });
+    } catch (error) {
+      console.error('Error resuming application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to resume the application. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   useEffect(() => {
     if (externalApplications) {
@@ -99,7 +170,7 @@ const ApplicationsList = ({
       purchase: 'Purchase of Property',
       franchise: 'Franchise Loan',
       factoring: 'Factoring Loan',
-      working_capital: 'Working Capital'
+      working_capital: 'Working Capital Loan'
     };
     return types[loanType as keyof typeof types] || loanType;
   };
@@ -110,7 +181,8 @@ const ApplicationsList = ({
       under_review: 'border-amber-400 text-amber-800 bg-amber-50',
       approved: 'border-emerald-400 text-emerald-800 bg-emerald-50',
       rejected: 'border-red-400 text-red-800 bg-red-50',
-      funded: 'border-indigo-400 text-indigo-800 bg-indigo-50'
+      funded: 'border-indigo-400 text-indigo-800 bg-indigo-50',
+      paused: 'border-orange-400 text-orange-800 bg-orange-50'
     };
     return colors[status as keyof typeof colors] || 'border-slate-300 text-slate-700 bg-slate-50';
   };
@@ -207,6 +279,10 @@ const ApplicationsList = ({
       funded: {
         text: 'Funded',
         color: 'text-indigo-700'
+      },
+      paused: {
+        text: 'Paused - Resume Anytime',
+        color: 'text-orange-700'
       }
     };
     return messages[status as keyof typeof messages] || messages.draft;
@@ -216,8 +292,246 @@ const ApplicationsList = ({
         {filteredApplications.map(application => {
         const statusInfo = getStatusMessage(application.status);
         const isCollapsed = collapsedCards.has(application.id);
+        const programId = getProgramIdForLoanType(application.loan_type);
         return <Collapsible key={application.id} open={!isCollapsed} onOpenChange={() => toggleCard(application.id)}>
-              
+              <Card className="border border-border hover:shadow-md transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  {/* Header Section */}
+                  <div className="flex-col gap-3 mb-4 sm:items-end sm:justify-between flex sm:flex-row">
+                    <div className="flex items-center gap-3 min-w-0">
+                      
+                      <div className="min-w-0">
+                        <p className="font-semibold text-foreground truncate">
+                          {application.business_name || 'New Application'}
+                        </p>
+                        
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {application.status === 'draft' ? <Button variant="default" size="sm" onClick={e => {
+                    e.stopPropagation();
+                    const pid = getProgramIdForLoanType(application.loan_type);
+                    if (pid) {
+                      navigate(`/?program=${pid}&applicationId=${application.id}`);
+                    }
+                  }}>
+                          Continue Application
+                        </Button> : <Button variant="outline" size="sm" onClick={e => {
+                    e.stopPropagation();
+                    toggleCard(application.id);
+                  }}>
+                          View Details
+                        </Button>}
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                        </Button>
+                      </CollapsibleTrigger>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <LoanProgressBar status={application.status} startDate={application.application_started_date || application.created_at} />
+
+                  {/* Collapsible Content */}
+                  <CollapsibleContent className="mt-4">
+                    <Separator className="mb-4" />
+                    
+                    {/* Details Grid */}
+                    {/* Mobile Stacked Layout */}
+                    <div className="sm:hidden space-y-2 mb-4">
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Program</span>
+                        <span className="text-xs font-medium text-foreground truncate max-w-[180px]">
+                          {getLoanTypeDisplay(application.loan_type)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Amount</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {formatCurrency(application.amount_requested || 0)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Term</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {(() => {
+                            const details = application.loan_details as any;
+                            const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
+                            if (!term) return 'TBD';
+                            const numericTerm = typeof term === 'string' ? term.replace(/_months|_month/gi, '').replace(/_/g, '') : term;
+                            return `${numericTerm}-Mo`;
+                          })()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Rate</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {(() => {
+                            const details = application.loan_details as any;
+                            const rate = details?.interestRate || details?.interest_rate || details?.rate;
+                            return rate ? `${rate}%` : 'TBD';
+                          })()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5 border-b border-border/50">
+                        <span className="text-xs text-muted-foreground">Started</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {format(new Date(application.created_at), 'MMM d, yyyy')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-1.5">
+                        <span className="text-xs text-muted-foreground">Funded</span>
+                        <span className="text-xs font-medium text-foreground">
+                          {application.status === 'funded' && application.funded_date 
+                            ? format(new Date(application.funded_date), 'MMM d, yyyy') 
+                            : 'TBD'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Desktop/Tablet Grid Layout */}
+                    <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3 mb-4">
+                      <div className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">Program</p>
+                          <p className="text-sm font-medium truncate">
+                            {getLoanTypeDisplay(application.loan_type)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <DollarSign className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">Amount</p>
+                          <p className="text-sm font-medium truncate">
+                            {formatCurrency(application.amount_requested || 0)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">Term</p>
+                          <p className="text-sm font-medium truncate">
+                            {(() => {
+                          const details = application.loan_details as any;
+                          const term = details?.loanTerm || details?.term || details?.termMonths || details?.loan_term;
+                          if (!term) return 'TBD';
+                          const numericTerm = typeof term === 'string' ? term.replace(/_months|_month/gi, '').replace(/_/g, '') : term;
+                          return `${numericTerm}-Mo`;
+                        })()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Percent className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">Rate</p>
+                          <p className="text-sm font-medium truncate">
+                            {(() => {
+                          const details = application.loan_details as any;
+                          const rate = details?.interestRate || details?.interest_rate || details?.rate;
+                          return rate ? `${rate}%` : 'TBD';
+                        })()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">Started</p>
+                          <p className="text-sm font-medium truncate">
+                            {format(new Date(application.created_at), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground">Funded</p>
+                          <p className="text-sm font-medium truncate">
+                            {application.status === 'funded' && application.funded_date ? format(new Date(application.funded_date), 'MMM d, yyyy') : 'TBD'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 mt-4 pt-4 border-t">
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => {
+                    const pid = getProgramIdForLoanType(application.loan_type);
+                    if (pid) {
+                      navigate(`/?program=${pid}&applicationId=${application.id}`);
+                    } else {
+                      navigate(`/loan-applications?id=${application.id}`);
+                    }
+                  }}>
+                        <ArrowRight className="w-4 h-4 mr-2" />
+                        Continue Application
+                      </Button>
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => navigate('/support')}>
+                        <Headphones className="w-4 h-4 mr-2" />
+                        Contact Support
+                      </Button>
+                      
+                      {/* Pause/Resume Application - show for draft, submitted, or under_review */}
+                      {(application.status === 'draft' || application.status === 'submitted' || application.status === 'under_review') && <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline">
+                              <Pause className="w-4 h-4 mr-2" />
+                              Pause Loan
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Pause Loan Application?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Pausing your application will prevent it from timing out. You can resume it anytime within 90 days to continue where you left off.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Keep Active</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handlePauseApplication(application.id)}>
+                                Pause Application
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>}
+
+                      {/* Resume Application - show for paused applications */}
+                      {application.status === 'paused' && <Button variant="outline" onClick={() => handleResumeApplication(application.id)}>
+                          <Play className="w-4 h-4 mr-2" />
+                          Resume Loan
+                        </Button>}
+
+                      {/* Delete Application */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline">
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Loan Application?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your loan application and all associated data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteApplication(application.id)} className="bg-destructive hover:bg-destructive/90">
+                              Delete Application
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </CollapsibleContent>
+                </CardContent>
+              </Card>
             </Collapsible>;
       })}
       </div>

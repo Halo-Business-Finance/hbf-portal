@@ -8,18 +8,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md active:scale-[0.98]",
+        default: "bg-primary text-primary-foreground shadow-sm active:scale-[0.98]",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md active:scale-[0.98]",
+          "bg-destructive text-destructive-foreground shadow-sm active:scale-[0.98]",
         outline:
-          "border-2 border-blue-500 bg-background text-foreground hover:bg-muted hover:border-blue-400 shadow-sm hover:shadow-md active:scale-[0.98]",
+          "border-2 border-blue-500 bg-background text-foreground shadow-sm active:scale-[0.98]",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md active:scale-[0.98]",
-        ghost: "text-foreground hover:bg-muted hover:text-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-gradient-primary text-primary-foreground shadow-primary hover:shadow-lg hover:opacity-90 active:scale-[0.98]",
-        "gradient-outline": "border-2 border-primary bg-background text-primary hover:bg-primary/5 shadow-sm hover:shadow-primary/20 active:scale-[0.98]",
-        success: "bg-success text-primary-foreground shadow-sm hover:bg-success/90 hover:shadow-md active:scale-[0.98]",
+          "bg-secondary text-secondary-foreground shadow-sm active:scale-[0.98]",
+        ghost: "text-foreground",
+        link: "text-primary underline-offset-4",
+        gradient: "bg-gradient-primary text-primary-foreground shadow-primary active:scale-[0.98]",
+        "gradient-outline": "border-2 border-primary bg-background text-primary shadow-sm active:scale-[0.98]",
+        success: "bg-success text-primary-foreground shadow-sm active:scale-[0.98]",
       },
       size: {
         default: "h-10 px-4 py-2",

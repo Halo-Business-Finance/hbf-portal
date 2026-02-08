@@ -688,6 +688,7 @@ export type Database = {
           created_at: string
           email: string | null
           first_name: string | null
+          funded_date: string | null
           id: string
           last_name: string | null
           loan_details: Json | null
@@ -711,6 +712,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          funded_date?: string | null
           id?: string
           last_name?: string | null
           loan_details?: Json | null
@@ -734,6 +736,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          funded_date?: string | null
           id?: string
           last_name?: string | null
           loan_details?: Json | null
@@ -872,6 +875,33 @@ export type Database = {
           updated_at?: string
           window_end?: string
           window_start?: string
+        }
+        Relationships: []
+      }
+      security_telemetry: {
+        Row: {
+          count: number
+          created_at: string
+          id: string
+          metric_date: string
+          metric_name: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          id?: string
+          metric_date?: string
+          metric_name: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          id?: string
+          metric_date?: string
+          metric_name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1028,6 +1058,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_security_telemetry: {
+        Args: { _increment_by?: number; _metric_name: string }
+        Returns: undefined
+      }
       is_assigned_to_user: {
         Args: { _admin_id: string; _borrower_user_id: string }
         Returns: boolean
@@ -1069,6 +1103,7 @@ export type Database = {
         | "approved"
         | "rejected"
         | "funded"
+        | "paused"
       loan_type:
         | "refinance"
         | "bridge_loan"
@@ -1219,6 +1254,7 @@ export const Constants = {
         "approved",
         "rejected",
         "funded",
+        "paused",
       ],
       loan_type: [
         "refinance",

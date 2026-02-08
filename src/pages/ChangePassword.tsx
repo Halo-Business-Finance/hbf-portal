@@ -8,8 +8,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, ArrowRight, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, Eye, EyeOff, Lock, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { useScrollBounce } from '@/hooks/useScrollBounce';
 
 // Rate limiting configuration
 const RATE_LIMIT = { maxAttempts: 3, windowMs: 300000, lockoutMs: 600000 }; // 10 min lockout
@@ -54,6 +55,7 @@ const ChangePassword = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAllPasswords, setShowAllPasswords] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const { onScroll, bounceClass } = useScrollBounce();
   
   // Rate limiting
   const rateLimitRef = useRef<RateLimitEntry | null>(null);
@@ -155,26 +157,27 @@ const ChangePassword = () => {
     }
   };
 
+  const newPassword = form.watch('newPassword');
+  const hasNewPassword = newPassword.length > 0;
+
   const renderSuccessState = () => (
-    <div className="w-full max-w-md">
-      <div className="mb-8">
+    <div className="w-full">
+      <div className="mb-8 text-center">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
-        <h1 className="text-xl font-normal text-gray-900 mb-3 text-center">
+        <h1 className="text-xl font-normal text-black mb-3">
           Password updated
         </h1>
-        <p className="text-gray-600 text-center">
+        <p className="text-black">
           Your password has been successfully updated. You can now use your new password to log in.
         </p>
       </div>
 
-      <div className="border-t border-gray-200 mb-8" />
-
       <Button 
         type="button"
         variant="outline"
-        className="w-full max-w-sm h-12 text-base font-medium justify-center rounded-none border-gray-300"
+        className="w-full h-12 text-base font-medium justify-center rounded-full border-black text-black hover:bg-gray-50 transition-all duration-200 hover:shadow-md"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-5 w-5" />
@@ -184,31 +187,31 @@ const ChangePassword = () => {
   );
 
   const renderFormState = () => (
-    <div className="w-full max-w-md">
-      <div className="mb-8">
-        <h1 className="text-xl font-normal text-gray-900 mb-3">
+    <div className="w-full">
+      <div className="mb-8 text-center">
+        <h1 className="text-xl font-normal text-black mb-3">
           Change your password
         </h1>
-        <p className="text-gray-600">
+        <p className="text-black">
           Update your password to keep your account secure.
         </p>
       </div>
 
-      <div className="border-t border-gray-200 mb-8" />
-
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" aria-label="Change password form">
           {/* Show all passwords toggle */}
-          <div className="flex items-center gap-2 max-w-sm">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => setShowAllPasswords(!showAllPasswords)}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+              className="flex items-center gap-2 text-sm text-black hover:text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1"
+              aria-pressed={showAllPasswords}
+              aria-label={showAllPasswords ? 'Hide all passwords' : 'Show all passwords'}
             >
               {showAllPasswords ? (
-                <EyeOff className="h-4 w-4" />
+                <EyeOff className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4" aria-hidden="true" />
               )}
               {showAllPasswords ? 'Hide all passwords' : 'Show all passwords'}
             </button>
@@ -217,20 +220,30 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="currentPassword"
-            render={({ field }) => (
-              <FormItem className="max-w-sm">
-                <Label htmlFor="currentPassword" className="text-sm text-blue-600 mb-2 block">
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <Label htmlFor="currentPassword" className="text-sm text-black mb-2 block">
                   Current password
                 </Label>
                 <FormControl>
                   <Input 
                     id="currentPassword"
                     type={showAllPasswords ? "text" : "password"}
-                    className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                    aria-label="Current password"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "currentPassword-error" : undefined}
+                    autoComplete="current-password"
+                    className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
+                      fieldState.error 
+                        ? 'border-red-500 focus:border-red-500' 
+                        : 'border-gray-300 focus:border-gray-400'
+                    }`}
+                    placeholder="Enter current password"
                     {...field} 
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="currentPassword-error" />
               </FormItem>
             )}
           />
@@ -238,19 +251,24 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="newPassword"
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               const strength = getPasswordStrength(field.value);
               const requirements = getPasswordRequirements(field.value);
               return (
-                <FormItem className="max-w-sm">
-                  <Label htmlFor="newPassword" className="text-sm text-blue-600 mb-2 block">
+                <FormItem>
+                  <Label htmlFor="newPassword" className="text-sm text-black mb-2 block">
                     New password
                   </Label>
                   <FormControl>
                     <Input 
                       id="newPassword"
                       type={showAllPasswords ? "text" : "password"}
-                      className="h-12 bg-white border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus:ring-0 px-0"
+                      className={`h-14 bg-white border rounded-xl px-5 focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700 ${
+                        fieldState.error 
+                          ? 'border-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:border-gray-400'
+                      }`}
+                      placeholder="Enter new password"
                       {...field} 
                     />
                   </FormControl>
@@ -302,33 +320,35 @@ const ChangePassword = () => {
           <FormField
             control={form.control}
             name="confirmPassword"
-            render={({ field }) => {
-              const newPassword = form.watch('newPassword');
+            render={({ field, fieldState }) => {
               const confirmPassword = field.value;
               const showMatch = confirmPassword.length > 0;
               const passwordsMatch = newPassword === confirmPassword;
               
               return (
-                <FormItem className="max-w-sm">
-                  <Label htmlFor="confirmPassword" className="text-sm text-blue-600 mb-2 block">
+                <FormItem>
+                  <Label htmlFor="confirmPassword" className="text-sm text-black mb-2 block">
                     Confirm new password
                   </Label>
                   <FormControl>
                     <Input 
                       id="confirmPassword"
                       type={showAllPasswords ? "text" : "password"}
-                      className={`h-12 bg-white border-0 border-b-2 rounded-none focus:ring-0 px-0 transition-colors ${
-                        showMatch 
-                          ? passwordsMatch 
-                            ? 'border-green-500 focus:border-green-500' 
-                            : 'border-red-400 focus:border-red-400'
-                          : 'border-gray-300 focus:border-blue-600'
+                      className={`h-14 bg-white border rounded-xl px-5 transition-colors placeholder:text-gray-400 text-gray-700 focus:ring-0 ${
+                        fieldState.error
+                          ? 'border-red-500 focus:border-red-500'
+                          : showMatch 
+                            ? passwordsMatch 
+                              ? 'border-green-500 focus:border-green-500' 
+                              : 'border-red-400 focus:border-red-400'
+                            : 'border-gray-300 focus:border-gray-400'
                       }`}
+                      placeholder="Confirm new password"
                       {...field} 
                     />
                   </FormControl>
                   {/* Password match indicator */}
-                  {showMatch && (
+                  {showMatch && !fieldState.error && (
                     <p className={`text-xs flex items-center gap-1.5 mt-2 transition-colors duration-200 ${
                       passwordsMatch ? 'text-green-600' : 'text-red-500'
                     }`}>
@@ -355,24 +375,29 @@ const ChangePassword = () => {
 
           <Button 
             type="submit" 
-            className="max-w-sm h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium justify-between px-4 rounded-none w-full"
-            disabled={isSubmitting}
+            variant="outline"
+            className="w-full h-12 border-2 border-black rounded-full text-black font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting || !hasNewPassword}
+            aria-busy={isSubmitting}
           >
+            {isSubmitting ? (
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Lock className="h-5 w-5" aria-hidden="true" />
+            )}
             <span>{isSubmitting ? "Updating..." : "Update Password"}</span>
-            {!isSubmitting && <ArrowRight className="h-5 w-5" />}
           </Button>
 
-          <div className="pt-6 border-t border-gray-200">
-            <button 
+          <div className="text-center">
+            <Button 
               type="button"
+              variant="outline"
               onClick={() => navigate('/')}
-              className="text-sm text-gray-700 hover:text-gray-900"
+              className="h-12 px-8 text-base font-medium rounded-full border-black text-black hover:bg-gray-50 transition-all duration-200 hover:shadow-md"
             >
-              <span className="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Back to Dashboard
-              </span>
-            </button>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </Button>
           </div>
         </form>
       </Form>
@@ -380,86 +405,53 @@ const ChangePassword = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="bg-black px-4 sm:px-6 py-4">
-        <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">HBF</span>
-          </div>
-          <span className="text-lg sm:text-xl font-semibold text-white">Halo Business Finance</span>
-        </a>
+        <div className="flex items-center justify-center">
+          <a href="https://halobusinessfinance.com" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <span className="text-xl sm:text-2xl font-semibold text-white uppercase tracking-wide">Halo Business Finance</span>
+          </a>
+        </div>
       </header>
 
-      {/* Main Content - Two Column Layout */}
-      <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Column - Form */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 bg-white">
-          {passwordUpdated ? renderSuccessState() : renderFormState()}
-        </div>
-
-        {/* Right Column - Decorative Geometric Shapes */}
-        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden items-center justify-center">
-          {/* Geometric shapes */}
-          <div className="absolute inset-0">
-            {/* Large circle - centered */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border-2 border-white/20" />
-            
-            {/* Medium circle */}
-            <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-white/10" />
-            
-            {/* Small filled circle */}
-            <div className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-blue-400/30" />
-            
-            {/* Dots pattern */}
-            <div className="absolute top-20 right-20 grid grid-cols-4 gap-4">
-              {Array.from({ length: 16 }).map((_, i) => (
-                <div key={i} className="w-2 h-2 rounded-full bg-white/30" />
-              ))}
-            </div>
-            
-            {/* Lines */}
-            <div className="absolute bottom-20 left-20 space-y-3">
-              <div className="w-32 h-0.5 bg-white/20" />
-              <div className="w-24 h-0.5 bg-white/20" />
-              <div className="w-16 h-0.5 bg-white/20" />
-            </div>
+      {/* Main Content - Background Image with Centered Card (hidden on mobile) */}
+      <div className="flex-1 flex items-center justify-center px-4 py-4 sm:py-8 overflow-hidden bg-white relative">
+        {/* Background image - only on md and above */}
+        <div 
+          className="absolute inset-0 hidden md:block bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/login-background.jpg?v=2')" }}
+        />
+        {/* Overlay for better readability - hidden on mobile */}
+        <div className="absolute inset-0 bg-black/10 hidden md:block" />
+        
+        {/* Change Password Card - no shadow on mobile for cleaner look */}
+        <div className={`relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl mx-2 sm:mx-0 max-h-[calc(100vh-140px)] sm:max-h-none flex flex-col ${bounceClass}`}>
+          <div 
+            className="p-6 sm:p-8 md:p-10 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent overscroll-contain"
+            onScroll={onScroll}
+          >
+            {passwordUpdated ? renderSuccessState() : renderFormState()}
           </div>
-
-          {/* Center content */}
-          <div className="relative z-10 text-center text-white px-12">
-            <p className="text-2xl font-bold tracking-wider mb-2 text-white">Account Security</p>
-            <h1 className="text-2xl font-bold mb-4 text-white">Keep Your Account Safe</h1>
-            <div className="flex items-center justify-center gap-8 text-sm text-white mb-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-white" />
-                <span>Secure</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-white" />
-                <span>Encrypted</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-white" />
-                <span>Protected</span>
-              </div>
-            </div>
-            <h2 className="text-base font-medium drop-shadow-md text-white">Your security is our priority</h2>
-          </div>
+          {/* Scroll indicator gradient for mobile */}
+          <div className="h-4 bg-gradient-to-t from-white to-transparent pointer-events-none sm:hidden -mt-4 relative z-10 md:rounded-b-2xl" />
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
-          <span className="text-center sm:text-left">
-            © {new Date().getFullYear()} Halo Business Finance.
-            <span className="block sm:inline"> All rights reserved.</span>
+      <footer className="bg-white border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm text-black">
+          <span className="text-center sm:text-left order-2 sm:order-1">
+            © {new Date().getFullYear()} Halo Business Finance. All rights reserved.
           </span>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Privacy Policy</a>
-            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Terms of Service</a>
-            <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700 hover:underline transition-colors">Support</a>
+          <div className="flex items-center gap-3 sm:gap-6 order-1 sm:order-2">
+            <a href="https://halobusinessfinance.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Privacy</a>
+            <a href="https://halobusinessfinance.com/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Terms</a>
+            <a href="https://halobusinessfinance.com/technical-support" target="_blank" rel="noopener noreferrer" className="text-black hover:underline transition-colors">Support</a>
+            <div className="flex items-center gap-1">
+              <Lock className="h-3 w-3 sm:h-4 sm:w-4 text-black" />
+              <span>Secured</span>
+            </div>
           </div>
         </div>
       </footer>

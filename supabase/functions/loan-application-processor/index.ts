@@ -15,6 +15,142 @@ const RATE_LIMITS: Record<string, { maxRequests: number; windowSeconds: number }
   'calculate-eligibility': { maxRequests: 20, windowSeconds: 60 }, // 20 per minute
 };
 
+// Email validation regex - RFC 5322 compliant with additional security checks
+const EMAIL_REGEX = /^(?!.*[.]{2})[a-zA-Z0-9](?:[a-zA-Z0-9._+-]*[a-zA-Z0-9])?@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$/;
+
+// Disposable email domains to block (common spam/fraud domains)
+const BLOCKED_EMAIL_DOMAINS = [
+  'tempmail.com', 'throwaway.email', 'guerrillamail.com', 'mailinator.com',
+  '10minutemail.com', 'fakeinbox.com', 'trashmail.com', 'yopmail.com',
+  'tempail.com', 'temp-mail.org', 'sharklasers.com', 'guerrillamailblock.com'
+];
+
+// Phone validation - allows common formats but extracts digits for validation
+const PHONE_REGEX = /^[\d\s\-\(\)\+\.]+$/;
+
+interface EmailValidationResult {
+  isValid: boolean;
+  error?: string;
+  sanitized: string;
+}
+
+interface PhoneValidationResult {
+  isValid: boolean;
+  error?: string;
+  sanitized: string;
+  digitsOnly: string;
+}
+
+function validateEmail(email: string): EmailValidationResult {
+  // Trim and lowercase
+  const sanitized = email.trim().toLowerCase();
+  
+  // Length checks
+  if (sanitized.length === 0) {
+    return { isValid: false, error: 'Email is required', sanitized };
+  }
+  if (sanitized.length > 254) {
+    return { isValid: false, error: 'Email must be less than 255 characters', sanitized };
+  }
+  
+  // Check local part length (before @)
+  const atIndex = sanitized.indexOf('@');
+  if (atIndex === -1) {
+    return { isValid: false, error: 'Invalid email format: missing @', sanitized };
+  }
+  if (atIndex > 64) {
+    return { isValid: false, error: 'Email local part must be less than 65 characters', sanitized };
+  }
+  
+  // Regex validation
+  if (!EMAIL_REGEX.test(sanitized)) {
+    return { isValid: false, error: 'Invalid email format', sanitized };
+  }
+  
+  // Domain extraction and validation
+  const domain = sanitized.substring(atIndex + 1);
+  if (domain.length > 253) {
+    return { isValid: false, error: 'Email domain too long', sanitized };
+  }
+  
+  // Block disposable email domains (case-insensitive)
+  if (BLOCKED_EMAIL_DOMAINS.includes(domain.toLowerCase())) {
+    return { isValid: false, error: 'Disposable email addresses are not allowed', sanitized };
+  }
+  
+  // Check for suspicious patterns
+  if (sanitized.includes('..') || sanitized.startsWith('.') || sanitized.includes('.@') || sanitized.includes('@.')) {
+    return { isValid: false, error: 'Invalid email format: consecutive or misplaced dots', sanitized };
+  }
+  
+  // Check for dangerous characters that could be used for injection
+  if (/[<>'";\x00-\x1F\x7F]/.test(email)) {
+    return { isValid: false, error: 'Email contains invalid characters', sanitized };
+  }
+  
+  return { isValid: true, sanitized };
+}
+
+function validatePhone(phone: string): PhoneValidationResult {
+  // Trim whitespace
+  const sanitized = phone.trim();
+  
+  // Length check on raw input
+  if (sanitized.length === 0) {
+    return { isValid: false, error: 'Phone number is required', sanitized, digitsOnly: '' };
+  }
+  if (sanitized.length > 25) {
+    return { isValid: false, error: 'Phone number too long', sanitized, digitsOnly: '' };
+  }
+  
+  // Check for dangerous characters first
+  if (/[<>'";\x00-\x1F\x7F]/.test(phone)) {
+    return { isValid: false, error: 'Phone contains invalid characters', sanitized, digitsOnly: '' };
+  }
+  
+  // Check allowed characters pattern
+  if (!PHONE_REGEX.test(sanitized)) {
+    return { isValid: false, error: 'Phone number contains invalid characters', sanitized, digitsOnly: '' };
+  }
+  
+  // Extract digits only for validation
+  const digitsOnly = sanitized.replace(/\D/g, '');
+  
+  // Validate digit count (US: 10-11, International: 7-15)
+  if (digitsOnly.length < 7) {
+    return { isValid: false, error: 'Phone number must have at least 7 digits', sanitized, digitsOnly };
+  }
+  if (digitsOnly.length > 15) {
+    return { isValid: false, error: 'Phone number must have no more than 15 digits', sanitized, digitsOnly };
+  }
+  
+  // Check for invalid US patterns (if it looks like a US number)
+  if (digitsOnly.length === 10 || (digitsOnly.length === 11 && digitsOnly.startsWith('1'))) {
+    const areaCode = digitsOnly.length === 11 ? digitsOnly.substring(1, 4) : digitsOnly.substring(0, 3);
+    const exchange = digitsOnly.length === 11 ? digitsOnly.substring(4, 7) : digitsOnly.substring(3, 6);
+    
+    // Invalid area codes
+    if (areaCode.startsWith('0') || areaCode.startsWith('1')) {
+      return { isValid: false, error: 'Invalid area code', sanitized, digitsOnly };
+    }
+    // N11 codes are reserved (211, 311, 411, etc.)
+    if (/^\d11$/.test(areaCode)) {
+      return { isValid: false, error: 'Invalid area code', sanitized, digitsOnly };
+    }
+    // Exchange codes can't start with 0 or 1
+    if (exchange.startsWith('0') || exchange.startsWith('1')) {
+      return { isValid: false, error: 'Invalid exchange code', sanitized, digitsOnly };
+    }
+  }
+  
+  // Check for obviously fake numbers (all same digit, sequential)
+  if (/^(\d)\1+$/.test(digitsOnly)) {
+    return { isValid: false, error: 'Invalid phone number pattern', sanitized, digitsOnly };
+  }
+  
+  return { isValid: true, sanitized, digitsOnly };
+}
+
 interface RateLimitResult {
   allowed: boolean;
   remaining_requests: number;
@@ -279,10 +415,13 @@ Deno.serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('Error in loan-application-processor:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    // Log full error details for debugging, but return generic message to client
+    console.error('[ERROR] loan-application-processor:', error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        error: 'Unable to process request',
+        message: 'An error occurred. Please try again or contact support.'
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -322,10 +461,17 @@ async function validateApplication(applicationData: LoanApplicationData, rateLim
     validation.isValid = false;
   }
 
-  // Phone validation
-  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-  if (!phoneRegex.test(applicationData.phone.replace(/\D/g, ''))) {
-    validation.errors.push('Invalid phone number format');
+  // Enhanced email validation
+  const emailValidation = validateEmail(applicationData.email);
+  if (!emailValidation.isValid) {
+    validation.errors.push(emailValidation.error || 'Invalid email address');
+    validation.isValid = false;
+  }
+
+  // Enhanced phone validation
+  const phoneValidation = validatePhone(applicationData.phone);
+  if (!phoneValidation.isValid) {
+    validation.errors.push(phoneValidation.error || 'Invalid phone number');
     validation.isValid = false;
   }
 
@@ -466,6 +612,7 @@ async function updateApplicationStatus(
   notes?: string,
   rateLimitHeaders?: Record<string, string>
 ): Promise<Response> {
+  const safeRateLimitHeaders = rateLimitHeaders ?? {};
   try {
     // First, fetch the current loan_details to merge safely
     const { data: currentApp, error: fetchError } = await supabase
@@ -478,9 +625,30 @@ async function updateApplicationStatus(
       throw fetchError;
     }
 
-    // Safely merge status_notes into loan_details without using raw SQL
-    // This prevents SQL injection by using parameterized updates
-    const sanitizedNotes = notes ? notes.replace(/[<>'"\\;]/g, '') : '';
+    // Comprehensive input sanitization for notes field
+    // Prevents XSS and injection attacks by:
+    // 1. Trimming whitespace
+    // 2. Removing control characters
+    // 3. HTML entity encoding dangerous characters
+    // 4. Truncating to max length
+    const sanitizeNotes = (input: string | undefined): string => {
+      if (!input) return '';
+      
+      return input
+        .trim()
+        .slice(0, 1000) // Enforce max length
+        .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;')
+        .replace(/\\/g, '&#x5C;')
+        .replace(/`/g, '&#x60;');
+    };
+    
+    const sanitizedNotes = sanitizeNotes(notes);
     const updatedLoanDetails = {
       ...(currentApp?.loan_details || {}),
       status_notes: sanitizedNotes
@@ -509,7 +677,7 @@ async function updateApplicationStatus(
         application: data,
         message: 'Application status updated successfully'
       }),
-      { headers: { ...corsHeaders, ...(rateLimitHeaders || {}), 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -518,10 +686,9 @@ async function updateApplicationStatus(
     return new Response(
       JSON.stringify({ 
         success: false, 
-        message: 'Failed to update application status',
-        error: errorMessage 
+        message: 'Failed to update application status'
       }),
-      { status: 500, headers: { ...corsHeaders, ...(rateLimitHeaders || {}), 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, ...safeRateLimitHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }

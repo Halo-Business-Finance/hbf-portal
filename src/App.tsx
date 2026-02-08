@@ -16,6 +16,16 @@ import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import { Navigate } from "react-router-dom";
+
+// External redirect component for privacy policy
+const ExternalRedirect = ({ to }: { to: string }) => {
+  React.useEffect(() => {
+    window.location.href = to;
+  }, [to]);
+  return null;
+};
 
 // Lazy load all other pages to reduce initial bundle
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -75,10 +85,17 @@ const App = () => (
               <Routes>
               {/* Public routes without Layout */}
               <Route path="/" element={<Index />} />
-              <Route path="/calculator" element={<LoanCalculator />} />
+              <Route path="/loan-calculator" element={
+                <Layout>
+                  <LoanCalculator />
+                </Layout>
+              } />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/privacy-policy" element={<ExternalRedirect to="https://halobusinessfinance.com/privacy-policy" />} />
+              <Route path="/terms-of-service" element={<ExternalRedirect to="https://halobusinessfinance.com/terms-of-service" />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               
               {/* Protected routes with Layout */}
               <Route path="/admin" element={
@@ -243,14 +260,23 @@ const App = () => (
                 </Layout>
               } />
               <Route path="/mfa-verify" element={
-                <ProtectedRoute>
-                  <MFAVerification />
-                </ProtectedRoute>
+                <Layout>
+                  <ProtectedRoute>
+                    <MFAVerification />
+                  </ProtectedRoute>
+                </Layout>
               } />
               <Route path="/loan-applications" element={
                 <Layout>
                   <ProtectedRoute>
                     <LoanApplications />
+                  </ProtectedRoute>
+                </Layout>
+              } />
+              <Route path="/my-documents" element={
+                <Layout>
+                  <ProtectedRoute>
+                    <MyDocuments />
                   </ProtectedRoute>
                 </Layout>
               } />

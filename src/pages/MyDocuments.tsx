@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { PageHeader } from '@/components/PageHeader';
 import { 
   Upload, 
   ChevronRight,
@@ -64,6 +65,7 @@ interface FolderCategory {
 const MyDocuments = () => {
   const { authenticated, loading, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -120,6 +122,17 @@ const MyDocuments = () => {
       loadDocuments();
     }
   }, [authenticated, loading, navigate, user]);
+
+  // Handle folder query parameter to auto-expand folder
+  useEffect(() => {
+    const folderParam = searchParams.get('folder');
+    if (folderParam) {
+      const matchedFolder = folders.find(f => f.name.toLowerCase() === folderParam.toLowerCase());
+      if (matchedFolder) {
+        setExpandedFolder(matchedFolder.id);
+      }
+    }
+  }, [searchParams]);
 
   const loadDocuments = async () => {
     try {
@@ -719,30 +732,38 @@ const MyDocuments = () => {
 
   if (loading || loadingData) {
     return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-background">
+        {/* Loading skeleton with banner */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
+          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
+            <div className="h-8 bg-white/20 rounded w-64 mb-2"></div>
+            <div className="h-4 bg-white/10 rounded w-48"></div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading documents...</p>
+          <p className="text-muted-foreground text-center">Loading documents...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-foreground" />
-            <h1 className="text-xl font-bold">Secured Document Storage</h1>
-          </div>
-          <Button onClick={() => setUploadDialogOpen(true)} className="flex items-center gap-2 h-9 text-sm">
-            <Upload className="w-4 h-4" />
-            Upload
-          </Button>
-        </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="Secured Document Storage" 
+        subtitle="Upload and manage your loan documents securely"
+      >
+        <Button 
+          onClick={() => setUploadDialogOpen(true)} 
+          className="flex items-center gap-2 bg-white text-blue-950 hover:bg-white/90"
+        >
+          <Upload className="w-4 h-4" />
+          Upload
+        </Button>
+      </PageHeader>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         {/* Folders List */}
         <div className="bg-white rounded-lg border">
           {folders.map((folder) => {
@@ -856,8 +877,6 @@ const MyDocuments = () => {
             );
           })}
         </div>
-      </div>
-
       {/* Upload Dialog */}
       <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
         <DialogContent>
@@ -1283,6 +1302,7 @@ const MyDocuments = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 };

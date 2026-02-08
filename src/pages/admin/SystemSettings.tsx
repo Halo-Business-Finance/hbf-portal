@@ -1,17 +1,15 @@
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { PageHeader } from '@/components/PageHeader';
 import { Bell, Mail, Database, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const SystemSettings = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<Record<string, any>>({});
 
@@ -60,25 +58,28 @@ const SystemSettings = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-muted-foreground">Loading settings...</p>
+      <div className="min-h-screen bg-background">
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-blue-950 animate-pulse">
+          <div className="max-w-7xl mx-auto sm:px-6 md:py-[30px] lg:px-[34px] px-[30px] py-[15px]">
+            <div className="h-8 bg-white/20 rounded w-48 mb-2"></div>
+            <div className="h-4 bg-white/10 rounded w-72"></div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <p className="text-muted-foreground text-center">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <Button variant="ghost" onClick={() => navigate('/admin')} className="mb-4">
-            ← Back to Dashboard
-          </Button>
-          <h1 className="text-2xl font-bold mb-2">System Settings</h1>
-          <p className="text-muted-foreground">Configure system-wide settings and preferences</p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <PageHeader 
+        title="System Settings" 
+        subtitle="Configure system-wide settings and preferences"
+      />
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Notification Settings */}
           <Card>

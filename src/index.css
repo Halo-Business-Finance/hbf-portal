@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+Pro&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -9,7 +12,7 @@
 @layer base {
   :root {
     /* Halo Business Finance - Professional Dark Navy Theme */
-    --background: 0 0% 98%;
+    --background: 0 0% 100%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -18,7 +21,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 213 94% 50%;
+    --primary: 224 64.2857% 32.9412%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 222 33% 96%;
@@ -27,7 +30,7 @@
     --muted: 222 33% 96%;
     --muted-foreground: 222 20% 45%;
 
-    --accent: 213 94% 50%;
+    --accent: 229 84% 4.902%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -49,11 +52,20 @@
     --cyan: 186 94% 41%;
     --indigo: 239 84% 67%;
 
-    /* Glass & Surface Effects */
-    --glass-light: 222 40% 10% / 0.8;
-    --glass-border: 222 33% 25% / 0.5;
+    /* Glass & Surface Effects - Enhanced Glassmorphism */
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-bg-strong: 0 0% 100% / 0.85;
+    --glass-border: 0 0% 100% / 0.3;
+    --glass-border-strong: 213 94% 50% / 0.2;
+    --glass-highlight: 0 0% 100% / 0.5;
+    --glass-shadow: 222 47% 11% / 0.1;
     --surface-elevated: 222 40% 12%;
     --surface-sunken: 222 47% 4%;
+    
+    /* Glassmorphism Shadows */
+    --shadow-glass: 0 8px 32px hsl(222 47% 11% / 0.12), 0 2px 8px hsl(222 47% 11% / 0.08), inset 0 1px 0 hsl(0 0% 100% / 0.4);
+    --shadow-glass-hover: 0 16px 48px hsl(222 47% 11% / 0.16), 0 4px 12px hsl(222 47% 11% / 0.1), inset 0 1px 0 hsl(0 0% 100% / 0.5);
+    --shadow-glass-glow: 0 0 60px hsl(213 94% 50% / 0.15), 0 8px 32px hsl(222 47% 11% / 0.12);
 
     /* Modern Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(213 94% 50%), hsl(213 94% 60%));
@@ -65,19 +77,22 @@
     --gradient-mesh: radial-gradient(at 40% 20%, hsl(213 94% 50% / 0.08) 0px, transparent 50%),
                      radial-gradient(at 80% 0%, hsl(152 82% 45% / 0.05) 0px, transparent 50%),
                      radial-gradient(at 0% 50%, hsl(186 94% 41% / 0.05) 0px, transparent 50%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(222 33% 98%) 100%);
+    --gradient-metric: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(222 33% 99%) 100%);
 
     /* Professional Shadows */
-    --shadow-xs: 0 1px 2px 0 hsl(222 47% 2% / 0.3);
-    --shadow-sm: 0 1px 3px 0 hsl(222 47% 2% / 0.4), 0 1px 2px -1px hsl(222 47% 2% / 0.4);
-    --shadow-md: 0 4px 6px -1px hsl(222 47% 2% / 0.4), 0 2px 4px -2px hsl(222 47% 2% / 0.4);
-    --shadow-lg: 0 10px 15px -3px hsl(222 47% 2% / 0.4), 0 4px 6px -4px hsl(222 47% 2% / 0.4);
-    --shadow-xl: 0 20px 25px -5px hsl(222 47% 2% / 0.4), 0 8px 10px -6px hsl(222 47% 2% / 0.4);
-    --shadow-2xl: 0 25px 50px -12px hsl(222 47% 2% / 0.5);
-    --shadow-primary: 0 10px 40px -10px hsl(213 94% 50% / 0.35);
-    --shadow-accent: 0 10px 40px -10px hsl(152 82% 45% / 0.35);
-    --shadow-card: 0 1px 3px hsl(222 47% 2% / 0.2), 0 4px 12px hsl(222 47% 2% / 0.3);
-    --shadow-card-hover: 0 4px 12px hsl(222 47% 2% / 0.3), 0 16px 32px hsl(222 47% 2% / 0.4);
-    --shadow-glow: 0 0 40px hsl(213 94% 50% / 0.15);
+    --shadow-xs: 0 1px 2px 0 hsl(222 47% 11% / 0.05);
+    --shadow-sm: 0 1px 3px 0 hsl(222 47% 11% / 0.08), 0 1px 2px -1px hsl(222 47% 11% / 0.08);
+    --shadow-md: 0 4px 6px -1px hsl(222 47% 11% / 0.08), 0 2px 4px -2px hsl(222 47% 11% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.1), 0 4px 6px -4px hsl(222 47% 11% / 0.08);
+    --shadow-xl: 0 20px 25px -5px hsl(222 47% 11% / 0.1), 0 8px 10px -6px hsl(222 47% 11% / 0.08);
+    --shadow-2xl: 0 25px 50px -12px hsl(222 47% 11% / 0.2);
+    --shadow-primary: 0 10px 40px -10px hsl(213 94% 50% / 0.25);
+    --shadow-accent: 0 10px 40px -10px hsl(152 82% 45% / 0.25);
+    --shadow-card: 0 1px 3px hsl(222 47% 11% / 0.06), 0 4px 12px hsl(222 47% 11% / 0.08);
+    --shadow-card-hover: 0 8px 24px hsl(222 47% 11% / 0.12), 0 4px 8px hsl(222 47% 11% / 0.08);
+    --shadow-glow: 0 0 40px hsl(213 94% 50% / 0.12);
+    --shadow-metric: 0 2px 8px hsl(222 47% 11% / 0.06), 0 8px 24px hsl(222 47% 11% / 0.08);
 
     --radius: 0.75rem;
 
@@ -91,11 +106,14 @@
     --sidebar-border: 222 33% 15%;
     --sidebar-ring: 213 94% 50%;
     --sidebar-muted: 0 0% 80%;
+    --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: "Source Serif Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   }
 
   .dark {
     /* Dark mode is the same as root for Halo theme */
-    --background: 222 47% 6%;
+    --background: 0 0% 100%;
     --foreground: 0 0% 100%;
 
     --card: 222 40% 10%;
@@ -137,6 +155,9 @@
     --sidebar-border: 222 33% 15%;
     --sidebar-ring: 213 94% 50%;
     --sidebar-muted: 0 0% 80%;
+    --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: "Source Serif Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   }
 }
 
@@ -145,14 +166,35 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior-x: none;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    overscroll-behavior-x: none;
   }
 
-  html {
-    scroll-behavior: smooth;
+  /* Prevent iOS auto-zoom on input focus - inputs must be at least 16px */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  @media screen and (min-width: 768px) {
+    input, select, textarea {
+      font-size: inherit !important;
+    }
   }
 
   /* Better focus states */
@@ -162,14 +204,242 @@
 }
 
 @layer components {
-  /* Glass Effect Card */
+  /* Enhanced Glass Effect Card - Prominent Glassmorphism */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl;
-    box-shadow: var(--shadow-card);
+    @apply relative rounded-xl transition-all duration-300 overflow-hidden;
+    background: linear-gradient(135deg, hsl(var(--glass-bg-strong)), hsl(var(--glass-bg)));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--shadow-glass);
   }
 
-  .glass-card:hover {
-    box-shadow: var(--shadow-card-hover);
+  .glass-card::before {
+    content: '';
+    @apply absolute inset-0 rounded-xl pointer-events-none;
+    background: linear-gradient(135deg, hsl(var(--glass-highlight)) 0%, transparent 50%);
+    opacity: 0.6;
+  }
+
+  /* Hover effects intentionally disabled (enterprise/banking UX) */
+
+  /* Glass Card with Animated Gradient Border */
+  .glass-card-glow {
+    @apply relative rounded-xl transition-all duration-300 overflow-visible;
+    background: linear-gradient(135deg, hsl(var(--glass-bg-strong)), hsl(var(--glass-bg)));
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-card-glow::before {
+    content: '';
+    @apply absolute inset-0 rounded-xl pointer-events-none;
+    background: linear-gradient(135deg, hsl(var(--glass-highlight)) 0%, transparent 40%);
+    z-index: 1;
+  }
+
+  /* Animated gradient border */
+  .glass-card-glow::after {
+    content: '';
+    @apply absolute -inset-[2px] rounded-xl pointer-events-none opacity-0 transition-opacity duration-500;
+    background: linear-gradient(
+      var(--gradient-angle, 135deg),
+      hsl(213 94% 50% / 0.6),
+      hsl(186 94% 41% / 0.4),
+      hsl(152 82% 45% / 0.5),
+      hsl(262 83% 58% / 0.4),
+      hsl(213 94% 50% / 0.6)
+    );
+    background-size: 300% 300%;
+    z-index: -1;
+    animation: gradient-rotate 4s linear infinite paused;
+  }
+
+  /* Hover effects intentionally disabled (enterprise/banking UX) */
+
+  @keyframes gradient-rotate {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Premium Animated Border - Standalone Class (Primary Blue Tones, Fast) */
+  .animated-gradient-border {
+    @apply relative;
+  }
+
+  .animated-gradient-border::before {
+    content: '';
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-200 pointer-events-none;
+    background: linear-gradient(
+      var(--gradient-angle, 0deg),
+      hsl(213 94% 55%),
+      hsl(224 64% 40%),
+      hsl(199 89% 48%),
+      hsl(213 94% 50%),
+      hsl(224 64% 33%),
+      hsl(213 94% 55%)
+    );
+    background-size: 300% 300%;
+    z-index: -1;
+    animation: gradient-spin 2s ease infinite paused;
+  }
+
+  .animated-gradient-border:focus-within::before,
+  .animated-gradient-border:focus-visible::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+
+  /* Subtle Animated Border - Less Prominent Version (Primary Blue Tones) */
+  .animated-gradient-border-subtle {
+    @apply relative;
+  }
+
+  .animated-gradient-border-subtle::before {
+    content: '';
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none;
+    background: linear-gradient(
+      var(--gradient-angle, 0deg),
+      hsl(213 94% 50% / 0.5),
+      hsl(224 64% 45% / 0.4),
+      hsl(199 89% 48% / 0.5),
+      hsl(213 94% 50% / 0.5)
+    );
+    background-size: 200% 200%;
+    z-index: -1;
+    animation: gradient-shift-subtle 3s ease-in-out infinite paused;
+  }
+
+  .animated-gradient-border-subtle:focus-within::before,
+  .animated-gradient-border-subtle:focus-visible::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+
+  /* Minimal Animated Border - Very Subtle (Primary Blue Shimmer) */
+  .animated-gradient-border-minimal {
+    @apply relative;
+  }
+
+  .animated-gradient-border-minimal::before {
+    content: '';
+    @apply absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-500 pointer-events-none;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--border)),
+      hsl(213 94% 50% / 0.35),
+      hsl(199 89% 48% / 0.3),
+      hsl(var(--border))
+    );
+    background-size: 200% 100%;
+    z-index: -1;
+    animation: gradient-shimmer 4s ease-in-out infinite paused;
+  }
+
+  .animated-gradient-border-minimal:focus-within::before,
+  .animated-gradient-border-minimal:focus-visible::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+
+  /* Input Focus Animated Border - Premium Form Styling */
+  .input-animated-focus {
+    @apply relative;
+  }
+
+  .input-animated-focus::before {
+    content: '';
+    @apply absolute -inset-[2px] rounded-lg opacity-0 transition-all duration-200 pointer-events-none;
+    background: linear-gradient(
+      90deg,
+      hsl(213 94% 50%),
+      hsl(199 89% 48%),
+      hsl(224 64% 45%),
+      hsl(213 94% 50%)
+    );
+    background-size: 300% 100%;
+    z-index: -1;
+    animation: input-glow 2s ease-in-out infinite paused;
+  }
+
+  .input-animated-focus:focus-within::before {
+    opacity: 1;
+    animation-play-state: running;
+  }
+
+  .input-animated-focus:focus-within {
+    filter: drop-shadow(0 0 8px hsl(213 94% 50% / 0.4)) drop-shadow(0 0 20px hsl(213 94% 50% / 0.2));
+  }
+
+  @keyframes input-glow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes gradient-spin {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 100% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
+  }
+
+  @keyframes gradient-shift-subtle {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes gradient-shimmer {
+    0% {
+      background-position: -200% 0%;
+    }
+    100% {
+      background-position: 200% 0%;
+    }
+  }
+
+  /* Frosted Glass Panel */
+  .frosted-panel {
+    @apply relative rounded-2xl overflow-hidden;
+    background: linear-gradient(145deg, hsl(0 0% 100% / 0.9), hsl(0 0% 100% / 0.7));
+    backdrop-filter: blur(40px) saturate(200%) brightness(105%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(105%);
+    border: 1px solid hsl(0 0% 100% / 0.4);
+    box-shadow: 
+      0 20px 60px hsl(222 47% 11% / 0.15),
+      0 8px 24px hsl(222 47% 11% / 0.1),
+      inset 0 1px 0 hsl(0 0% 100% / 0.6),
+      inset 0 -1px 0 hsl(222 47% 11% / 0.05);
+  }
+
+  .frosted-panel::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: linear-gradient(180deg, hsl(0 0% 100% / 0.3) 0%, transparent 30%);
   }
 
   /* Elevated Card with Premium Feel */

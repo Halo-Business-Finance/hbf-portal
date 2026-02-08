@@ -1,33 +1,45 @@
 import { ReactNode } from 'react';
 import Navbar from './Navbar';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/AppSidebar';
 import { BottomNav } from '@/components/BottomNav';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Footer } from '@/components/Footer';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+import { SessionTimeoutDialog } from '@/components/SessionTimeoutDialog';
+
 interface LayoutProps {
   children: ReactNode;
 }
+
 const Layout = ({
   children
 }: LayoutProps) => {
-  return <SidebarProvider>
-      <div className="min-h-screen w-full bg-background flex flex-col gradient-bg-animated">
-        <Navbar />
-        <div className="flex flex-1 w-full overflow-hidden">
-          <AppSidebar />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <Breadcrumbs />
-            <main className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-20 md:pb-8 bg-white">
-              <div className="animate-fade-in">
-                {children}
-              </div>
-            </main>
-            <Footer />
+  const { showWarning, remainingSeconds, extendSession, logoutNow } = useSessionTimeout({
+    // 14 minutes of inactivity before warning
+    warningTimeMs: 14 * 60 * 1000,
+    // 1 minute after warning to logout (15 min total)
+    logoutTimeMs: 1 * 60 * 1000,
+  });
+
+  return <div className="min-h-screen w-full bg-background flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Breadcrumbs />
+        <main className="flex-1 overflow-auto pb-20 md:pb-8 bg-white">
+          <div className="animate-fade-in">
+            {children}
           </div>
-        </div>
-        <BottomNav />
+        </main>
+        <Footer />
       </div>
-    </SidebarProvider>;
+      <BottomNav />
+      
+      {/* Session timeout warning dialog */}
+      <SessionTimeoutDialog
+        open={showWarning}
+        remainingSeconds={remainingSeconds}
+        onExtend={extendSession}
+        onLogout={logoutNow}
+      />
+    </div>;
 };
 export default Layout;
