@@ -14,9 +14,11 @@ dist/
 # Supabase (not needed for frontend build)
 supabase/
 
-# Environment files (defense-in-depth)
+# Environment files (keep .env.production for Vite build)
 .env
-.env.*
+.env.local
+.env.development
+!.env.production
 !.env.example
 
 # Logs
