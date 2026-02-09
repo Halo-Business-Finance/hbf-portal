@@ -22,13 +22,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Create .env file for Vite build
-        run: |
-          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
-          echo "VITE_SUPABASE_PUBLISHABLE_KEY=${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}" >> .env
-          echo "Created .env file for Vite build variables"
+        uses: actions/checkout@v6
 
       - name: Install IBM Cloud CLI
         run: |
@@ -64,9 +58,17 @@ jobs:
         timeout-minutes: 45
         env:
           DB_URL: ${{ secrets.IBM_DATABASE_URL }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: |
           echo "Building from source using Code Engine managed build..."
           echo "This builds the Dockerfile on IBM servers and pushes to the registry."
+          
+          # Create .env file for Vite build (these are public/publishable keys)
+          cat > .env.production <<EOF
+          VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+          VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+          EOF
           
           ibmcloud ce application update \
             --name ${{ env.IMAGE_NAME }} \

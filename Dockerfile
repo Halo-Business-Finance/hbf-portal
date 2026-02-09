@@ -2,26 +2,23 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Code Engine passes build-time environment variables via --build-env
-# These are automatically available as ENV during build
-# No ARG declarations needed - the vars come from the build environment
-
+# Copy package files first for better layer caching
 COPY package*.json ./
 
-# Use npm install instead of npm ci (project uses bun.lockb, not package-lock.json)
-RUN npm install
+# Install dependencies (npm install handles lockfile drift better than ci)
+RUN npm install --legacy-peer-deps
 
+# Copy source code
 COPY . .
 
-# VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY are passed via --build-env
-# and are available as environment variables during build
+# Build the Vite application with environment variables
 RUN npm run build
 
 FROM nginx:alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder /app/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
