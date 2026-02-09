@@ -64,14 +64,18 @@ jobs:
           echo "Building from source using Code Engine managed build..."
           echo "This builds the Dockerfile on IBM servers and pushes to the registry."
           
+          # Create .env file for Vite build (these are public/publishable keys)
+          cat > .env.production <<EOF
+          VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+          VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+          EOF
+          
           ibmcloud ce application update \
             --name ${{ env.IMAGE_NAME }} \
             --src . \
             --strategy dockerfile \
             --registry-secret icr-secret \
             --image "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}" \
-            --build-env "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" \
-            --build-env "VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY" \
             --env "DATABASE_URL=$DB_URL"
 
       - name: Wait for deployment to stabilize

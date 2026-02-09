@@ -2,14 +2,6 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Accept build-time environment variables from Code Engine --build-env
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_PUBLISHABLE_KEY
-
-# Make them available as environment variables during build
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
-
 # Copy package files first for better layer caching
 COPY package*.json ./
 
