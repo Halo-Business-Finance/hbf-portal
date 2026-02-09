@@ -13,8 +13,8 @@ ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 # Copy package files first for better layer caching
 COPY package*.json ./
 
-# Install dependencies using npm (more reliable in Docker alpine)
-RUN npm ci --legacy-peer-deps
+# Install dependencies (npm install handles lockfile drift better than ci)
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
