@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Building2, Landmark } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 interface BankAccount {
@@ -26,14 +26,8 @@ export const BankBalanceWidget = () => {
   }, [user]);
   const loadBankAccounts = async () => {
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('bank_accounts').select('*').eq('user_id', user?.id).eq('status', 'active').order('balance', {
-        ascending: false
-      });
-      if (error) throw error;
-      setAccounts(data || []);
+      const data = await api.bankAccounts.listActive(user?.id ?? '');
+      setAccounts(data);
     } catch (error) {
       console.error('Error loading bank accounts:', error);
     } finally {

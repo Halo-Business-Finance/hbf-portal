@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 import { TrendingUp, PieChartIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from '@/services/api';
 interface DashboardChartsProps {
   userId?: string;
   className?: string;
@@ -29,9 +29,7 @@ export const DashboardCharts = ({
         return;
       }
       try {
-        const {
-          data: applications
-        } = await supabase.from('loan_applications').select('status, created_at, amount_requested').eq('user_id', userId);
+        const applications = await api.loanApplications.list(userId);
         if (applications) {
           // Status distribution
           const statusCounts: Record<string, number> = {};

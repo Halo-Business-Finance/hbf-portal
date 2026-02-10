@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import { Calendar, DollarSign, FileText, ChevronDown, ChevronUp, Trash2, Pause, Play, ArrowRight, Headphones, Clock, Percent } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -58,10 +58,7 @@ const ApplicationsList = ({
   };
   const handleDeleteApplication = async (applicationId: string) => {
     try {
-      const {
-        error
-      } = await supabase.from('loan_applications').delete().eq('id', applicationId);
-      if (error) throw error;
+      await api.loanApplications.delete(applicationId);
       setApplications(prev => prev.filter(app => app.id !== applicationId));
       toast({
         title: "Application Deleted",
@@ -78,12 +75,7 @@ const ApplicationsList = ({
   };
   const handlePauseApplication = async (applicationId: string) => {
     try {
-      const {
-        error
-      } = await supabase.from('loan_applications').update({
-        status: 'paused'
-      }).eq('id', applicationId);
-      if (error) throw error;
+      await api.loanApplications.updateStatus(applicationId, 'paused');
       setApplications(prev => prev.map(app => app.id === applicationId ? {
         ...app,
         status: 'paused'
@@ -103,12 +95,7 @@ const ApplicationsList = ({
   };
   const handleResumeApplication = async (applicationId: string) => {
     try {
-      const {
-        error
-      } = await supabase.from('loan_applications').update({
-        status: 'draft'
-      }).eq('id', applicationId);
-      if (error) throw error;
+      await api.loanApplications.updateStatus(applicationId, 'draft');
       setApplications(prev => prev.map(app => app.id === applicationId ? {
         ...app,
         status: 'draft'
@@ -137,16 +124,8 @@ const ApplicationsList = ({
   const fetchApplications = async () => {
     if (!user) return;
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('loan_applications').select('*').eq('user_id', user.id).order('created_at', {
-        ascending: false
-      });
-      if (error) {
-        throw error;
-      }
-      setApplications(data || []);
+      const data = await api.loanApplications.list(user.id);
+      setApplications(data);
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast({

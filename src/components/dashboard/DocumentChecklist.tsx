@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from '@/services/api';
 interface DocumentItem {
   id: string;
   name: string;
@@ -77,12 +77,8 @@ export const DocumentChecklist = ({
         return;
       }
       try {
-        const {
-          data
-        } = await supabase.from('borrower_documents').select('document_category').eq('user_id', userId);
-        if (data) {
-          setUploadedDocs(data.map(d => d.document_category.toLowerCase()));
-        }
+        const data = await api.documents.listCategories(userId);
+        setUploadedDocs(data.map(d => d.document_category.toLowerCase()));
       } catch (error) {
         console.error('Error fetching documents:', error);
       } finally {
