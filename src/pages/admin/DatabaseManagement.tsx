@@ -338,7 +338,7 @@ const DatabaseManagement = () => {
         </Card>
 
         {/* Migration Tool */}
-        {isSuperAdmin() && (
+        {isAdmin() && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
