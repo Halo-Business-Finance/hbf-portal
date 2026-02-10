@@ -69,17 +69,12 @@ async function withPool<T>(fn: (pool: Pool) => Promise<T>): Promise<T> {
   const databaseUrl = Deno.env.get("DATABASE_URL");
   if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
 
-  // IBM Cloud PostgreSQL uses certificates that Deno's built-in TLS
-  // validator may not trust. Parse the URL and configure TLS manually.
-  const url = new URL(databaseUrl);
-  const pool = new Pool({
-    hostname: url.hostname,
-    port: url.port || "5432",
-    database: url.pathname.slice(1),
-    user: url.username,
-    password: url.password,
-    tls: { enabled: true, enforce: false },
-  }, 1, true);
+  // IBM Cloud PostgreSQL requires SSL but uses an IBM-issued CA that
+  // Deno doesn't trust by default. Force sslmode=require in the URL
+  // so the driver encrypts the connection without verifying the cert.
+  const connUrl = new URL(databaseUrl);
+  connUrl.searchParams.set("sslmode", "require");
+  const pool = new Pool(connUrl.toString(), 1, true);
 
   try {
     return await fn(pool);
