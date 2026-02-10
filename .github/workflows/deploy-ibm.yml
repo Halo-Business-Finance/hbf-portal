@@ -65,10 +65,14 @@ jobs:
           echo "This builds the Dockerfile on IBM servers and pushes to the registry."
           
           # Create .env file for Vite build (these are public/publishable keys)
-          cat > .env.production <<EOF
-          VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-          VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
-          EOF
+          cat > .env.production <<'ENVEOF'
+VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
+ENVEOF
+          # Substitute env vars (heredoc was quoted to avoid premature expansion)
+          envsubst < .env.production > .env.production.tmp && mv .env.production.tmp .env.production
+          echo "--- .env.production ---"
+          cat .env.production
           
           ibmcloud ce application update \
             --name ${{ env.IMAGE_NAME }} \
