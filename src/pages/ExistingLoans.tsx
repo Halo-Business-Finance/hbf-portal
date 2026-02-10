@@ -6,6 +6,7 @@ import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { toast } from 'sonner';
 import { 
   Wallet, 
@@ -67,7 +68,8 @@ const ExistingLoans = () => {
 
   const loadExistingLoans = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data, error: authError } = await authProvider.getUser();
+      const user = data?.user;
       
       if (!user) {
         toast.error('Please log in to view your loans');

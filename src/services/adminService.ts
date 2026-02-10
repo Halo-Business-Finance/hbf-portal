@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { auditService } from './auditService';
 
 export interface ApplicationStats {
@@ -140,7 +141,7 @@ class AdminService {
         {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            'Authorization': `Bearer ${(await authProvider.getSession()).data?.session?.access_token}`,
             'apikey': supabaseKey || ''
           }
         }

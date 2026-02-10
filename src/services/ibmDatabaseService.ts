@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 
 async function callIbmDatabase(operation: string, query?: string, params?: unknown[]) {
   const body: Record<string, unknown> = { operation };
@@ -61,8 +62,8 @@ export const ibmDatabaseService = {
     step: 'schema' | 'data' | 'full' = 'full',
     onProgress?: (event: MigrationProgress) => void
   ): Promise<MigrationProgress> => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) throw new Error('Authentication required');
+    const { data: sessionData } = await authProvider.getSession();
+    if (!sessionData?.session?.access_token) throw new Error('Authentication required');
 
     const response = await fetch(
       `https://zosgzkpfgaaadadezpxo.supabase.co/functions/v1/migrate-to-ibm`,
@@ -70,7 +71,7 @@ export const ibmDatabaseService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${sessionData.session.access_token}`,
           'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY',
         },
         body: JSON.stringify({ step }),

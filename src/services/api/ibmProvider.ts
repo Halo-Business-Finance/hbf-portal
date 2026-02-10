@@ -4,6 +4,7 @@
  * which connects directly to IBM PostgreSQL.
  */
 import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import type {
   DataAPI,
   LoanApplicationsAPI,
@@ -16,7 +17,8 @@ import type {
 
 /** Call the ibm-data-api edge function with the current user's auth token. */
 async function callIbmApi<T>(body: Record<string, unknown>): Promise<T> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: sessionData } = await authProvider.getSession();
+  const session = sessionData?.session;
   if (!session?.access_token) throw new Error('Not authenticated');
 
   const resp = await supabase.functions.invoke('ibm-data-api', {

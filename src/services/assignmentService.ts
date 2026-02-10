@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { auditService } from './auditService';
 
 export interface ApplicationAssignment {
@@ -214,7 +215,7 @@ class AssignmentService {
     adminId: string,
     notes?: string
   ): Promise<ApplicationAssignment> {
-    const { data: userData } = await supabase.auth.getUser();
+    const { data: userData } = await authProvider.getUser();
     const assignedBy = userData?.user?.id || null;
 
     const { data, error } = await supabase

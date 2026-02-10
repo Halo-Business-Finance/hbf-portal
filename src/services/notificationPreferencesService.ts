@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 
 export interface NotificationPreference {
   email: boolean;
@@ -48,9 +49,9 @@ class NotificationPreferencesService {
    */
   async getPreferences(): Promise<NotificationPreferences | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+      const { data: authData, error: authError } = await authProvider.getUser();
+      const user = authData?.user;
+      if (authError || !user) {
         throw new Error('User not authenticated');
       }
 
@@ -73,9 +74,9 @@ class NotificationPreferencesService {
    */
   async updatePreferences(preferences: NotificationPreferences) {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+      const { data: authData, error: authError } = await authProvider.getUser();
+      const user = authData?.user;
+      if (authError || !user) {
         throw new Error('User not authenticated');
       }
 
