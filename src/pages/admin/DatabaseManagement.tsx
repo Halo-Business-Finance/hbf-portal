@@ -8,7 +8,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
 import { ibmDatabaseService } from '@/services/ibmDatabaseService';
 import {
-  Database, HardDrive, Play, RefreshCw, Table2, AlertTriangle, CheckCircle2, XCircle, Loader2, ShieldAlert,
+  Database, HardDrive, Play, RefreshCw, Table2, AlertTriangle, CheckCircle2, XCircle, Loader2, ShieldAlert, Upload,
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -58,6 +58,18 @@ const DatabaseManagement = () => {
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingMutation, setPendingMutation] = useState<string | null>(null);
+
+  // Migration state
+  const [migrateConfirmOpen, setMigrateConfirmOpen] = useState(false);
+  const [migrateStep, setMigrateStep] = useState<'schema' | 'data' | 'full'>('full');
+  const [migrating, setMigrating] = useState(false);
+  const [migrationResult, setMigrationResult] = useState<{
+    success: boolean;
+    tablesCreated: number;
+    rowsInserted: number;
+    log: string[];
+    errors?: string[];
+  } | null>(null);
 
   const fetchStatus = useCallback(async () => {
     setStatusLoading(true);
@@ -143,6 +155,31 @@ const DatabaseManagement = () => {
     } finally {
       setQueryLoading(false);
       setPendingMutation(null);
+    }
+  };
+
+  const runMigration = async () => {
+    setMigrateConfirmOpen(false);
+    setMigrating(true);
+    setMigrationResult(null);
+    try {
+      const result = await ibmDatabaseService.migrateToIbm(migrateStep);
+      setMigrationResult(result);
+      toast({
+        title: result.success ? 'Migration Complete' : 'Migration completed with errors',
+        description: `${result.rowsInserted} rows exported to IBM PostgreSQL.`,
+        variant: result.success ? 'default' : 'destructive',
+      });
+      // Refresh tables after migration
+      if (migrateStep !== 'data') fetchTables();
+    } catch (err: unknown) {
+      toast({
+        title: 'Migration Failed',
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setMigrating(false);
     }
   };
 
@@ -299,6 +336,80 @@ const DatabaseManagement = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Migration Tool */}
+        {isSuperAdmin() && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Upload className="w-5 h-5" />
+                Supabase → IBM Migration
+              </CardTitle>
+              <CardDescription>
+                Export schema and data from Supabase to IBM PostgreSQL. This creates tables and copies all rows.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => { setMigrateStep('schema'); setMigrateConfirmOpen(true); }}
+                  disabled={migrating}
+                >
+                  Schema Only
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => { setMigrateStep('data'); setMigrateConfirmOpen(true); }}
+                  disabled={migrating}
+                >
+                  Data Only
+                </Button>
+                <Button
+                  onClick={() => { setMigrateStep('full'); setMigrateConfirmOpen(true); }}
+                  disabled={migrating}
+                >
+                  {migrating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                  Full Migration
+                </Button>
+              </div>
+
+              {migrating && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Migration in progress... This may take a few minutes.
+                </div>
+              )}
+
+              {migrationResult && (
+                <div className="space-y-3">
+                  <div className={`flex items-center gap-2 text-sm font-medium ${migrationResult.success ? 'text-primary' : 'text-destructive'}`}>
+                    {migrationResult.success ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                    {migrationResult.success ? 'Migration completed successfully' : 'Migration completed with errors'}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div><span className="text-muted-foreground">Tables processed:</span> <span className="font-mono">{migrationResult.tablesCreated}</span></div>
+                    <div><span className="text-muted-foreground">Rows exported:</span> <span className="font-mono">{migrationResult.rowsInserted}</span></div>
+                  </div>
+                  <div className="rounded-md border bg-muted/50 p-3 max-h-[200px] overflow-auto">
+                    <div className="text-xs text-muted-foreground mb-1">Migration Log:</div>
+                    {migrationResult.log.map((line, i) => (
+                      <div key={i} className="font-mono text-xs">{line}</div>
+                    ))}
+                  </div>
+                  {migrationResult.errors && migrationResult.errors.length > 0 && (
+                    <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 max-h-[200px] overflow-auto">
+                      <div className="text-xs text-destructive mb-1">Errors:</div>
+                      {migrationResult.errors.map((line, i) => (
+                        <div key={i} className="font-mono text-xs text-destructive">{line}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Write Confirmation Dialog */}
@@ -326,6 +437,39 @@ const DatabaseManagement = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmMutation} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Execute Write
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Migration Confirmation Dialog */}
+      <AlertDialog open={migrateConfirmOpen} onOpenChange={setMigrateConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Upload className="w-5 h-5 text-primary" />
+              Confirm Migration to IBM
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <div className="flex items-start gap-2 rounded-md bg-accent/50 border border-accent p-3">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                  <span className="text-sm">
+                    This will {migrateStep === 'schema' ? 'create all tables in' : migrateStep === 'data' ? 'copy all Supabase data to' : 'create schema and copy all data to'} the IBM PostgreSQL database. Existing data will not be overwritten (ON CONFLICT DO NOTHING).
+                  </span>
+                </div>
+                <div className="rounded-md bg-muted p-3 text-sm">
+                  <div><strong>Mode:</strong> {migrateStep === 'full' ? 'Schema + Data' : migrateStep === 'schema' ? 'Schema Only' : 'Data Only'}</div>
+                  <div><strong>Tables:</strong> 21 tables will be processed</div>
+                  <div><strong>Safety:</strong> Uses ON CONFLICT DO NOTHING, audit logged</div>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={runMigration}>
+              Start Migration
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
