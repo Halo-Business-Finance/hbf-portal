@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import postgres from "https://deno.land/x/postgresjs@v3.4.5/mod.js";
+import { Pool } from "https://deno.land/x/postgres@v0.19.3/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,53 +64,91 @@ async function authenticateAdmin(req: Request) {
   return { user, supabase, isSuperAdmin: roleSet.has("super_admin") };
 }
 
-// Build a postgres.js connection with the IBM CA certificate for TLS verification
-function getSQL() {
+// Parse DATABASE_URL into deno-postgres connection options with IBM CA cert
+function getPoolConfig() {
   const databaseUrl = Deno.env.get("DATABASE_URL");
   if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
 
-  const caCert = Deno.env.get("IBM_DB_CA_CERT");
+  const url = new URL(databaseUrl);
+  let caCert = Deno.env.get("IBM_DB_CA_CERT") || "";
 
-  // Build SSL config: use CA cert if available, otherwise require SSL without verification
-  const sslConfig = caCert
-    ? { rejectUnauthorized: true, ca: caCert }
-    : "require";
+  // Log cert diagnostics (first/last 40 chars only for security)
+  if (caCert) {
+    console.log("CA cert length:", caCert.length);
+    console.log("CA cert starts with:", caCert.substring(0, 40));
+    console.log("CA cert ends with:", caCert.substring(caCert.length - 40));
+    
+    // Handle base64-encoded certs (no PEM header)
+    if (!caCert.includes("-----BEGIN")) {
+      try {
+        caCert = atob(caCert);
+        console.log("Decoded base64 cert, new length:", caCert.length);
+      } catch {
+        console.log("Not base64 encoded, using as-is");
+      }
+    }
+    
+    // Ensure proper PEM formatting with newlines
+    if (caCert.includes("-----BEGIN") && !caCert.includes("\n")) {
+      // Certificate was likely pasted as single line - reformat
+      caCert = caCert
+        .replace("-----BEGIN CERTIFICATE-----", "-----BEGIN CERTIFICATE-----\n")
+        .replace("-----END CERTIFICATE-----", "\n-----END CERTIFICATE-----")
+        .replace(/(.{64})/g, "$1\n");
+      console.log("Reformatted single-line PEM cert");
+    }
+  } else {
+    console.log("No IBM_DB_CA_CERT secret found");
+  }
 
-  return postgres(databaseUrl, {
-    ssl: sslConfig,
-    max: 1,
-    idle_timeout: 5,
-    connect_timeout: 10,
-  });
+  const tlsConfig = caCert
+    ? { enabled: true, enforce: true, caCertificates: [caCert] }
+    : { enabled: true, enforce: false };
+
+  return {
+    hostname: url.hostname,
+    port: url.port || "5432",
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    database: url.pathname.slice(1),
+    tls: tlsConfig,
+  };
+}
+
+async function withClient<T>(fn: (client: ReturnType<Pool["connect"]> extends Promise<infer C> ? C : never) => Promise<T>): Promise<T> {
+  const pool = new Pool(getPoolConfig(), 1);
+  const client = await pool.connect();
+  try {
+    return await fn(client);
+  } finally {
+    client.release();
+    await pool.end();
+  }
 }
 
 async function handleStatus() {
-  const sql = getSQL();
-  try {
-    const result = await sql`SELECT version()`;
-    const version = result[0]?.version ?? "unknown";
-    const urlParts = new URL(Deno.env.get("DATABASE_URL")!);
+  return withClient(async (client) => {
+    const result = await client.queryObject<{ version: string }>("SELECT version()");
+    const version = result.rows[0]?.version ?? "unknown";
+    const url = new URL(Deno.env.get("DATABASE_URL")!);
     return jsonResp({
       status: "connected",
-      host: urlParts.hostname,
-      port: urlParts.port || "5432",
-      database: urlParts.pathname.slice(1),
-      ssl: Deno.env.get("IBM_DB_CA_CERT") ? "verify-full (CA provided)" : "require",
+      host: url.hostname,
+      port: url.port || "5432",
+      database: url.pathname.slice(1),
+      ssl: "verify-full (CA provided)",
       postgresVersion: version,
     });
-  } finally {
-    await sql.end();
-  }
+  });
 }
 
 async function handleTables() {
-  const sql = getSQL();
-  try {
-    const result = await sql`SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`;
-    return jsonResp({ tables: result });
-  } finally {
-    await sql.end();
-  }
+  return withClient(async (client) => {
+    const result = await client.queryObject<{ table_name: string; table_type: string }>(
+      `SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`
+    );
+    return jsonResp({ tables: result.rows });
+  });
 }
 
 async function handleQuery(query: string) {
@@ -119,13 +157,10 @@ async function handleQuery(query: string) {
     return jsonResp({ error: "Only read-only queries (SELECT, SHOW, EXPLAIN) are allowed via 'query'. Use 'mutate' for writes." }, 403);
   }
 
-  const sql = getSQL();
-  try {
-    const result = await sql.unsafe(query);
-    return jsonResp({ rows: result, rowCount: result.length });
-  } finally {
-    await sql.end();
-  }
+  return withClient(async (client) => {
+    const result = await client.queryObject(query);
+    return jsonResp({ rows: result.rows, rowCount: result.rows.length });
+  });
 }
 
 // Rate limit config for mutate: 10 writes per 60-second window
@@ -167,7 +202,6 @@ async function handleMutate(
   ipAddress: string | null,
   userAgent: string | null,
 ) {
-  // Server-side rate limiting — fail-closed
   const rateLimit = await checkMutateRateLimit(supabase, user.id);
   if (!rateLimit) {
     return jsonResp({ error: "Rate limit check failed. Write aborted for safety." }, 503);
@@ -188,7 +222,6 @@ async function handleMutate(
     return jsonResp({ error: "Use the 'query' operation for read-only statements." }, 400);
   }
 
-  // Audit log the write operation BEFORE executing
   try {
     await supabase.rpc("log_audit_event", {
       _user_id: user.id,
@@ -207,19 +240,22 @@ async function handleMutate(
     return jsonResp({ error: "Write aborted: audit logging failed" }, 500);
   }
 
-  const sql = getSQL();
-  try {
-    const result = await sql.begin(async (tx) => {
-      return await tx.unsafe(query);
-    });
-    return jsonResp({
-      success: true,
-      rowCount: result.length,
-      rows: result,
-    });
-  } finally {
-    await sql.end();
-  }
+  return withClient(async (client) => {
+    const transaction = client.createTransaction("mutation");
+    await transaction.begin();
+    try {
+      const result = await transaction.queryObject(query);
+      await transaction.commit();
+      return jsonResp({
+        success: true,
+        rowCount: result.rows.length,
+        rows: result.rows,
+      });
+    } catch (txErr) {
+      await transaction.rollback();
+      throw txErr;
+    }
+  });
 }
 
 serve(async (req) => {
