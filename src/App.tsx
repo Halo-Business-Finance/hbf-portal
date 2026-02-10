@@ -17,6 +17,7 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AuthCallback from "./pages/AuthCallback";
 import { Navigate } from "react-router-dom";
 
 // External redirect component for privacy policy
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/terms-of-service" element={<ExternalRedirect to="https://halobusinessfinance.com/terms-of-service" />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               
               {/* Protected routes with Layout */}
               <Route path="/admin" element={
