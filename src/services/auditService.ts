@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 
 export type AuditAction = 
   | 'VIEW_BANK_ACCOUNTS'
@@ -54,7 +55,8 @@ class AuditService {
    */
   async logAccess(params: AuditLogParams): Promise<void> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data } = await authProvider.getSession();
+      const session = data?.session;
       if (!session?.user) {
         console.warn('Audit log skipped: No authenticated user');
         return;
