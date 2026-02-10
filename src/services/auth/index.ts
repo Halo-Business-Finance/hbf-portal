@@ -24,6 +24,6 @@ import { appIdAuthProvider, handleAppIdOAuthCallback } from './appIdAuthProvider
  * - supabaseAuthProvider  → Supabase Auth (current default)
  * - appIdAuthProvider     → IBM App ID (OIDC/Cloud Directory)
  */
-export const authProvider = supabaseAuthProvider;
+export const authProvider = appIdAuthProvider;
 
 export { appIdAuthProvider, handleAppIdOAuthCallback };
