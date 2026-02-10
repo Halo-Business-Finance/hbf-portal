@@ -8,13 +8,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-function jsonResp(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
 // Tables in dependency order (parents before children)
 const TABLES_IN_ORDER = [
   "profiles",
@@ -68,29 +61,22 @@ function getPoolConfig() {
   };
 }
 
-// Escape a value for SQL insertion
 function escapeSqlValue(val: unknown): string {
   if (val === null || val === undefined) return "NULL";
   if (typeof val === "boolean") return val ? "TRUE" : "FALSE";
   if (typeof val === "number") return String(val);
   if (val instanceof Date) return `'${val.toISOString()}'`;
   if (typeof val === "object") {
-    // JSON/JSONB or array
     const jsonStr = JSON.stringify(val);
     return `'${jsonStr.replace(/'/g, "''")}'::jsonb`;
   }
-  // String
   return `'${String(val).replace(/'/g, "''")}'`;
 }
 
-// Build batch INSERT for a table
 function buildInsertSQL(tableName: string, rows: Record<string, unknown>[]): string[] {
   if (!rows.length) return [];
-  
   const columns = Object.keys(rows[0]);
   const statements: string[] = [];
-  
-  // Batch 50 rows per INSERT for performance
   const BATCH_SIZE = 50;
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
     const batch = rows.slice(i, i + BATCH_SIZE);
@@ -98,30 +84,21 @@ function buildInsertSQL(tableName: string, rows: Record<string, unknown>[]): str
       const vals = columns.map(col => escapeSqlValue(row[col]));
       return `(${vals.join(", ")})`;
     });
-    
     statements.push(
       `INSERT INTO public.${tableName} (${columns.map(c => `"${c}"`).join(", ")}) VALUES\n${valuesClauses.join(",\n")} ON CONFLICT DO NOTHING;`
     );
   }
-  
   return statements;
 }
 
-// Schema SQL split into individual statements
 function getSchemaStatements(): string[] {
-  // We'll run the schema creation as individual DDL blocks
   return [
-    // Extensions
     `CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`,
     `CREATE EXTENSION IF NOT EXISTS "pgcrypto"`,
-
-    // Enums (use DO block to handle "already exists")
     `DO $$ BEGIN CREATE TYPE app_role AS ENUM ('admin','moderator','user','customer_service','underwriter','super_admin'); EXCEPTION WHEN duplicate_object THEN NULL; END $$`,
     `DO $$ BEGIN CREATE TYPE application_status AS ENUM ('draft','submitted','under_review','approved','rejected','funded','paused'); EXCEPTION WHEN duplicate_object THEN NULL; END $$`,
     `DO $$ BEGIN CREATE TYPE loan_type AS ENUM ('refinance','bridge_loan','purchase','franchise','factoring','working_capital'); EXCEPTION WHEN duplicate_object THEN NULL; END $$`,
     `DO $$ BEGIN CREATE TYPE user_role AS ENUM ('admin','user'); EXCEPTION WHEN duplicate_object THEN NULL; END $$`,
-
-    // Tables (IF NOT EXISTS)
     `CREATE TABLE IF NOT EXISTS public.profiles (id UUID PRIMARY KEY, first_name TEXT, last_name TEXT, phone TEXT, business_name TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`,
     `CREATE TABLE IF NOT EXISTS public.user_roles (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID NOT NULL, role app_role NOT NULL DEFAULT 'user', created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE (user_id, role))`,
     `CREATE TABLE IF NOT EXISTS public.loan_applications (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID NOT NULL, loan_type loan_type NOT NULL, amount_requested NUMERIC, status application_status NOT NULL DEFAULT 'draft', first_name TEXT, last_name TEXT, email TEXT, phone TEXT, business_name TEXT, business_address TEXT, business_city TEXT, business_state TEXT, business_zip TEXT, years_in_business INTEGER, loan_details JSONB DEFAULT '{}'::jsonb, application_number TEXT, application_started_date TIMESTAMPTZ DEFAULT now(), application_submitted_date TIMESTAMPTZ, funded_date TIMESTAMPTZ, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`,
@@ -143,8 +120,6 @@ function getSchemaStatements(): string[] {
     `CREATE TABLE IF NOT EXISTS public.crm_activities (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), contact_id UUID REFERENCES public.crm_contacts(id), opportunity_id UUID REFERENCES public.crm_opportunities(id), user_id UUID NOT NULL, activity_type TEXT NOT NULL, subject TEXT NOT NULL, description TEXT, status TEXT DEFAULT 'pending', priority TEXT DEFAULT 'medium', duration_minutes INTEGER, scheduled_at TIMESTAMPTZ, completed_at TIMESTAMPTZ, external_crm_id TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`,
     `CREATE TABLE IF NOT EXISTS public.crm_integration_settings (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID NOT NULL, external_crm_name TEXT NOT NULL DEFAULT 'loanflow-nexus', api_endpoint TEXT, webhook_url TEXT, sync_enabled BOOLEAN DEFAULT false, sync_direction TEXT DEFAULT 'bidirectional', last_sync_at TIMESTAMPTZ, field_mappings JSONB DEFAULT '{}'::jsonb, settings JSONB DEFAULT '{}'::jsonb, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`,
     `CREATE TABLE IF NOT EXISTS public.crm_sync_log (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID NOT NULL, sync_type TEXT NOT NULL, operation TEXT NOT NULL, entity_type TEXT NOT NULL, entity_id UUID, external_id TEXT, status TEXT NOT NULL, error_message TEXT, data_payload JSONB, processing_time_ms INTEGER, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`,
-
-    // Masked view
     `CREATE OR REPLACE VIEW public.bank_accounts_masked AS SELECT id, user_id, account_name, '****' || RIGHT(account_number, 4) AS account_number_masked, account_type, institution, balance, currency, status, is_business, created_at, updated_at FROM public.bank_accounts`,
   ];
 }
@@ -155,16 +130,18 @@ async function authenticateAdmin(req: Request) {
   const authHeader = req.headers.get("Authorization");
 
   if (!supabaseUrl || !supabaseKey) throw new Error("Missing Supabase configuration");
-  if (!authHeader) return { error: jsonResp({ error: "Authorization header required" }, 401) };
+  if (!authHeader) return { error: "Authorization header required", status: 401 };
 
   const supabase = createClient(supabaseUrl, supabaseKey);
   const token = authHeader.replace("Bearer ", "");
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-  if (authError || !user) return { error: jsonResp({ error: "Unauthorized" }, 401) };
+  if (authError || !user) return { error: "Unauthorized", status: 401 };
 
   const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
   const roleSet = new Set((roles ?? []).map((r: { role: string }) => r.role));
-  if (!roleSet.has("super_admin")) return { error: jsonResp({ error: "Only super_admin can run migrations" }, 403) };
+  if (!roleSet.has("super_admin") && !roleSet.has("admin")) {
+    return { error: "Admin access required to run migrations", status: 403 };
+  }
 
   return { user, supabase };
 }
@@ -172,136 +149,175 @@ async function authenticateAdmin(req: Request) {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  try {
-    const auth = await authenticateAdmin(req);
-    if ("error" in auth) return auth.error;
-    const { user, supabase } = auth;
+  // Use streaming to avoid timeout — send progress as newline-delimited JSON
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (data: Record<string, unknown>) => {
+        controller.enqueue(encoder.encode(JSON.stringify(data) + "\n"));
+      };
 
-    const body = await req.json().catch(() => ({}));
-    const step = body.step || "full"; // "schema", "data", or "full"
-
-    const log: string[] = [];
-    const errors: string[] = [];
-    let tablesCreated = 0;
-    let rowsInserted = 0;
-
-    // Connect to IBM
-    const pool = new Pool(getPoolConfig(), 1);
-    const client = await pool.connect();
-
-    try {
-      // STEP 1: Schema creation
-      if (step === "schema" || step === "full") {
-        log.push("Starting schema creation...");
-        const schemaStatements = getSchemaStatements();
-        
-        for (const stmt of schemaStatements) {
-          try {
-            await client.queryObject(stmt);
-            if (stmt.includes("CREATE TABLE")) tablesCreated++;
-          } catch (e) {
-            const msg = e instanceof Error ? e.message : String(e);
-            // Ignore "already exists" errors
-            if (!msg.includes("already exists") && !msg.includes("duplicate")) {
-              errors.push(`Schema error: ${msg.substring(0, 200)}`);
-            }
-          }
+      try {
+        const auth = await authenticateAdmin(req);
+        if ("error" in auth) {
+          send({ type: "error", error: auth.error });
+          controller.close();
+          return;
         }
-        log.push(`Schema creation complete. ${tablesCreated} table statements processed.`);
-      }
+        const { user, supabase } = auth;
 
-      // STEP 2: Data migration
-      if (step === "data" || step === "full") {
-        log.push("Starting data migration...");
+        const body = await req.json().catch(() => ({}));
+        const step = body.step || "full";
 
-        // Disable triggers during data load to avoid conflicts
+        const log: string[] = [];
+        const errors: string[] = [];
+        let tablesCreated = 0;
+        let rowsInserted = 0;
+
+        send({ type: "progress", message: "Connecting to IBM PostgreSQL..." });
+
+        const pool = new Pool(getPoolConfig(), 1);
+        let client;
         try {
-          await client.queryObject("SET session_replication_role = 'replica'");
-        } catch {
-          log.push("Warning: Could not disable triggers during import");
+          client = await pool.connect();
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          send({ type: "error", error: `Failed to connect to IBM: ${msg}` });
+          controller.close();
+          await pool.end();
+          return;
         }
 
-        for (const tableName of TABLES_IN_ORDER) {
-          try {
-            // Read all data from Supabase using service role (bypasses RLS)
-            const { data: rows, error: fetchError } = await supabase
-              .from(tableName)
-              .select("*")
-              .limit(10000); // Safety limit
+        try {
+          // STEP 1: Schema creation
+          if (step === "schema" || step === "full") {
+            send({ type: "progress", message: "Starting schema creation..." });
+            log.push("Starting schema creation...");
+            const schemaStatements = getSchemaStatements();
 
-            if (fetchError) {
-              errors.push(`Fetch ${tableName}: ${fetchError.message}`);
-              continue;
-            }
-
-            if (!rows || rows.length === 0) {
-              log.push(`${tableName}: 0 rows (skipped)`);
-              continue;
-            }
-
-            // Build and execute INSERT statements
-            const insertStatements = buildInsertSQL(tableName, rows);
-            let tableRowCount = 0;
-
-            for (const stmt of insertStatements) {
+            for (const stmt of schemaStatements) {
               try {
                 await client.queryObject(stmt);
-                tableRowCount += rows.length;
+                if (stmt.includes("CREATE TABLE")) tablesCreated++;
               } catch (e) {
                 const msg = e instanceof Error ? e.message : String(e);
-                errors.push(`Insert ${tableName}: ${msg.substring(0, 200)}`);
+                if (!msg.includes("already exists") && !msg.includes("duplicate")) {
+                  errors.push(`Schema error: ${msg.substring(0, 200)}`);
+                  send({ type: "error_detail", message: `Schema error: ${msg.substring(0, 200)}` });
+                }
+              }
+            }
+            log.push(`Schema creation complete. ${tablesCreated} table statements processed.`);
+            send({ type: "progress", message: `Schema creation complete. ${tablesCreated} table statements processed.` });
+          }
+
+          // STEP 2: Data migration
+          if (step === "data" || step === "full") {
+            send({ type: "progress", message: "Starting data migration..." });
+            log.push("Starting data migration...");
+
+            try {
+              await client.queryObject("SET session_replication_role = 'replica'");
+            } catch {
+              log.push("Warning: Could not disable triggers during import");
+              send({ type: "progress", message: "Warning: Could not disable triggers during import" });
+            }
+
+            for (const tableName of TABLES_IN_ORDER) {
+              try {
+                const { data: rows, error: fetchError } = await supabase
+                  .from(tableName)
+                  .select("*")
+                  .limit(10000);
+
+                if (fetchError) {
+                  errors.push(`Fetch ${tableName}: ${fetchError.message}`);
+                  send({ type: "error_detail", message: `Fetch ${tableName}: ${fetchError.message}` });
+                  continue;
+                }
+
+                if (!rows || rows.length === 0) {
+                  log.push(`${tableName}: 0 rows (skipped)`);
+                  send({ type: "table_progress", table: tableName, rows: 0, skipped: true });
+                  continue;
+                }
+
+                const insertStatements = buildInsertSQL(tableName, rows);
+                for (const stmt of insertStatements) {
+                  try {
+                    await client.queryObject(stmt);
+                  } catch (e) {
+                    const msg = e instanceof Error ? e.message : String(e);
+                    errors.push(`Insert ${tableName}: ${msg.substring(0, 200)}`);
+                    send({ type: "error_detail", message: `Insert ${tableName}: ${msg.substring(0, 200)}` });
+                  }
+                }
+
+                rowsInserted += rows.length;
+                log.push(`${tableName}: ${rows.length} rows exported`);
+                send({ type: "table_progress", table: tableName, rows: rows.length, skipped: false });
+              } catch (e) {
+                const msg = e instanceof Error ? e.message : String(e);
+                errors.push(`Table ${tableName}: ${msg.substring(0, 200)}`);
+                send({ type: "error_detail", message: `Table ${tableName}: ${msg.substring(0, 200)}` });
               }
             }
 
-            rowsInserted += rows.length;
-            log.push(`${tableName}: ${rows.length} rows exported`);
-          } catch (e) {
-            const msg = e instanceof Error ? e.message : String(e);
-            errors.push(`Table ${tableName}: ${msg.substring(0, 200)}`);
+            try {
+              await client.queryObject("SET session_replication_role = 'origin'");
+            } catch {
+              log.push("Warning: Could not re-enable triggers");
+            }
+
+            log.push(`Data migration complete. ${rowsInserted} total rows exported.`);
+            send({ type: "progress", message: `Data migration complete. ${rowsInserted} total rows exported.` });
           }
-        }
 
-        // Re-enable triggers
-        try {
-          await client.queryObject("SET session_replication_role = 'origin'");
-        } catch {
-          log.push("Warning: Could not re-enable triggers");
-        }
+          // Audit the migration
+          try {
+            await supabase.rpc("log_audit_event", {
+              _user_id: user.id,
+              _action: "IBM_DATA_MIGRATION",
+              _resource_type: "ibm_database",
+              _details: {
+                step,
+                tablesCreated,
+                rowsInserted,
+                errors: errors.length,
+                completedAt: new Date().toISOString(),
+              },
+            });
+          } catch { /* non-critical */ }
 
-        log.push(`Data migration complete. ${rowsInserted} total rows exported.`);
-      }
-
-      // Audit the migration
-      try {
-        await supabase.rpc("log_audit_event", {
-          _user_id: user.id,
-          _action: "IBM_DATA_MIGRATION",
-          _resource_type: "ibm_database",
-          _details: {
+          // Final result
+          send({
+            type: "complete",
+            success: errors.length === 0,
             step,
             tablesCreated,
             rowsInserted,
-            errors: errors.length,
-            completedAt: new Date().toISOString(),
-          },
-        });
-      } catch { /* non-critical */ }
+            log,
+            errors: errors.length > 0 ? errors : undefined,
+          });
+        } finally {
+          client.release();
+          await pool.end();
+        }
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : "Unknown error";
+        console.error("Migration error:", msg);
+        send({ type: "error", error: msg });
+      }
 
-      return jsonResp({
-        success: errors.length === 0,
-        step,
-        tablesCreated,
-        rowsInserted,
-        log,
-        errors: errors.length > 0 ? errors : undefined,
-      });
-    } finally {
-      client.release();
-      await pool.end();
-    }
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Unknown error";
-    console.error("Migration error:", msg);
-    return jsonResp({ error: msg }, 500);
-  }
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/x-ndjson",
+      "Transfer-Encoding": "chunked",
+    },
+  });
 });

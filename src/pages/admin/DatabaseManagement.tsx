@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/PageHeader';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
-import { ibmDatabaseService } from '@/services/ibmDatabaseService';
+import { ibmDatabaseService, type MigrationProgress } from '@/services/ibmDatabaseService';
 import {
   Database, HardDrive, Play, RefreshCw, Table2, AlertTriangle, CheckCircle2, XCircle, Loader2, ShieldAlert, Upload,
 } from 'lucide-react';
@@ -63,6 +63,7 @@ const DatabaseManagement = () => {
   const [migrateConfirmOpen, setMigrateConfirmOpen] = useState(false);
   const [migrateStep, setMigrateStep] = useState<'schema' | 'data' | 'full'>('full');
   const [migrating, setMigrating] = useState(false);
+  const [migrationLog, setMigrationLog] = useState<string[]>([]);
   const [migrationResult, setMigrationResult] = useState<{
     success: boolean;
     tablesCreated: number;
@@ -162,15 +163,32 @@ const DatabaseManagement = () => {
     setMigrateConfirmOpen(false);
     setMigrating(true);
     setMigrationResult(null);
+    setMigrationLog([]);
     try {
-      const result = await ibmDatabaseService.migrateToIbm(migrateStep);
-      setMigrationResult(result);
+      const result = await ibmDatabaseService.migrateToIbm(migrateStep, (event: MigrationProgress) => {
+        if (event.type === 'progress' && event.message) {
+          setMigrationLog(prev => [...prev, event.message!]);
+        } else if (event.type === 'table_progress') {
+          const msg = event.skipped
+            ? `${event.table}: 0 rows (skipped)`
+            : `${event.table}: ${event.rows} rows exported`;
+          setMigrationLog(prev => [...prev, msg]);
+        } else if (event.type === 'error_detail' && event.message) {
+          setMigrationLog(prev => [...prev, `⚠ ${event.message}`]);
+        }
+      });
+      setMigrationResult({
+        success: result.success ?? false,
+        tablesCreated: result.tablesCreated ?? 0,
+        rowsInserted: result.rowsInserted ?? 0,
+        log: result.log ?? [],
+        errors: result.errors,
+      });
       toast({
         title: result.success ? 'Migration Complete' : 'Migration completed with errors',
-        description: `${result.rowsInserted} rows exported to IBM PostgreSQL.`,
+        description: `${result.rowsInserted ?? 0} rows exported to IBM PostgreSQL.`,
         variant: result.success ? 'default' : 'destructive',
       });
-      // Refresh tables after migration
       if (migrateStep !== 'data') fetchTables();
     } catch (err: unknown) {
       toast({
@@ -375,9 +393,19 @@ const DatabaseManagement = () => {
               </div>
 
               {migrating && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Migration in progress... This may take a few minutes.
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Migration in progress... This may take a few minutes.
+                  </div>
+                  {migrationLog.length > 0 && (
+                    <div className="rounded-md border bg-muted/50 p-3 max-h-[200px] overflow-auto">
+                      <div className="text-xs text-muted-foreground mb-1">Live Progress:</div>
+                      {migrationLog.map((line, i) => (
+                        <div key={i} className="font-mono text-xs">{line}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
