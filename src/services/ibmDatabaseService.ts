@@ -5,14 +5,29 @@ async function callIbmDatabase(operation: string, query?: string, params?: unkno
   if (query) body.query = query;
   if (params?.length) body.params = params;
 
-  const { data, error } = await supabase.functions.invoke('ibm-database', {
-    body,
-  });
+  try {
+    const { data, error } = await supabase.functions.invoke('ibm-database', {
+      body,
+    });
 
-  if (error) {
-    throw new Error(error.message || 'Request failed');
+    if (error) {
+      // The supabase client wraps errors - try to extract the message
+      const msg = typeof error === 'object' && error !== null && 'message' in error
+        ? (error as { message: string }).message
+        : String(error);
+      throw new Error(msg || `${operation} request failed`);
+    }
+
+    // Handle case where data contains an error from the edge function
+    if (data && typeof data === 'object' && 'error' in data) {
+      throw new Error((data as { error: string }).error);
+    }
+
+    return data;
+  } catch (err) {
+    if (err instanceof Error) throw err;
+    throw new Error(`${operation} request failed`);
   }
-  return data;
 }
 
 export const ibmDatabaseService = {
