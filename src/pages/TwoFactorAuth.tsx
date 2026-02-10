@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { ArrowLeft, Shield, Smartphone, AlertCircle, CheckCircle, Copy } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
@@ -97,11 +97,11 @@ const TwoFactorAuth = () => {
 
   const checkEnrollmentStatus = async () => {
     try {
-      const { data, error } = await supabase.auth.mfa.listFactors();
+      const { data, error } = await authProvider.mfa.listFactors();
       
       if (error) throw error;
 
-      const verified = data?.all?.filter(f => f.status === 'verified') || [];
+      const verified = data?.totp?.filter(f => f.status === 'verified') || [];
       setEnrolledFactors(verified);
       setHasEnrolledFactor(verified.length > 0);
     } catch (error: any) {
@@ -119,7 +119,7 @@ const TwoFactorAuth = () => {
   const startEnrollment = async () => {
     setEnrolling(true);
     try {
-      const { data, error } = await supabase.auth.mfa.enroll({
+      const { data, error } = await authProvider.mfa.enroll({
         factorType: 'totp',
         friendlyName: 'Authenticator App'
       });
@@ -168,7 +168,7 @@ const TwoFactorAuth = () => {
 
     setVerifying(true);
     try {
-      const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+      const { error } = await authProvider.mfa.challengeAndVerify({
         factorId,
         code: verificationCode
       });
@@ -225,7 +225,7 @@ const TwoFactorAuth = () => {
     }
 
     try {
-      const { error } = await supabase.auth.mfa.unenroll({ factorId: factorIdToRemove });
+      const { error } = await authProvider.mfa.unenroll({ factorId: factorIdToRemove });
       
       if (error) throw error;
 

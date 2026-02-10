@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -52,8 +52,8 @@ const ResetPassword = () => {
   useEffect(() => {
     // Check if user has a valid recovery session
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      const result = await authProvider.getSession();
+      if (result.data?.session) {
         setIsValidSession(true);
       } else {
         toast({
@@ -66,7 +66,7 @@ const ResetPassword = () => {
     };
 
     // Listen for auth state changes (recovery token)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { unsubscribe } = authProvider.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         setIsValidSession(true);
         setIsLoading(false);
@@ -75,7 +75,7 @@ const ResetPassword = () => {
 
     checkSession();
 
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, [toast]);
 
   const form = useForm<z.infer<typeof passwordSchema>>({
@@ -89,7 +89,7 @@ const ResetPassword = () => {
   const onSubmit = async (values: z.infer<typeof passwordSchema>) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { error } = await authProvider.updateUser({
         password: values.newPassword,
       });
 
