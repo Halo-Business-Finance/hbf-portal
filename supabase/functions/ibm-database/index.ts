@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 interface DatabaseOperation {
-  operation: "query" | "mutate" | "status" | "tables";
+  operation: "query" | "mutate" | "status" | "tables" | "compare_counts";
   query?: string;
   params?: unknown[];
 }
@@ -145,6 +145,52 @@ async function handleTables() {
   });
 }
 
+const COMPARE_TABLES = [
+  "profiles", "user_roles", "loan_applications", "loan_application_status_history",
+  "admin_application_assignments", "bank_accounts", "credit_scores", "existing_loans",
+  "borrower_documents", "notifications", "notification_preferences", "audit_logs",
+  "external_notification_webhooks", "system_settings", "security_telemetry",
+  "rate_limit_tracking", "crm_contacts", "crm_opportunities", "crm_activities",
+  "crm_integration_settings", "crm_sync_log",
+];
+
+async function handleCompareCounts(supabase: ReturnType<typeof createClient>) {
+  // Query IBM counts
+  const ibmCounts: Record<string, number> = {};
+  await withClient(async (client) => {
+    for (const table of COMPARE_TABLES) {
+      try {
+        const r = await client.queryObject<{ count: string }>(`SELECT COUNT(*) as count FROM public.${table}`);
+        ibmCounts[table] = parseInt(r.rows[0]?.count ?? "0", 10);
+      } catch {
+        ibmCounts[table] = -1; // table doesn't exist
+      }
+    }
+  });
+
+  // Query Supabase counts using service role
+  const supabaseCounts: Record<string, number> = {};
+  for (const table of COMPARE_TABLES) {
+    try {
+      const { count, error } = await supabase
+        .from(table)
+        .select("*", { count: "exact", head: true });
+      supabaseCounts[table] = error ? -1 : (count ?? 0);
+    } catch {
+      supabaseCounts[table] = -1;
+    }
+  }
+
+  const comparison = COMPARE_TABLES.map((table) => ({
+    table,
+    supabase: supabaseCounts[table] ?? -1,
+    ibm: ibmCounts[table] ?? -1,
+    match: supabaseCounts[table] === ibmCounts[table],
+  }));
+
+  return jsonResp({ comparison });
+}
+
 async function handleQuery(query: string) {
   const classification = classifyQuery(query);
   if (classification !== "read") {
@@ -277,6 +323,9 @@ serve(async (req) => {
 
       case "tables":
         return await handleTables();
+
+      case "compare_counts":
+        return await handleCompareCounts(supabase);
 
       case "query":
         if (!body.query) return jsonResp({ error: "Query string is required" }, 400);

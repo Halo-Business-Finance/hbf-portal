@@ -43,11 +43,19 @@ export interface MigrationProgress {
   error?: string;
 }
 
+export interface RowCountComparison {
+  table: string;
+  supabase: number;
+  ibm: number;
+  match: boolean;
+}
+
 export const ibmDatabaseService = {
   getStatus: () => callIbmDatabase('status'),
   getTables: () => callIbmDatabase('tables'),
   executeQuery: (query: string) => callIbmDatabase('query', query),
   executeMutation: (query: string, params?: unknown[]) => callIbmDatabase('mutate', query, params),
+  compareRowCounts: () => callIbmDatabase('compare_counts') as Promise<{ comparison: RowCountComparison[] }>,
 
   migrateToIbm: async (
     step: 'schema' | 'data' | 'full' = 'full',

@@ -6,9 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/PageHeader';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
-import { ibmDatabaseService, type MigrationProgress } from '@/services/ibmDatabaseService';
+import { ibmDatabaseService, type MigrationProgress, type RowCountComparison } from '@/services/ibmDatabaseService';
 import {
-  Database, HardDrive, Play, RefreshCw, Table2, AlertTriangle, CheckCircle2, XCircle, Loader2, ShieldAlert, Upload,
+  Database, HardDrive, Play, RefreshCw, Table2, AlertTriangle, CheckCircle2, XCircle, Loader2, ShieldAlert, Upload, GitCompareArrows,
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -59,6 +59,11 @@ const DatabaseManagement = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingMutation, setPendingMutation] = useState<string | null>(null);
 
+  // Data verification state
+  const [comparisonData, setComparisonData] = useState<RowCountComparison[] | null>(null);
+  const [comparisonLoading, setComparisonLoading] = useState(false);
+  const [comparisonError, setComparisonError] = useState<string | null>(null);
+
   // Migration state
   const [migrateConfirmOpen, setMigrateConfirmOpen] = useState(false);
   const [migrateStep, setMigrateStep] = useState<'schema' | 'data' | 'full'>('full');
@@ -103,6 +108,19 @@ const DatabaseManagement = () => {
       fetchStatus();
     }
   }, [roleLoading, isAdmin, fetchStatus]);
+
+  const runComparison = useCallback(async () => {
+    setComparisonLoading(true);
+    setComparisonError(null);
+    try {
+      const data = await ibmDatabaseService.compareRowCounts();
+      setComparisonData(data.comparison);
+    } catch (err: unknown) {
+      setComparisonError(err instanceof Error ? err.message : 'Comparison failed');
+    } finally {
+      setComparisonLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (dbStatus && !tables.length && !tablesLoading) {
@@ -277,6 +295,77 @@ const DatabaseManagement = () => {
                     {t.table_type === 'VIEW' && <span className="ml-1 text-muted-foreground">(view)</span>}
                   </Badge>
                 ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Data Verification */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <GitCompareArrows className="w-5 h-5" />
+                Data Verification
+              </CardTitle>
+              <CardDescription>Compare row counts between Supabase and IBM PostgreSQL</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={runComparison} disabled={comparisonLoading}>
+              {comparisonLoading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+              {comparisonData ? 'Re-run' : 'Run Comparison'}
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {comparisonError && (
+              <div className="flex items-center gap-2 text-destructive text-sm"><XCircle className="w-4 h-4" /> {comparisonError}</div>
+            )}
+            {comparisonLoading && !comparisonData && (
+              <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Querying both databases…</div>
+            )}
+            {comparisonData && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                    <span className="font-medium">{comparisonData.filter(r => r.match).length}</span>
+                    <span className="text-muted-foreground">matching</span>
+                  </div>
+                  {comparisonData.filter(r => !r.match).length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                      <span className="font-medium">{comparisonData.filter(r => !r.match).length}</span>
+                      <span className="text-muted-foreground">mismatched</span>
+                    </div>
+                  )}
+                </div>
+                <div className="rounded-md border overflow-auto max-h-[400px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="font-mono text-xs">Table</TableHead>
+                        <TableHead className="font-mono text-xs text-right">Supabase</TableHead>
+                        <TableHead className="font-mono text-xs text-right">IBM</TableHead>
+                        <TableHead className="font-mono text-xs text-center">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {comparisonData.map((row) => (
+                        <TableRow key={row.table} className={!row.match ? 'bg-destructive/5' : ''}>
+                          <TableCell className="font-mono text-xs">{row.table}</TableCell>
+                          <TableCell className="font-mono text-xs text-right">{row.supabase === -1 ? 'N/A' : row.supabase}</TableCell>
+                          <TableCell className="font-mono text-xs text-right">{row.ibm === -1 ? 'N/A' : row.ibm}</TableCell>
+                          <TableCell className="text-center">
+                            {row.match ? (
+                              <CheckCircle2 className="w-4 h-4 text-primary inline-block" />
+                            ) : (
+                              <XCircle className="w-4 h-4 text-destructive inline-block" />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
             )}
           </CardContent>
