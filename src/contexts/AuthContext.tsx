@@ -1,9 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { authProvider, type AuthUser, type AuthSession } from '@/services/auth';
 import { useToast } from '@/hooks/use-toast';
 import { telemetryService } from '@/services/telemetryService';
-import { auditService } from '@/services/auditService';
 
 // Rate limiting configuration
 const RATE_LIMIT_CONFIG = {
@@ -21,8 +19,8 @@ interface RateLimitEntry {
 }
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
+  session: AuthSession | null;
   authenticated: boolean;
   loading: boolean;
   formState: number;
@@ -48,8 +46,8 @@ export const useAuth = () => {
 };
 
 const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [formState, setFormState] = useState(0);
   const [username, setUsername] = useState<string | null>(null);
@@ -72,7 +70,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     const key = action;
     const current = rateLimitsRef.current[key];
 
-    // Check if currently locked out
     if (current?.lockedUntil && now < current.lockedUntil) {
       const remainingTime = current.lockedUntil - now;
       return {
@@ -81,7 +78,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       };
     }
 
-    // Clean up expired entries
     if (current && now > current.resetTime) {
       delete rateLimitsRef.current[key];
     }
@@ -115,15 +111,16 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { unsubscribe } = authProvider.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Update username from user metadata
         if (session?.user) {
-          setUsername(session.user.user_metadata?.name || session.user.email);
+          setUsername(
+            (session.user.user_metadata?.name as string) || session.user.email || null
+          );
         } else {
           setUsername(null);
         }
@@ -131,26 +128,26 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    authProvider.getSession().then((result) => {
+      const s = result.data?.session ?? null;
+      setSession(s);
+      setUser(s?.user ?? null);
       setLoading(false);
       
-      if (session?.user) {
-        setUsername(session.user.user_metadata?.name || session.user.email);
+      if (s?.user) {
+        setUsername(
+          (s.user.user_metadata?.name as string) || s.user.email || null
+        );
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    // Check rate limit before attempting sign in
     const rateLimitCheck = checkRateLimit('login');
     if (!rateLimitCheck.allowed) {
-      // Track rate limit triggered (anonymous telemetry)
       telemetryService.trackRateLimitTriggered();
-      
       toast({
         title: "Too Many Attempts",
         description: rateLimitCheck.message,
@@ -159,26 +156,16 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: { message: rateLimitCheck.message }, rateLimited: true };
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await authProvider.signInWithPassword(email, password);
     
     if (error) {
-      // Track failed login attempt (anonymous aggregate only)
       telemetryService.trackFailedLogin();
-      
-      // Check if this constitutes repeated failures (3+ in current session)
       const currentEntry = rateLimitsRef.current['login'];
       if (currentEntry && currentEntry.count >= REPEATED_FAILURE_THRESHOLD) {
         telemetryService.trackRepeatedFailedLogin();
-        
-        // Log audit event for security monitoring (with user context for investigation)
-        // Note: We only have the email at this point, not user_id
         console.warn(`Security alert: ${REPEATED_FAILURE_THRESHOLD}+ failed login attempts for email`);
       }
     } else {
-      // Reset rate limit on successful login
       resetAuthRateLimit('login');
     }
     
@@ -186,7 +173,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string) => {
-    // Check rate limit before attempting sign up
     const rateLimitCheck = checkRateLimit('signup');
     if (!rateLimitCheck.allowed) {
       toast({
@@ -197,7 +183,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: { message: rateLimitCheck.message }, rateLimited: true };
     }
 
-    // Get safe redirect URL - only allow known production/preview domains
     const getSafeRedirectUrl = (): string => {
       const origin = window.location.origin;
       const allowedPatterns = [
@@ -207,26 +192,19 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         /^http:\/\/127\.0\.0\.1:\d+$/,
       ];
       
-      if (allowedPatterns.some(pattern => pattern.test(origin))) {
-        return `${origin}/`;
-      }
-      if (origin.startsWith('https://')) {
-        return `${origin}/`;
-      }
+      if (allowedPatterns.some(pattern => pattern.test(origin))) return `${origin}/`;
+      if (origin.startsWith('https://')) return `${origin}/`;
       return '';
     };
     
     const redirectUrl = getSafeRedirectUrl();
     
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await authProvider.signUp(
       email,
       password,
-      options: redirectUrl ? {
-        emailRedirectTo: redirectUrl
-      } : undefined
-    });
+      redirectUrl ? { emailRedirectTo: redirectUrl } : undefined
+    );
     
-    // Reset rate limit on successful signup
     if (!error) {
       resetAuthRateLimit('signup');
     }
@@ -235,7 +213,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await authProvider.signOut();
     setUsername(null);
     setPhone(null);
   };
