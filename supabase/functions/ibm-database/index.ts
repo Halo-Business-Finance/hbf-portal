@@ -72,33 +72,27 @@ function getPoolConfig() {
   const url = new URL(databaseUrl);
   let caCert = Deno.env.get("IBM_DB_CA_CERT") || "";
 
-  // Log cert diagnostics (first/last 40 chars only for security)
   if (caCert) {
-    console.log("CA cert length:", caCert.length);
-    console.log("CA cert starts with:", caCert.substring(0, 40));
-    console.log("CA cert ends with:", caCert.substring(caCert.length - 40));
-    
     // Handle base64-encoded certs (no PEM header)
     if (!caCert.includes("-----BEGIN")) {
       try {
         caCert = atob(caCert);
-        console.log("Decoded base64 cert, new length:", caCert.length);
       } catch {
-        console.log("Not base64 encoded, using as-is");
+        // not base64, use as-is
       }
     }
     
-    // Ensure proper PEM formatting with newlines
-    if (caCert.includes("-----BEGIN") && !caCert.includes("\n")) {
-      // Certificate was likely pasted as single line - reformat
-      caCert = caCert
-        .replace("-----BEGIN CERTIFICATE-----", "-----BEGIN CERTIFICATE-----\n")
-        .replace("-----END CERTIFICATE-----", "\n-----END CERTIFICATE-----")
-        .replace(/(.{64})/g, "$1\n");
-      console.log("Reformatted single-line PEM cert");
+    // Fix single-line PEM: extract the base64 body and reformat with proper 64-char lines
+    if (caCert.includes("-----BEGIN CERTIFICATE-----") && !caCert.includes("\n")) {
+      const body = caCert
+        .replace("-----BEGIN CERTIFICATE-----", "")
+        .replace("-----END CERTIFICATE-----", "")
+        .replace(/\s+/g, "");
+      const lines = body.match(/.{1,64}/g) || [];
+      caCert = "-----BEGIN CERTIFICATE-----\n" + lines.join("\n") + "\n-----END CERTIFICATE-----\n";
     }
-  } else {
-    console.log("No IBM_DB_CA_CERT secret found");
+    
+    console.log("CA cert ready, length:", caCert.length, "has newlines:", caCert.includes("\n"));
   }
 
   const tlsConfig = caCert
