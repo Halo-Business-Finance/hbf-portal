@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import pg from "npm:pg@8.13.1";
-
-const { Pool } = pg;
+import postgres from "https://deno.land/x/postgresjs@v3.4.5/mod.js";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -66,50 +64,47 @@ async function authenticateAdmin(req: Request) {
   return { user, supabase, isSuperAdmin: roleSet.has("super_admin") };
 }
 
-// Use npm:pg with ssl.rejectUnauthorized=false to handle IBM Cloud's
-// self-signed / IBM-issued CA certificates that Deno doesn't trust.
-async function withClient<T>(fn: (client: pg.PoolClient) => Promise<T>): Promise<T> {
+// Use postgresjs (Deno-native) which supports ssl: "require" without
+// needing the CA to be in Deno's trust store.
+function getSQL() {
   const databaseUrl = Deno.env.get("DATABASE_URL");
   if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
 
-  const pool = new Pool({
-    connectionString: databaseUrl,
+  return postgres(databaseUrl, {
+    ssl: "require",
     max: 1,
-    ssl: { rejectUnauthorized: false },
+    idle_timeout: 5,
+    connect_timeout: 10,
   });
-
-  const client = await pool.connect();
-  try {
-    return await fn(client);
-  } finally {
-    client.release();
-    await pool.end();
-  }
 }
 
 async function handleStatus() {
-  return withClient(async (client) => {
-    const result = await client.query("SELECT version()");
-    const version = result.rows[0]?.version ?? "unknown";
+  const sql = getSQL();
+  try {
+    const result = await sql`SELECT version()`;
+    const version = result[0]?.version ?? "unknown";
     const urlParts = new URL(Deno.env.get("DATABASE_URL")!);
     return jsonResp({
       status: "connected",
       host: urlParts.hostname,
       port: urlParts.port || "5432",
       database: urlParts.pathname.slice(1),
-      ssl: "require (rejectUnauthorized: false)",
+      ssl: "require",
       postgresVersion: version,
     });
-  });
+  } finally {
+    await sql.end();
+  }
 }
 
 async function handleTables() {
-  return withClient(async (client) => {
-    const result = await client.query(
-      `SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`
-    );
-    return jsonResp({ tables: result.rows });
-  });
+  const sql = getSQL();
+  try {
+    const result = await sql`SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`;
+    return jsonResp({ tables: result });
+  } finally {
+    await sql.end();
+  }
 }
 
 async function handleQuery(query: string) {
@@ -118,10 +113,13 @@ async function handleQuery(query: string) {
     return jsonResp({ error: "Only read-only queries (SELECT, SHOW, EXPLAIN) are allowed via 'query'. Use 'mutate' for writes." }, 403);
   }
 
-  return withClient(async (client) => {
-    const result = await client.query(query);
-    return jsonResp({ rows: result.rows, rowCount: result.rowCount });
-  });
+  const sql = getSQL();
+  try {
+    const result = await sql.unsafe(query);
+    return jsonResp({ rows: result, rowCount: result.length });
+  } finally {
+    await sql.end();
+  }
 }
 
 // Rate limit config for mutate: 10 writes per 60-second window
@@ -157,7 +155,7 @@ async function checkMutateRateLimit(
 
 async function handleMutate(
   query: string,
-  params: unknown[] | undefined,
+  _params: unknown[] | undefined,
   user: { id: string; email?: string },
   supabase: ReturnType<typeof createClient>,
   ipAddress: string | null,
@@ -195,8 +193,6 @@ async function handleMutate(
       _user_agent: userAgent,
       _details: {
         query: query.substring(0, 500),
-        hasParams: !!params?.length,
-        paramCount: params?.length ?? 0,
         executedAt: new Date().toISOString(),
       },
     });
@@ -205,23 +201,19 @@ async function handleMutate(
     return jsonResp({ error: "Write aborted: audit logging failed" }, 500);
   }
 
-  return withClient(async (client) => {
-    try {
-      await client.query("BEGIN");
-      const result = params?.length
-        ? await client.query(query, params)
-        : await client.query(query);
-      await client.query("COMMIT");
-      return jsonResp({
-        success: true,
-        rowCount: result.rowCount ?? result.rows.length,
-        rows: result.rows,
-      });
-    } catch (txErr) {
-      await client.query("ROLLBACK");
-      throw txErr;
-    }
-  });
+  const sql = getSQL();
+  try {
+    const result = await sql.begin(async (tx) => {
+      return await tx.unsafe(query);
+    });
+    return jsonResp({
+      success: true,
+      rowCount: result.length,
+      rows: result,
+    });
+  } finally {
+    await sql.end();
+  }
 }
 
 serve(async (req) => {
