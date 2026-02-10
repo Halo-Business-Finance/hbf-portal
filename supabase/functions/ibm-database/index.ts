@@ -64,14 +64,20 @@ async function authenticateAdmin(req: Request) {
   return { user, supabase, isSuperAdmin: roleSet.has("super_admin") };
 }
 
-// Use postgresjs (Deno-native) which supports ssl: "require" without
-// needing the CA to be in Deno's trust store.
+// Build a postgres.js connection with the IBM CA certificate for TLS verification
 function getSQL() {
   const databaseUrl = Deno.env.get("DATABASE_URL");
   if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
 
+  const caCert = Deno.env.get("IBM_DB_CA_CERT");
+
+  // Build SSL config: use CA cert if available, otherwise require SSL without verification
+  const sslConfig = caCert
+    ? { rejectUnauthorized: true, ca: caCert }
+    : "require";
+
   return postgres(databaseUrl, {
-    ssl: "require",
+    ssl: sslConfig,
     max: 1,
     idle_timeout: 5,
     connect_timeout: 10,
@@ -89,7 +95,7 @@ async function handleStatus() {
       host: urlParts.hostname,
       port: urlParts.port || "5432",
       database: urlParts.pathname.slice(1),
-      ssl: "require",
+      ssl: Deno.env.get("IBM_DB_CA_CERT") ? "verify-full (CA provided)" : "require",
       postgresVersion: version,
     });
   } finally {
