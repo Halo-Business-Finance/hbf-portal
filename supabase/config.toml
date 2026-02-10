@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.ibm-data-api]
 verify_jwt = false
+
+[functions.appid-auth]
+verify_jwt = false
