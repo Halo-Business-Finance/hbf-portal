@@ -68,7 +68,19 @@ async function authenticateAdmin(req: Request) {
 async function withPool<T>(fn: (pool: Pool) => Promise<T>): Promise<T> {
   const databaseUrl = Deno.env.get("DATABASE_URL");
   if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
-  const pool = new Pool(databaseUrl, 1, true);
+
+  // IBM Cloud PostgreSQL uses certificates that Deno's built-in TLS
+  // validator may not trust. Parse the URL and configure TLS manually.
+  const url = new URL(databaseUrl);
+  const pool = new Pool({
+    hostname: url.hostname,
+    port: url.port || "5432",
+    database: url.pathname.slice(1),
+    user: url.username,
+    password: url.password,
+    tls: { enabled: true, enforce: false },
+  }, 1, true);
+
   try {
     return await fn(pool);
   } finally {
