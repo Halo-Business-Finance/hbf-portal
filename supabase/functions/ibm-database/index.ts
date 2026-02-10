@@ -128,6 +128,37 @@ async function handleQuery(query: string) {
   });
 }
 
+// Rate limit config for mutate: 10 writes per 60-second window
+const MUTATE_RATE_LIMIT = { maxRequests: 10, windowSeconds: 60 };
+
+async function checkMutateRateLimit(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+): Promise<{ allowed: boolean; remaining: number; resetAt: string } | null> {
+  try {
+    const { data, error } = await supabase.rpc("check_rate_limit", {
+      _endpoint: "ibm_database_mutate",
+      _identifier: userId,
+      _max_requests: MUTATE_RATE_LIMIT.maxRequests,
+      _window_seconds: MUTATE_RATE_LIMIT.windowSeconds,
+    });
+    if (error) {
+      console.error("Rate limit check failed:", error);
+      return null; // fail-open would be dangerous; fail-closed instead
+    }
+    const row = data?.[0];
+    if (!row) return null;
+    return {
+      allowed: row.allowed,
+      remaining: row.remaining_requests,
+      resetAt: row.reset_at,
+    };
+  } catch (err) {
+    console.error("Rate limit check exception:", err);
+    return null;
+  }
+}
+
 async function handleMutate(
   query: string,
   params: unknown[] | undefined,
@@ -136,6 +167,19 @@ async function handleMutate(
   ipAddress: string | null,
   userAgent: string | null,
 ) {
+  // Server-side rate limiting — fail-closed
+  const rateLimit = await checkMutateRateLimit(supabase, user.id);
+  if (!rateLimit) {
+    return jsonResp({ error: "Rate limit check failed. Write aborted for safety." }, 503);
+  }
+  if (!rateLimit.allowed) {
+    return jsonResp({
+      error: "Rate limit exceeded. Too many write operations.",
+      remaining: rateLimit.remaining,
+      resetAt: rateLimit.resetAt,
+    }, 429);
+  }
+
   const classification = classifyQuery(query);
   if (classification === "blocked") {
     return jsonResp({ error: "This SQL statement is not allowed. Blocked for safety." }, 403);
