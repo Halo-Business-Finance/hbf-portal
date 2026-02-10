@@ -84,12 +84,18 @@ const DatabaseManagement = () => {
     }
   }, [toast]);
 
+  // Sequential loading: status first, then tables after status succeeds
   useEffect(() => {
     if (!roleLoading && isAdmin()) {
       fetchStatus();
+    }
+  }, [roleLoading, isAdmin, fetchStatus]);
+
+  useEffect(() => {
+    if (dbStatus && !tables.length && !tablesLoading) {
       fetchTables();
     }
-  }, [roleLoading, isAdmin, fetchStatus, fetchTables]);
+  }, [dbStatus, tables.length, tablesLoading, fetchTables]);
 
   const executeQuery = async () => {
     const trimmed = query.trim();
