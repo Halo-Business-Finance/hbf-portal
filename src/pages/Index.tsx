@@ -34,6 +34,7 @@ import { BusinessLineOfCreditForm } from "@/components/forms/BusinessLineOfCredi
 import InvoiceFactoringForm from "@/components/forms/InvoiceFactoringForm";
 import SBAExpressLoanForm from "@/components/forms/SBAExpressLoanForm";
 import { supabase } from "@/integrations/supabase/client";
+import { api } from '@/services/api';
 import Layout from "@/components/Layout";
 import Navbar from "@/components/Navbar";
 import { CreditScoreWidget } from '@/components/CreditScoreWidget';
@@ -52,12 +53,8 @@ const FundedLoansView = ({
   useEffect(() => {
     const fetchFundedLoans = async () => {
       if (!userId) return;
-      const {
-        data
-      } = await supabase.from('loan_applications').select('*').eq('user_id', userId).in('status', ['funded', 'approved']).order('application_submitted_date', {
-        ascending: false
-      });
-      setFundedLoans(data || []);
+      const data = await api.loanApplications.listByStatus(userId, ['funded', 'approved']);
+      setFundedLoans(data);
       setIsLoading(false);
     };
     fetchFundedLoans();
@@ -159,11 +156,9 @@ const DashboardView = () => {
   useEffect(() => {
     const checkFirstTimeUser = async () => {
       if (!user) return;
-      const {
-        data: applications
-      } = await supabase.from('loan_applications').select('id').eq('user_id', user.id);
+      const hasApps = await api.loanApplications.hasAny(user.id);
       const hasSeenSelector = localStorage.getItem('hbf_loan_selector_seen');
-      if ((!applications || applications.length === 0) && !hasSeenSelector) {
+      if (!hasApps && !hasSeenSelector) {
         setShowLoanSelector(true);
       }
     };
