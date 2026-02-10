@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { useAuth } from '@/contexts/AuthContext';
 
 export type MFALevel = 'aal1' | 'aal2';
@@ -20,26 +20,26 @@ export const useMFAStatus = () => {
 
     try {
       // Check current AAL (Authentication Assurance Level)
-      const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const aalResult = await authProvider.mfa.getAuthenticatorAssuranceLevel();
       
-      if (aalError) {
-        console.error('Error getting AAL:', aalError);
+      if (aalResult.error) {
+        console.error('Error getting AAL:', aalResult.error);
         setLoading(false);
         return;
       }
 
-      setCurrentLevel(aalData?.currentLevel as MFALevel || 'aal1');
+      setCurrentLevel(aalResult.data?.currentLevel || 'aal1');
 
       // Check if user has enrolled MFA factors
-      const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+      const factorsResult = await authProvider.mfa.listFactors();
       
-      if (factorsError) {
-        console.error('Error listing factors:', factorsError);
+      if (factorsResult.error) {
+        console.error('Error listing factors:', factorsResult.error);
         setLoading(false);
         return;
       }
 
-      const verifiedFactors = factorsData?.totp?.filter(f => f.status === 'verified') || [];
+      const verifiedFactors = factorsResult.data?.totp?.filter(f => f.status === 'verified') || [];
       setMfaEnabled(verifiedFactors.length > 0);
     } catch (error) {
       console.error('Error checking MFA status:', error);

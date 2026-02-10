@@ -17,5 +17,13 @@ export type {
 } from './types';
 
 import { supabaseAuthProvider } from './supabaseAuthProvider';
+import { appIdAuthProvider, handleAppIdOAuthCallback } from './appIdAuthProvider';
 
+/**
+ * Switch auth backend by changing this line.
+ * - supabaseAuthProvider  → Supabase Auth (current default)
+ * - appIdAuthProvider     → IBM App ID (OIDC/Cloud Directory)
+ */
 export const authProvider = supabaseAuthProvider;
+
+export { appIdAuthProvider, handleAppIdOAuthCallback };
