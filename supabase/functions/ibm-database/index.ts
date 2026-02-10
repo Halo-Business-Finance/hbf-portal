@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Pool } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
+import pg from "npm:pg@8.13.1";
+
+const { Pool } = pg;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -51,7 +53,6 @@ async function authenticateAdmin(req: Request) {
 
   if (authError || !user) return { error: jsonResp({ error: "Unauthorized" }, 401) };
 
-  // Get the user's highest role
   const { data: roles } = await supabase
     .from("user_roles")
     .select("role")
@@ -65,56 +66,49 @@ async function authenticateAdmin(req: Request) {
   return { user, supabase, isSuperAdmin: roleSet.has("super_admin") };
 }
 
-async function withPool<T>(fn: (pool: Pool) => Promise<T>): Promise<T> {
+// Use npm:pg with ssl.rejectUnauthorized=false to handle IBM Cloud's
+// self-signed / IBM-issued CA certificates that Deno doesn't trust.
+async function withClient<T>(fn: (client: pg.PoolClient) => Promise<T>): Promise<T> {
   const databaseUrl = Deno.env.get("DATABASE_URL");
   if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
 
-  // IBM Cloud PostgreSQL requires SSL but uses an IBM-issued CA that
-  // Deno doesn't trust by default. Force sslmode=require in the URL
-  // so the driver encrypts the connection without verifying the cert.
-  const connUrl = new URL(databaseUrl);
-  connUrl.searchParams.set("sslmode", "require");
-  const pool = new Pool(connUrl.toString(), 1, true);
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    max: 1,
+    ssl: { rejectUnauthorized: false },
+  });
 
+  const client = await pool.connect();
   try {
-    return await fn(pool);
+    return await fn(client);
   } finally {
+    client.release();
     await pool.end();
   }
 }
 
 async function handleStatus() {
-  return withPool(async (pool) => {
-    const conn = await pool.connect();
-    try {
-      const result = await conn.queryObject("SELECT version()");
-      const version = (result.rows[0] as Record<string, string>)?.version ?? "unknown";
-      const urlParts = new URL(Deno.env.get("DATABASE_URL")!);
-      return jsonResp({
-        status: "connected",
-        host: urlParts.hostname,
-        port: urlParts.port || "5432",
-        database: urlParts.pathname.slice(1),
-        ssl: urlParts.searchParams.get("sslmode") || "require",
-        postgresVersion: version,
-      });
-    } finally {
-      conn.release();
-    }
+  return withClient(async (client) => {
+    const result = await client.query("SELECT version()");
+    const version = result.rows[0]?.version ?? "unknown";
+    const urlParts = new URL(Deno.env.get("DATABASE_URL")!);
+    return jsonResp({
+      status: "connected",
+      host: urlParts.hostname,
+      port: urlParts.port || "5432",
+      database: urlParts.pathname.slice(1),
+      ssl: "require (rejectUnauthorized: false)",
+      postgresVersion: version,
+    });
   });
 }
 
 async function handleTables() {
-  return withPool(async (pool) => {
-    const conn = await pool.connect();
-    try {
-      const result = await conn.queryObject(
-        `SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`
-      );
-      return jsonResp({ tables: result.rows });
-    } finally {
-      conn.release();
-    }
+  return withClient(async (client) => {
+    const result = await client.query(
+      `SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`
+    );
+    return jsonResp({ tables: result.rows });
   });
 }
 
@@ -124,14 +118,9 @@ async function handleQuery(query: string) {
     return jsonResp({ error: "Only read-only queries (SELECT, SHOW, EXPLAIN) are allowed via 'query'. Use 'mutate' for writes." }, 403);
   }
 
-  return withPool(async (pool) => {
-    const conn = await pool.connect();
-    try {
-      const result = await conn.queryObject(query);
-      return jsonResp({ rows: result.rows, rowCount: result.rows.length });
-    } finally {
-      conn.release();
-    }
+  return withClient(async (client) => {
+    const result = await client.query(query);
+    return jsonResp({ rows: result.rows, rowCount: result.rowCount });
   });
 }
 
@@ -151,7 +140,7 @@ async function checkMutateRateLimit(
     });
     if (error) {
       console.error("Rate limit check failed:", error);
-      return null; // fail-open would be dangerous; fail-closed instead
+      return null;
     }
     const row = data?.[0];
     if (!row) return null;
@@ -205,7 +194,7 @@ async function handleMutate(
       _ip_address: ipAddress,
       _user_agent: userAgent,
       _details: {
-        query: query.substring(0, 500), // truncate for safety
+        query: query.substring(0, 500),
         hasParams: !!params?.length,
         paramCount: params?.length ?? 0,
         executedAt: new Date().toISOString(),
@@ -216,27 +205,21 @@ async function handleMutate(
     return jsonResp({ error: "Write aborted: audit logging failed" }, 500);
   }
 
-  return withPool(async (pool) => {
-    const conn = await pool.connect();
+  return withClient(async (client) => {
     try {
-      const tx = conn.createTransaction("ibm_mutate");
-      await tx.begin();
-      try {
-        const result = params?.length
-          ? await tx.queryObject(query, params)
-          : await tx.queryObject(query);
-        await tx.commit();
-        return jsonResp({
-          success: true,
-          rowCount: result.rowCount ?? result.rows.length,
-          rows: result.rows,
-        });
-      } catch (txErr) {
-        await tx.rollback();
-        throw txErr;
-      }
-    } finally {
-      conn.release();
+      await client.query("BEGIN");
+      const result = params?.length
+        ? await client.query(query, params)
+        : await client.query(query);
+      await client.query("COMMIT");
+      return jsonResp({
+        success: true,
+        rowCount: result.rowCount ?? result.rows.length,
+        rows: result.rows,
+      });
+    } catch (txErr) {
+      await client.query("ROLLBACK");
+      throw txErr;
     }
   });
 }
