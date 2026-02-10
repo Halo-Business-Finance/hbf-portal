@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -120,7 +120,7 @@ const ChangeEmail = () => {
         throw new Error("Current email doesn't match your account email");
       }
 
-      const { error } = await supabase.auth.updateUser({
+      const { error } = await authProvider.updateUser({
         email: values.newEmail,
       });
 

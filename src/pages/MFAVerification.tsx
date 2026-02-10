@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { authProvider } from '@/services/auth';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -92,7 +92,7 @@ const MFAVerification = () => {
   const initiateMFAChallenge = async () => {
     try {
       // Get enrolled factors
-      const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+      const { data: factorsData, error: factorsError } = await authProvider.mfa.listFactors();
       
       if (factorsError) throw factorsError;
 
@@ -113,7 +113,7 @@ const MFAVerification = () => {
       setFactorId(factor.id);
 
       // Create a challenge
-      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+      const { data: challengeData, error: challengeError } = await authProvider.mfa.challenge({
         factorId: factor.id
       });
 
@@ -155,7 +155,7 @@ const MFAVerification = () => {
 
     setVerifying(true);
     try {
-      const { data, error } = await supabase.auth.mfa.verify({
+      const { error } = await authProvider.mfa.verify({
         factorId,
         challengeId,
         code: verificationCode
@@ -186,7 +186,7 @@ const MFAVerification = () => {
       setVerificationCode('');
       
       // Create a new challenge after failed attempt
-      const { data: newChallenge } = await supabase.auth.mfa.challenge({
+      const { data: newChallenge } = await authProvider.mfa.challenge({
         factorId
       });
       if (newChallenge) {
@@ -204,7 +204,7 @@ const MFAVerification = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await authProvider.signOut();
     navigate('/');
   };
 

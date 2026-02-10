@@ -34,6 +34,7 @@ import { BusinessLineOfCreditForm } from "@/components/forms/BusinessLineOfCredi
 import InvoiceFactoringForm from "@/components/forms/InvoiceFactoringForm";
 import SBAExpressLoanForm from "@/components/forms/SBAExpressLoanForm";
 import { supabase } from "@/integrations/supabase/client";
+import { authProvider } from '@/services/auth';
 import { api } from '@/services/api';
 import Layout from "@/components/Layout";
 import Navbar from "@/components/Navbar";
@@ -545,12 +546,10 @@ const Index = () => {
       const redirectTo = getSafeRedirectUrl();
       const {
         error
-      } = await supabase.auth.signInWithOAuth({
-        provider: 'azure',
-        options: redirectTo ? {
+      } = await authProvider.signInWithOAuth('azure', redirectTo ? {
           redirectTo
         } : undefined
-      });
+      );
       if (error) {
         setAuthError(error.message || "Failed to sign in with Microsoft");
       }
@@ -567,12 +566,10 @@ const Index = () => {
       const redirectTo = getSafeRedirectUrl();
       const {
         error
-      } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: redirectTo ? {
+      } = await authProvider.signInWithOAuth('google', redirectTo ? {
           redirectTo
         } : undefined
-      });
+      );
       if (error) {
         setAuthError(error.message || "Failed to sign in with Google");
       }
@@ -589,12 +586,10 @@ const Index = () => {
       const redirectTo = getSafeRedirectUrl();
       const {
         error
-      } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: redirectTo ? {
+      } = await authProvider.signInWithOAuth('apple', redirectTo ? {
           redirectTo
         } : undefined
-      });
+      );
       if (error) {
         setAuthError(error.message || "Failed to sign in with Apple");
       }
@@ -611,12 +606,10 @@ const Index = () => {
       const redirectTo = getSafeRedirectUrl();
       const {
         error
-      } = await supabase.auth.signInWithOAuth({
-        provider: 'linkedin_oidc',
-        options: redirectTo ? {
+      } = await authProvider.signInWithOAuth('linkedin_oidc', redirectTo ? {
           redirectTo
         } : undefined
-      });
+      );
       if (error) {
         setAuthError(error.message || "Failed to sign in with LinkedIn");
       }
