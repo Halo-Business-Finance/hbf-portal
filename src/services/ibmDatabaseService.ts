@@ -35,4 +35,18 @@ export const ibmDatabaseService = {
   getTables: () => callIbmDatabase('tables'),
   executeQuery: (query: string) => callIbmDatabase('query', query),
   executeMutation: (query: string, params?: unknown[]) => callIbmDatabase('mutate', query, params),
+  migrateToIbm: async (step: 'schema' | 'data' | 'full' = 'full') => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) throw new Error('Authentication required');
+    
+    const { data, error } = await supabase.functions.invoke('migrate-to-ibm', {
+      body: { step },
+    });
+    
+    if (error) throw new Error(error.message || 'Migration failed');
+    if (data && typeof data === 'object' && 'error' in data) {
+      throw new Error((data as { error: string }).error);
+    }
+    return data;
+  },
 };
