@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
 import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from '@/components/ui/premium-card';
 import { BarChart3, TrendingUp, DollarSign, Users, FileText, CheckCircle, Clock, Download, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { useToast } from '@/hooks/use-toast';
 import { EnhancedAreaChart, EnhancedBarChart, EnhancedPieChart, EnhancedLineChart } from '@/components/ui/charts';
 import { AnimatedCounter, AnimatedCurrency, AnimatedPercentage } from '@/components/ui/animated-counter';
@@ -45,11 +45,7 @@ const Analytics = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const { data: applications, error } = await supabase
-        .from('loan_applications')
-        .select('*');
-
-      if (error) throw error;
+      const { data: applications } = await restQuery<any[]>('loan_applications');
 
       const data = applications || [];
       

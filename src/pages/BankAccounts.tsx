@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { BankBalanceWidget } from '@/components/BankBalanceWidget';
 import { PageHeader } from '@/components/PageHeader';
 import { Landmark, TrendingUp, DollarSign, Calendar, Building2, User, Plus, Trash2, Search, Filter, ArrowUpDown } from 'lucide-react';
@@ -75,13 +75,10 @@ const BankAccounts = () => {
     try {
       if (!user) return;
 
-      const { data, error } = await supabase
-        .from('bank_accounts')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('user_id', `eq.${user.id}`);
+      params.set('order', 'created_at.desc');
+      const { data } = await restQuery<BankAccount[]>('bank_accounts', { params });
 
       const personal = data?.filter(account => !account.is_business) || [];
       const business = data?.filter(account => account.is_business) || [];
@@ -113,9 +110,9 @@ const BankAccounts = () => {
         return;
       }
 
-      const { error } = await supabase
-        .from('bank_accounts')
-        .insert([{
+      await restQuery('bank_accounts', {
+        method: 'POST',
+        body: [{
           user_id: user.id,
           account_name: newAccount.account_name.trim(),
           account_number: newAccount.account_number.trim(),
@@ -124,9 +121,8 @@ const BankAccounts = () => {
           balance: parseFloat(newAccount.balance) || 0,
           is_business: newAccount.is_business,
           status: 'active'
-        }]);
-
-      if (error) throw error;
+        }],
+      });
 
       toast({
         title: "Success",
@@ -159,12 +155,9 @@ const BankAccounts = () => {
 
     setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from('bank_accounts')
-        .delete()
-        .eq('id', deleteAccountId);
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('id', `eq.${deleteAccountId}`);
+      await restQuery('bank_accounts', { method: 'DELETE', params });
 
       toast({
         title: "Success",

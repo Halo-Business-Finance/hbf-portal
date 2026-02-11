@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery, storageUpload, storageCreateSignedUrl, storageRemove, invokeEdgeFunction } from '@/services/supabaseHttp';
 import { authProvider } from '@/services/auth';
 import { PageHeader } from '@/components/PageHeader';
 import { 
@@ -138,13 +138,10 @@ const MyDocuments = () => {
   const loadDocuments = async () => {
     try {
       // Only load latest versions by default
-      const { data, error } = await supabase
-        .from('borrower_documents')
-        .select('*')
-        .eq('is_latest_version', true)
-        .order('uploaded_at', { ascending: false });
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('is_latest_version', 'eq.true');
+      params.set('order', 'uploaded_at.desc');
+      const { data } = await restQuery<Document[]>('borrower_documents', { params });
 
       setDocuments(data || []);
     } catch (error) {
@@ -275,21 +272,15 @@ const MyDocuments = () => {
 
       for (const file of selectedFiles) {
         try {
-          const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${file.name}`;
           
-          const { error: uploadError } = await supabase.storage
-            .from('borrower-documents')
-            .upload(fileName, file, {
-              cacheControl: '3600',
-              upsert: false
-            });
+          await storageUpload('borrower-documents', fileName, file, {
+            cacheControl: '3600',
+          });
 
-          if (uploadError) throw uploadError;
-
-          const { error: dbError } = await supabase
-            .from('borrower_documents')
-            .insert({
+          await restQuery('borrower_documents', {
+            method: 'POST',
+            body: [{
               user_id: user.id,
               file_name: file.name,
               file_path: fileName,
@@ -297,9 +288,8 @@ const MyDocuments = () => {
               file_size: file.size,
               document_category: selectedCategory,
               description: null
-            });
-
-          if (dbError) throw dbError;
+            }],
+          });
 
           uploadedCount++;
           setUploadProgress(Math.round((uploadedCount / totalFiles) * 100));
@@ -364,13 +354,9 @@ const MyDocuments = () => {
     setLoadingPreview(true);
 
     try {
-      const { data, error } = await supabase.storage
-        .from('borrower-documents')
-        .createSignedUrl(doc.file_path, 3600); // 1 hour expiry
+      const signedUrl = await storageCreateSignedUrl('borrower-documents', doc.file_path, 3600);
 
-      if (error) throw error;
-
-      setPreviewUrl(data.signedUrl);
+      setPreviewUrl(signedUrl);
     } catch (error) {
       console.error('Error loading preview:', error);
       toast({
@@ -387,15 +373,11 @@ const MyDocuments = () => {
   const handleDownload = async (doc: Document, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const { data, error } = await supabase.storage
-        .from('borrower-documents')
-        .createSignedUrl(doc.file_path, 60); // 1 minute expiry
-
-      if (error) throw error;
+      const signedUrl = await storageCreateSignedUrl('borrower-documents', doc.file_path, 60);
 
       // Create a temporary link and trigger download
       const link = document.createElement('a');
-      link.href = data.signedUrl;
+      link.href = signedUrl;
       link.download = doc.file_name;
       link.target = '_blank';
       document.body.appendChild(link);
@@ -427,13 +409,9 @@ const MyDocuments = () => {
 
     try {
       const expirySeconds = parseInt(linkExpiry);
-      const { data, error } = await supabase.storage
-        .from('borrower-documents')
-        .createSignedUrl(documentToShare.file_path, expirySeconds);
+      const signedUrl = await storageCreateSignedUrl('borrower-documents', documentToShare.file_path, expirySeconds);
 
-      if (error) throw error;
-
-      setShareableLink(data.signedUrl);
+      setShareableLink(signedUrl);
       toast({
         title: "Success",
         description: "Shareable link generated",
@@ -499,18 +477,12 @@ const MyDocuments = () => {
       const { data: authData } = await authProvider.getUser();
       const senderName = authData?.user?.email || 'A user';
 
-      const response = await supabase.functions.invoke('send-document-email', {
-        body: {
-          recipientEmail,
-          documentName: documentToShare.file_name,
-          shareableLink,
-          senderName,
-        },
+      await invokeEdgeFunction('send-document-email', {
+        recipientEmail,
+        documentName: documentToShare.file_name,
+        shareableLink,
+        senderName,
       });
-
-      if (response.error) {
-        throw new Error(response.error.message);
-      }
 
       toast({
         title: "Success",
@@ -561,13 +533,10 @@ const MyDocuments = () => {
       const rootDocId = doc.parent_document_id || doc.id;
 
       // Load all versions of this document
-      const { data, error } = await supabase
-        .from('borrower_documents')
-        .select('*')
-        .or(`id.eq.${rootDocId},parent_document_id.eq.${rootDocId}`)
-        .order('version_number', { ascending: false });
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('or', `(id.eq.${rootDocId},parent_document_id.eq.${rootDocId})`);
+      params.set('order', 'version_number.desc');
+      const { data } = await restQuery<Document[]>('borrower_documents', { params });
 
       setDocumentVersions(data || []);
     } catch (error) {
@@ -635,21 +604,16 @@ const MyDocuments = () => {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 100);
 
-      const { error: uploadError } = await supabase.storage
-        .from('borrower-documents')
-        .upload(fileName, newVersionFile, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      await storageUpload('borrower-documents', fileName, newVersionFile, {
+        cacheControl: '3600',
+      });
 
       clearInterval(progressInterval);
       setUploadProgress(95);
 
-      if (uploadError) throw uploadError;
-
-      const { error: dbError } = await supabase
-        .from('borrower_documents')
-        .insert({
+      await restQuery('borrower_documents', {
+        method: 'POST',
+        body: [{
           user_id: user.id,
           file_name: newVersionFile.name,
           file_path: fileName,
@@ -660,9 +624,8 @@ const MyDocuments = () => {
           version_number: nextVersion,
           parent_document_id: rootDocId,
           is_latest_version: true
-        });
-
-      if (dbError) throw dbError;
+        }],
+      });
 
       setUploadProgress(100);
 
@@ -697,19 +660,12 @@ const MyDocuments = () => {
     setDeleting(true);
     try {
       // Delete from storage
-      const { error: storageError } = await supabase.storage
-        .from('borrower-documents')
-        .remove([documentToDelete.file_path]);
-
-      if (storageError) throw storageError;
+      await storageRemove('borrower-documents', [documentToDelete.file_path]);
 
       // Delete from database
-      const { error: dbError } = await supabase
-        .from('borrower_documents')
-        .delete()
-        .eq('id', documentToDelete.id);
-
-      if (dbError) throw dbError;
+      const params = new URLSearchParams();
+      params.set('id', `eq.${documentToDelete.id}`);
+      await restQuery('borrower_documents', { method: 'DELETE', params });
 
       toast({
         title: "Success",

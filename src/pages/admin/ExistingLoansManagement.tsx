@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { PageHeader } from '@/components/PageHeader';
 import { 
   Plus, 
@@ -109,12 +109,9 @@ const ExistingLoansManagement = () => {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name')
-        .order('first_name');
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('order', 'first_name.asc');
+      const { data } = await restQuery<any[]>('profiles', { params });
       setUsers(data || []);
     } catch (error) {
       console.error('Error loading users:', error);
@@ -123,12 +120,9 @@ const ExistingLoansManagement = () => {
 
   const loadLoans = async () => {
     try {
-      const { data, error } = await supabase
-        .from('existing_loans')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('order', 'created_at.desc');
+      const { data } = await restQuery<ExistingLoan[]>('existing_loans', { params });
       setLoans(data || []);
     } catch (error) {
       console.error('Error loading loans:', error);
@@ -184,23 +178,16 @@ const ExistingLoansManagement = () => {
 
     try {
       if (editingLoan) {
-        const { error } = await supabase
-          .from('existing_loans')
-          .update(loanData)
-          .eq('id', editingLoan.id);
-
-        if (error) throw error;
+        const params = new URLSearchParams();
+        params.set('id', `eq.${editingLoan.id}`);
+        await restQuery('existing_loans', { method: 'PATCH', body: loanData, params });
 
         toast({
           title: "Success",
           description: "Loan updated successfully"
         });
       } else {
-        const { error } = await supabase
-          .from('existing_loans')
-          .insert([loanData]);
-
-        if (error) throw error;
+        await restQuery('existing_loans', { method: 'POST', body: [loanData] });
 
         toast({
           title: "Success",
@@ -249,12 +236,9 @@ const ExistingLoansManagement = () => {
     if (!confirm('Are you sure you want to delete this loan?')) return;
 
     try {
-      const { error } = await supabase
-        .from('existing_loans')
-        .delete()
-        .eq('id', loanId);
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('id', `eq.${loanId}`);
+      await restQuery('existing_loans', { method: 'DELETE', params });
 
       toast({
         title: "Success",

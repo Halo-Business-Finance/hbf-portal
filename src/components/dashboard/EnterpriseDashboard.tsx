@@ -6,7 +6,7 @@ import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Upload, Calculator, CreditCard, ChevronRight, DollarSign, Clock, CheckCircle, AlertCircle, Building2, Plus, Link2, TrendingUp, ArrowRight, User, Briefcase, FileBarChart } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { AnimatedCurrency } from '@/components/ui/animated-counter';
@@ -72,29 +72,24 @@ export const EnterpriseDashboard = ({
   const fetchDashboardData = async () => {
     if (!user) return;
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name')
-        .eq('id', user.id)
-        .maybeSingle();
-      setFirstName(profile?.first_name ?? null);
+      const profileParams = new URLSearchParams();
+      profileParams.set('id', `eq.${user.id}`);
+      profileParams.set('select', 'first_name');
+      const { data: profileArr } = await restQuery<any[]>('profiles', { params: profileParams });
+      setFirstName(profileArr?.[0]?.first_name ?? null);
 
-      const { data: apps, error } = await supabase
-        .from('loan_applications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
-      if (error) throw error;
+      const appParams = new URLSearchParams();
+      appParams.set('user_id', `eq.${user.id}`);
+      appParams.set('order', 'updated_at.desc');
+      const { data: apps } = await restQuery<LoanApplication[]>('loan_applications', { params: appParams });
       const appData = apps || [];
       setApplications(appData);
 
       // Fetch credit scores
-      const { data: scores, error: scoresError } = await supabase
-        .from('credit_scores')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('score_date', { ascending: false });
-      if (scoresError) throw scoresError;
+      const scoreParams = new URLSearchParams();
+      scoreParams.set('user_id', `eq.${user.id}`);
+      scoreParams.set('order', 'score_date.desc');
+      const { data: scores } = await restQuery<CreditScore[]>('credit_scores', { params: scoreParams });
       setCreditScores(scores || []);
 
       const approved = appData.filter(a => a.status === 'approved' || a.status === 'funded');

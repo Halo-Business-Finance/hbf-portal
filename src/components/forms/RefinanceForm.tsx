@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
 import { useToast } from '@/hooks/use-toast';
 import { useFormAutoSave } from '@/hooks/useFormAutoSave';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FormSection, FormRow } from '@/components/ui/form-section';
@@ -54,13 +54,12 @@ const RefinanceForm = () => {
   useEffect(() => {
     const loadExisting = async () => {
       if (!appId || !user) return;
-      const { data, error } = await supabase
-        .from('loan_applications')
-        .select('*')
-        .eq('id', appId)
-        .eq('user_id', user.id)
-        .single();
-      if (error || !data) return;
+      const params = new URLSearchParams();
+      params.set('id', `eq.${appId}`);
+      params.set('user_id', `eq.${user.id}`);
+      const { data: rows } = await restQuery<any[]>('loan_applications', { params });
+      const data = rows?.[0];
+      if (!data) return;
       setValue('amount_requested', data.amount_requested || 0);
       setValue('first_name', data.first_name || '');
       setValue('last_name', data.last_name || '');
@@ -103,9 +102,13 @@ const RefinanceForm = () => {
     setIsLoading(true);
     try {
       if (appId) {
-        const { error } = await supabase
-          .from('loan_applications')
-          .update({
+        const params = new URLSearchParams();
+        params.set('id', `eq.${appId}`);
+        params.set('user_id', `eq.${user.id}`);
+        await restQuery('loan_applications', {
+          method: 'PATCH',
+          params,
+          body: {
             amount_requested: data.amount_requested,
             first_name: data.first_name,
             last_name: data.last_name,
@@ -125,15 +128,13 @@ const RefinanceForm = () => {
             },
             status: 'submitted',
             application_submitted_date: new Date().toISOString(),
-          })
-          .eq('id', appId)
-          .eq('user_id', user.id);
-        if (error) throw error;
+          },
+        });
         toast({ title: 'Application Updated', description: 'Your refinance application has been updated.' });
       } else {
-        const { error } = await supabase
-          .from('loan_applications')
-          .insert({
+        await restQuery('loan_applications', {
+          method: 'POST',
+          body: [{
             user_id: user.id,
             loan_type: 'refinance',
             amount_requested: data.amount_requested,
@@ -155,8 +156,8 @@ const RefinanceForm = () => {
             },
             status: 'submitted',
             application_submitted_date: new Date().toISOString(),
-          });
-        if (error) throw error;
+          }],
+        });
         toast({ title: 'Application Submitted', description: 'Your refinance application has been submitted successfully.' });
       }
       navigate('/');

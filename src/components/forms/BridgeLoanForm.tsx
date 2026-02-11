@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { AutoSaveIndicator } from '@/components/ui/auto-save-indicator';
 import { useToast } from '@/hooks/use-toast';
 import { useFormAutoSave } from '@/hooks/useFormAutoSave';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FormSection, FormRow } from '@/components/ui/form-section';
@@ -70,9 +70,9 @@ const BridgeLoanForm = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('loan_applications')
-        .insert({
+      await restQuery('loan_applications', {
+        method: 'POST',
+        body: [{
           user_id: user.id,
           loan_type: 'bridge_loan',
           amount_requested: data.amount_requested,
@@ -94,11 +94,8 @@ const BridgeLoanForm = () => {
           },
           status: 'submitted',
           application_submitted_date: new Date().toISOString(),
-        });
-
-      if (error) {
-        throw error;
-      }
+        }],
+      });
 
       clearOnSubmit();
       toast({

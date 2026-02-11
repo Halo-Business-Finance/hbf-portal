@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ApplicationsList from '@/components/ApplicationsList';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { Filter, ArrowUpDown } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
@@ -29,12 +29,9 @@ const LoanApplications = () => {
 
   const loadApplications = async () => {
     try {
-      const { data, error } = await supabase
-        .from('loan_applications')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('order', 'created_at.desc');
+      const { data } = await restQuery<any[]>('loan_applications', { params });
       setApplications(data || []);
     } catch (error) {
       console.error('Error loading applications:', error);
