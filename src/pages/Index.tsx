@@ -747,7 +747,7 @@ const Index = () => {
                 </Alert>}
 
               {/* Sign On Button */}
-              <Button type="submit" className="w-full h-12 bg-blue-950 text-white rounded-full font-bold hover:bg-blue-900 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed" disabled={authLoading || isLockedOut || !email || !password}>
+              <Button type="submit" className="w-full h-12 bg-[#4a5580] text-white rounded-full font-bold hover:bg-[#3d4770] transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed" disabled={authLoading || isLockedOut || !email || !password}>
                 {authLoading ? <span className="flex items-center gap-2 justify-center text-white font-bold">
                     <Loader2 className="h-5 w-5 animate-spin text-white" />
                     Signing in...
