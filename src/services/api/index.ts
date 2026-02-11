@@ -1,10 +1,10 @@
 /**
  * Central data API — single import for all components.
  *
- * To switch backends, change the provider import here.
- * e.g. swap `supabaseProvider` → `ibmProvider`
+ * Primary: IBM PostgreSQL provider (via ibm-data-api edge function)
+ * Fallback: Supabase provider kept in supabaseProvider.ts
  */
 export type { DataAPI, LoanApplication, BankAccount, CreditScore, BorrowerDocument } from './types';
-import { supabaseProvider } from './supabaseProvider';
+import { ibmProvider } from './ibmProvider';
 
-export const api = supabaseProvider;
+export const api = ibmProvider;
