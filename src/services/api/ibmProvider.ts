@@ -14,9 +14,9 @@ import type {
   BankAccount,
 } from './types';
 
-// ── Direct HTTP — no Supabase client needed ──
-const EDGE_FUNCTION_URL = 'https://zosgzkpfgaaadadezpxo.supabase.co/functions/v1/ibm-data-api';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY';
+import { edgeFunctionUrl, SUPABASE_ANON_KEY as ANON_KEY } from '@/config/supabase';
+
+const EDGE_FUNCTION_URL = edgeFunctionUrl('ibm-data-api');
 
 /** Call the ibm-data-api edge function with the current user's auth token. */
 async function callIbmApi<T>(body: Record<string, unknown>): Promise<T> {

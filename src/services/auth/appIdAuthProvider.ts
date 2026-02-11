@@ -14,9 +14,10 @@ import type {
   OAuthProvider,
 } from './types';
 
-// ── Edge function endpoint (direct HTTP — no Supabase client needed) ──
-const EDGE_FUNCTION_URL = 'https://zosgzkpfgaaadadezpxo.supabase.co/functions/v1/appid-auth';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY';
+import { edgeFunctionUrl, SUPABASE_ANON_KEY as ANON_KEY } from '@/config/supabase';
+
+// ── Edge function endpoint ──
+const EDGE_FUNCTION_URL = edgeFunctionUrl('appid-auth');
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';

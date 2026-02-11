@@ -32,8 +32,7 @@ export interface Analytics {
   statusDistribution: Array<{ status: string; count: number; percentage: number }>;
 }
 
-const BASE_URL = 'https://zosgzkpfgaaadadezpxo.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY';
+import { SUPABASE_URL as BASE_URL, SUPABASE_ANON_KEY as ANON_KEY } from '@/config/supabase';
 
 class AdminService {
   async getApplicationStats(): Promise<ApplicationStats> {
