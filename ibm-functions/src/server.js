@@ -16,6 +16,8 @@ import healthCheckRouter from './routes/health-check.js';
 import securityTelemetryRouter from './routes/security-telemetry.js';
 import sendDocumentEmailRouter from './routes/send-document-email.js';
 import adminDashboardRouter from './routes/admin-dashboard.js';
+import restQueryRouter from './routes/rest-query.js';
+import rpcRouter from './routes/rpc.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -46,6 +48,8 @@ app.use('/api/health-check', healthCheckRouter);
 app.use('/api/security-telemetry', securityTelemetryRouter);
 app.use('/api/send-document-email', sendDocumentEmailRouter);
 app.use('/api/admin-dashboard', adminDashboardRouter);
+app.use('/api/rest-query', restQueryRouter);
+app.use('/api/rpc', rpcRouter);
 
 // ── 404 fallback ──
 app.use((_req, res) => {

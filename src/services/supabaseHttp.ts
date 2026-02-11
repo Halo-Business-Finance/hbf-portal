@@ -1,9 +1,8 @@
 /**
- * Direct HTTP helpers for calling Supabase Edge Functions and REST API
- * without importing @supabase/supabase-js.
+ * Direct HTTP helpers for calling backend REST API and Edge Functions.
  *
- * This module centralises the base URL and anon key so every service
- * can be decoupled from the Supabase client library.
+ * When IBM_FUNCTIONS_URL is configured, restQuery and callRpc are routed
+ * through the IBM Cloud Functions Express server instead of Supabase PostgREST.
  */
 
 import { authProvider } from '@/services/auth';
@@ -12,6 +11,7 @@ import {
   SUPABASE_ANON_KEY as ANON_KEY,
   functionUrl,
   isIbmRouted,
+  IBM_FUNCTIONS_URL,
 } from '@/config/supabase';
 
 // ── Helpers ──
@@ -53,7 +53,7 @@ export async function invokeEdgeFunction<T = any>(
   return data as T;
 }
 
-// ── REST API (PostgREST) caller ──
+// ── REST API (PostgREST-compatible) caller ──
 
 interface RestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -71,6 +71,48 @@ interface RestOptions {
 export async function restQuery<T = any>(
   table: string,
   options: RestOptions = {},
+): Promise<{ data: T; count?: number }> {
+  // Route through IBM if configured
+  if (IBM_FUNCTIONS_URL) {
+    return restQueryViaIbm<T>(table, options);
+  }
+  return restQueryViaSupabase<T>(table, options);
+}
+
+/** Route through IBM Cloud Functions rest-query proxy */
+async function restQueryViaIbm<T>(
+  table: string,
+  options: RestOptions,
+): Promise<{ data: T; count?: number }> {
+  const { method = 'GET', body, params, returnData, countOnly, single } = options;
+  const headers = await getAuthHeaders();
+  delete headers['apikey']; // IBM doesn't use Supabase apikey
+
+  // Convert URLSearchParams to plain object for JSON body
+  const paramsObj: Record<string, string> = {};
+  if (params) {
+    params.forEach((v, k) => { paramsObj[k] = v; });
+  }
+
+  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/rest-query`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ table, method, params: paramsObj, body, returnData, countOnly, single }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err?.error || `REST ${method} ${table} failed (${res.status})`);
+  }
+
+  const result = await res.json();
+  return { data: result.data as T, count: result.count };
+}
+
+/** Original Supabase PostgREST path (fallback) */
+async function restQueryViaSupabase<T>(
+  table: string,
+  options: RestOptions,
 ): Promise<{ data: T; count?: number }> {
   const { method = 'GET', body, params, returnData, countOnly, single } = options;
   const headers = await getAuthHeaders();
@@ -98,7 +140,6 @@ export async function restQuery<T = any>(
   }
 
   if (countOnly && method === 'GET' && res.headers.get('content-range')) {
-    // HEAD-like count query: parse content-range
     const range = res.headers.get('content-range') || '';
     const total = parseInt(range.split('/').pop() || '0', 10);
     return { data: [] as unknown as T, count: total };
@@ -117,6 +158,38 @@ export async function restQuery<T = any>(
 export async function callRpc<T = any>(
   functionName: string,
   params: Record<string, unknown> = {},
+): Promise<T> {
+  // Route through IBM if configured
+  if (IBM_FUNCTIONS_URL) {
+    return callRpcViaIbm<T>(functionName, params);
+  }
+  return callRpcViaSupabase<T>(functionName, params);
+}
+
+/** Route RPC through IBM Cloud Functions */
+async function callRpcViaIbm<T>(
+  functionName: string,
+  params: Record<string, unknown>,
+): Promise<T> {
+  const headers = await getAuthHeaders();
+  delete headers['apikey'];
+
+  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/rpc/${functionName}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err?.message || err?.error || `RPC ${functionName} failed (${res.status})`);
+  }
+  return res.json();
+}
+
+/** Original Supabase PostgREST RPC path (fallback) */
+async function callRpcViaSupabase<T>(
+  functionName: string,
+  params: Record<string, unknown>,
 ): Promise<T> {
   const headers = await getAuthHeaders();
   const res = await fetch(`${BASE_URL}/rest/v1/rpc/${functionName}`, {
