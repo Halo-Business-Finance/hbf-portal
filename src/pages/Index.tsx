@@ -718,9 +718,9 @@ const Index = () => {
                 <div className="flex items-center gap-2 -mt-2">
                   <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
                   <div className="flex items-center gap-1 text-sm">
-                    <span className="font-medium text-blue-900">Welcome back!</span>
-                    <span className="text-muted-foreground">·</span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="font-medium text-black">Welcome back!</span>
+                    <span className="text-black">·</span>
+                    <span className="text-xs text-black">
                       Last login: {new Date(returningUser).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -758,7 +758,7 @@ const Index = () => {
               </Button>
 
               {/* Divider */}
-              <div className="text-center text-gray-500 text-sm">
+              <div className="text-center text-black text-sm">
                 or continue with
               </div>
 
