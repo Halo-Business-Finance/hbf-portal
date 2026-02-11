@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ModernTabs as Tabs, ModernTabsContent as TabsContent, ModernTabsList as TabsList, ModernTabsTrigger as TabsTrigger } from '@/components/ui/modern-tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { authProvider } from '@/services/auth';
 import { toast } from 'sonner';
 import { 
@@ -77,18 +77,11 @@ const ExistingLoans = () => {
       }
 
       // Fetch funded loan applications
-      const { data: fundedApplications, error: appError } = await supabase
-        .from('loan_applications')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('status', 'funded')
-        .order('funded_date', { ascending: false });
-
-      if (appError) {
-        console.error('Error fetching funded applications:', appError);
-        toast.error('Failed to load funded loans');
-        return;
-      }
+      const params = new URLSearchParams();
+      params.set('user_id', `eq.${user.id}`);
+      params.set('status', 'eq.funded');
+      params.set('order', 'funded_date.desc');
+      const { data: fundedApplications } = await restQuery<any[]>('loan_applications', { params });
 
       // Transform funded applications to ExistingLoan format
       const transformedLoans: ExistingLoan[] = (fundedApplications || []).map(app => {

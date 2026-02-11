@@ -17,7 +17,7 @@ import { useLoanApplication } from '@/hooks/useLoanApplication';
 import { useFormAutoSave } from '@/hooks/useFormAutoSave';
 import { TrendingUp, Building, DollarSign, FileText, Check } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { useAuth } from '@/contexts/AuthContext';
 import { PhoneInput, isValidPhoneNumber } from '@/components/ui/phone-input';
 

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, AlertTriangle, Users, Activity, Lock, UserX, Database, Clock, Zap } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { Badge } from '@/components/ui/badge';
 
 const AnimatedCounter = ({ value, duration = 1000 }: { value: number; duration?: number }) => {
@@ -70,42 +70,42 @@ export const SecurityOverview = () => {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         
-        // Get admin users count from user_roles table
-        const { data: adminRoles } = await supabase
-          .from('user_roles')
-          .select('id, user_id, role')
-          .eq('role', 'admin');
+        // Get admin users count
+        const adminParams = new URLSearchParams();
+        adminParams.set('role', 'eq.admin');
+        const { data: adminRoles } = await restQuery<any[]>('user_roles', { params: adminParams });
 
-        // Get recent admin actions from status history
-        const { data: adminActions } = await supabase
-          .from('loan_application_status_history')
-          .select('id, created_at, changed_by, status')
-          .gte('created_at', yesterday.toISOString())
-          .order('created_at', { ascending: false })
-          .limit(5);
+        // Get recent admin actions
+        const actionParams = new URLSearchParams();
+        actionParams.set('created_at', `gte.${yesterday.toISOString()}`);
+        actionParams.set('order', 'created_at.desc');
+        actionParams.set('limit', '5');
+        const { data: adminActions } = await restQuery<any[]>('loan_application_status_history', { params: actionParams });
 
-        // Get pending applications
-        const { count: pendingCount } = await supabase
-          .from('loan_applications')
-          .select('*', { count: 'exact', head: true })
-          .in('status', ['submitted', 'under_review']);
+        // Get pending applications count
+        const pendingParams = new URLSearchParams();
+        pendingParams.set('status', 'in.(submitted,under_review)');
+        pendingParams.set('select', 'id');
+        const { data: pendingApps } = await restQuery<any[]>('loan_applications', { params: pendingParams });
+        const pendingCount = pendingApps?.length || 0;
 
-        // Get all tables for database size estimation
-        const { count: loansCount } = await supabase
-          .from('loan_applications')
-          .select('*', { count: 'exact', head: true });
+        // Get record counts
+        const loansParams = new URLSearchParams();
+        loansParams.set('select', 'id');
+        const { data: loansData } = await restQuery<any[]>('loan_applications', { params: loansParams });
+        const loansCount = loansData?.length || 0;
 
-        const { count: docsCount } = await supabase
-          .from('borrower_documents')
-          .select('*', { count: 'exact', head: true });
+        const docsParams = new URLSearchParams();
+        docsParams.set('select', 'id');
+        const { data: docsData } = await restQuery<any[]>('borrower_documents', { params: docsParams });
+        const docsCount = docsData?.length || 0;
 
-        // Get recent notifications as events
-        const { data: notifications } = await supabase
-          .from('notifications')
-          .select('created_at, type, message')
-          .gte('created_at', yesterday.toISOString())
-          .order('created_at', { ascending: false })
-          .limit(5);
+        // Get recent notifications
+        const notifParams = new URLSearchParams();
+        notifParams.set('created_at', `gte.${yesterday.toISOString()}`);
+        notifParams.set('order', 'created_at.desc');
+        notifParams.set('limit', '5');
+        const { data: notifications } = await restQuery<any[]>('notifications', { params: notifParams });
 
         // Parse recent events
         const events: RecentEvent[] = [];

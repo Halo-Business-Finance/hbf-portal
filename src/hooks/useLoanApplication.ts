@@ -3,7 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { loanApplicationService, type LoanApplicationData } from '@/services/loanApplicationService';
 import { notificationService } from '@/services/notificationService';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdgeFunction } from '@/services/supabaseHttp';
 import { sanitizeFormData } from '@/lib/utils';
 
 export const useLoanApplication = () => {
@@ -62,10 +62,8 @@ export const useLoanApplication = () => {
     try {
       setIsLoading(true);
 
-      // Sanitize application data
       const sanitizedData = sanitizeFormData(applicationData) as LoanApplicationData;
 
-      // First validate the application
       const validationResult = await loanApplicationService.validateApplication(sanitizedData);
       if (!validationResult.isValid) {
         toast({
@@ -76,26 +74,22 @@ export const useLoanApplication = () => {
         return null;
       }
 
-      // Process the application
       const result = await loanApplicationService.processApplication(sanitizedData);
 
       if (result.success) {
-        // Auto-sync to CRM for employee processing
+        // Auto-sync to CRM (non-critical)
         try {
-          await supabase.functions.invoke('crm-integration', {
-            body: { 
-              action: 'sync_loan_application', 
-              data: { 
-                applicationId: result.application.id,
-                ...result.application 
-              } 
-            }
+          await invokeEdgeFunction('crm-integration', { 
+            action: 'sync_loan_application', 
+            data: { 
+              applicationId: result.application.id,
+              ...result.application 
+            } 
           });
         } catch (crmError) {
-          // CRM sync failure is non-critical, continue with application flow
+          // CRM sync failure is non-critical
         }
 
-        // Send confirmation notification
         await notificationService.sendApplicationSubmittedNotification(
           user.email || `${applicationData.first_name}@example.com`,
           `${applicationData.first_name} ${applicationData.last_name}`,

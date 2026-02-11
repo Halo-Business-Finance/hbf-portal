@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery, invokeEdgeFunction } from '@/services/supabaseHttp';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -77,11 +77,11 @@ const BorrowerPortal = () => {
     try {
       // Fetch user profile
       if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, phone')
-          .eq('id', user.id)
-          .maybeSingle();
+        const params = new URLSearchParams();
+        params.set('id', `eq.${user.id}`);
+        params.set('select', 'first_name,last_name,phone');
+        const { data: profileArr } = await restQuery<any[]>('profiles', { params });
+        const profileData = profileArr?.[0] ?? null;
         
         if (profileData) {
           setUserProfile({
@@ -125,15 +125,11 @@ const BorrowerPortal = () => {
 
     setIsSaving(true);
     try {
-      const { data, error } = await supabase.functions.invoke('update_profile', {
-        body: {
-          first_name: values.first_name,
-          last_name: values.last_name,
-          phone: values.phone || '',
-        },
+      await invokeEdgeFunction('update_profile', {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        phone: values.phone || '',
       });
-
-      if (error) throw error;
 
       setUserProfile({
         ...userProfile,

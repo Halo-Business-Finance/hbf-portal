@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,13 +26,10 @@ export const CreditScoreWidget = () => {
 
   const loadCreditScores = async () => {
     try {
-      const { data, error } = await supabase
-        .from('credit_scores')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('score_date', { ascending: false });
-
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('user_id', `eq.${user?.id}`);
+      params.set('order', 'score_date.desc');
+      const { data } = await restQuery<CreditScore[]>('credit_scores', { params });
       setScores(data || []);
     } catch (error) {
       console.error('Error loading credit scores:', error);

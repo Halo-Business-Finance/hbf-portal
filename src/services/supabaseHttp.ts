@@ -120,3 +120,76 @@ export async function callRpc<T = any>(
   }
   return res.json();
 }
+
+// ── Storage helpers ──
+
+async function getStorageHeaders(contentType?: string): Promise<Record<string, string>> {
+  const { data } = await authProvider.getSession();
+  const token = data?.session?.access_token;
+  const headers: Record<string, string> = {
+    apikey: ANON_KEY,
+    Authorization: `Bearer ${token || ANON_KEY}`,
+  };
+  if (contentType) headers['Content-Type'] = contentType;
+  return headers;
+}
+
+export async function storageUpload(
+  bucket: string,
+  path: string,
+  file: File,
+  options?: { cacheControl?: string; upsert?: boolean },
+): Promise<{ key: string }> {
+  const headers = await getStorageHeaders();
+  if (options?.cacheControl) headers['cache-control'] = options.cacheControl;
+  if (options?.upsert) headers['x-upsert'] = 'true';
+
+  const formData = new FormData();
+  formData.append('', file);
+
+  const res = await fetch(`${BASE_URL}/storage/v1/object/${bucket}/${path}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err?.error || err?.message || `Storage upload failed (${res.status})`);
+  }
+  return res.json();
+}
+
+export async function storageCreateSignedUrl(
+  bucket: string,
+  path: string,
+  expiresIn: number,
+): Promise<string> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${BASE_URL}/storage/v1/object/sign/${bucket}/${path}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ expiresIn }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err?.error || err?.message || `Signed URL failed (${res.status})`);
+  }
+  const data = await res.json();
+  return `${BASE_URL}/storage/v1${data.signedURL}`;
+}
+
+export async function storageRemove(
+  bucket: string,
+  paths: string[],
+): Promise<void> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${BASE_URL}/storage/v1/object/${bucket}`, {
+    method: 'DELETE',
+    headers,
+    body: JSON.stringify({ prefixes: paths }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err?.error || err?.message || `Storage delete failed (${res.status})`);
+  }
+}

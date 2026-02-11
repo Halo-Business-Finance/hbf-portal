@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { Check, Circle, X, Clock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { cn } from '@/lib/utils';
 
 interface StatusHistoryItem {
@@ -64,17 +64,15 @@ const statusConfig = {
 export const LoanTimeline = ({ loanApplicationId, currentStatus }: LoanTimelineProps) => {
   const [history, setHistory] = useState<StatusHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const { data, error } = await supabase
-          .from('loan_application_status_history')
-          .select('*')
-          .eq('loan_application_id', loanApplicationId)
-          .order('changed_at', { ascending: true });
-
-        if (error) throw error;
+        const params = new URLSearchParams();
+        params.set('loan_application_id', `eq.${loanApplicationId}`);
+        params.set('order', 'changed_at.asc');
+        const { data } = await restQuery<StatusHistoryItem[]>('loan_application_status_history', { params });
         setHistory(data || []);
       } catch (error) {
         console.error('Error fetching status history:', error);
@@ -85,25 +83,11 @@ export const LoanTimeline = ({ loanApplicationId, currentStatus }: LoanTimelineP
 
     fetchHistory();
 
-    // Subscribe to real-time updates
-    const channel = supabase
-      .channel('status-history-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'loan_application_status_history',
-          filter: `loan_application_id=eq.${loanApplicationId}`,
-        },
-        (payload) => {
-          setHistory((prev) => [...prev, payload.new as StatusHistoryItem]);
-        }
-      )
-      .subscribe();
+    // Poll for updates every 30s instead of realtime subscription
+    pollRef.current = setInterval(fetchHistory, 30000);
 
     return () => {
-      supabase.removeChannel(channel);
+      if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [loanApplicationId]);
 
@@ -135,10 +119,7 @@ export const LoanTimeline = ({ loanApplicationId, currentStatus }: LoanTimelineP
     <div className="space-y-1">
       <h4 className="text-sm font-semibold uppercase tracking-wide mb-4 text-muted-foreground">Application Timeline</h4>
       <div className="relative">
-        {/* Timeline line */}
         <div className="absolute left-4 top-0 bottom-0 w-px border-l border-dashed border-border/50" />
-
-        {/* Timeline items */}
         <div className="space-y-6">
           {history.map((item, index) => {
             const config = statusConfig[item.status as keyof typeof statusConfig] || statusConfig.draft;
@@ -148,7 +129,6 @@ export const LoanTimeline = ({ loanApplicationId, currentStatus }: LoanTimelineP
 
             return (
               <div key={item.id} className="relative flex gap-4">
-                {/* Icon */}
                 <div
                   className={cn(
                     'relative z-10 flex items-center justify-center w-9 h-9 rounded-full border-2',
@@ -159,8 +139,6 @@ export const LoanTimeline = ({ loanApplicationId, currentStatus }: LoanTimelineP
                 >
                   <Icon className={cn('w-4 h-4', config.color)} />
                 </div>
-
-                {/* Content */}
                 <div className={cn('flex-1 pb-6', isLast && 'pb-0')}>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">

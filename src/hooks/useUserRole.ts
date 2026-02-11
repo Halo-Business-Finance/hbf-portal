@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { callRpc } from '@/services/supabaseHttp';
 
 // Extended role types for granular access control
 export type UserRole = 'super_admin' | 'admin' | 'underwriter' | 'customer_service' | 'moderator' | 'user';
@@ -31,29 +31,26 @@ export const useUserRole = () => {
       }
 
       try {
-        // Check all roles in order of hierarchy (highest first)
         const rolesToCheck: UserRole[] = ['super_admin', 'admin', 'underwriter', 'customer_service', 'moderator'];
         const userRoles: UserRole[] = [];
         let highestRole: UserRole = 'user';
 
         for (const roleToCheck of rolesToCheck) {
-          const { data: hasThisRole, error } = await supabase
-            .rpc('has_app_role', { _user_id: user.id, _role: roleToCheck });
+          try {
+            const hasThisRole = await callRpc<boolean>('has_app_role', { _user_id: user.id, _role: roleToCheck });
 
-          if (error) {
+            if (hasThisRole) {
+              userRoles.push(roleToCheck);
+              if (ROLE_HIERARCHY[roleToCheck] > ROLE_HIERARCHY[highestRole]) {
+                highestRole = roleToCheck;
+              }
+            }
+          } catch (error) {
             console.error(`Error checking ${roleToCheck} role:`, error);
             continue;
           }
-
-          if (hasThisRole) {
-            userRoles.push(roleToCheck);
-            if (ROLE_HIERARCHY[roleToCheck] > ROLE_HIERARCHY[highestRole]) {
-              highestRole = roleToCheck;
-            }
-          }
         }
 
-        // Everyone has at least the 'user' role
         userRoles.push('user');
         
         setRole(highestRole);
