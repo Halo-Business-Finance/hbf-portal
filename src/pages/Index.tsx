@@ -631,7 +631,7 @@ const Index = () => {
 
               {/* Email/User ID Input */}
               <div className="relative">
-                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border border-black rounded-xl px-5 pr-12 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border-2 border-black rounded-xl px-5 pr-12 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" tabIndex={-1} aria-label="Clear email field">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
@@ -655,7 +655,7 @@ const Index = () => {
                   aria-label="Password"
                   aria-required="true"
                   autoComplete={isLogin ? "current-password" : "new-password"}
-                  className="h-14 bg-white border border-black rounded-xl px-5 pr-16 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
+                  className="h-14 bg-white border-2 border-black rounded-xl px-5 pr-16 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
                 />
                 <button
                   type="button"
