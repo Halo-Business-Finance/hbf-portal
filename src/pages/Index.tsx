@@ -804,7 +804,7 @@ const Index = () => {
               </div>
 
               {/* Sign up / Sign in toggle */}
-              <div className="text-center text-sm text-black pt-2 px-4">
+              <div className="text-center text-sm text-black pt-0 px-4">
                 {isLogin ? <>
                     Don't have an account?{" "}
                     <button type="button" onClick={() => switchMode("signup")} className="text-black hover:text-gray-700 font-medium hover:underline focus:outline-none">
