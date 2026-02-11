@@ -14,9 +14,9 @@ import type {
   BankAccount,
 } from './types';
 
-import { edgeFunctionUrl, SUPABASE_ANON_KEY as ANON_KEY } from '@/config/supabase';
+import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY } from '@/config/supabase';
 
-const EDGE_FUNCTION_URL = edgeFunctionUrl('ibm-data-api');
+const EDGE_FUNCTION_URL = functionUrl('ibm-data-api');
 
 /** Call the ibm-data-api edge function with the current user's auth token. */
 async function callIbmApi<T>(body: Record<string, unknown>): Promise<T> {
