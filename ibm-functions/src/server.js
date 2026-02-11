@@ -18,6 +18,7 @@ import sendDocumentEmailRouter from './routes/send-document-email.js';
 import adminDashboardRouter from './routes/admin-dashboard.js';
 import restQueryRouter from './routes/rest-query.js';
 import rpcRouter from './routes/rpc.js';
+import cosStorageRouter from './routes/cos-storage.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -25,7 +26,7 @@ const PORT = process.env.PORT || 8080;
 // ── Middleware ──
 app.use(helmet());
 app.use(cors({ origin: '*' }));
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '15mb' })); // 15MB to handle base64-encoded 10MB files
 
 // ── Health check ──
 app.get('/health', async (_req, res) => {
@@ -50,6 +51,7 @@ app.use('/api/send-document-email', sendDocumentEmailRouter);
 app.use('/api/admin-dashboard', adminDashboardRouter);
 app.use('/api/rest-query', restQueryRouter);
 app.use('/api/rpc', rpcRouter);
+app.use('/api/storage', cosStorageRouter);
 
 // ── 404 fallback ──
 app.use((_req, res) => {

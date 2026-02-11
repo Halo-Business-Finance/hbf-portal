@@ -205,6 +205,8 @@ async function callRpcViaSupabase<T>(
 }
 
 // ── Storage helpers ──
+// Routes through IBM COS when IBM_FUNCTIONS_URL is configured,
+// otherwise falls back to Supabase Storage.
 
 async function getStorageHeaders(contentType?: string): Promise<Record<string, string>> {
   const { data } = await authProvider.getSession();
@@ -217,7 +219,65 @@ async function getStorageHeaders(contentType?: string): Promise<Record<string, s
   return headers;
 }
 
+/** Convert a File to base64 string */
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remove data URL prefix (data:...;base64,)
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function storageUpload(
+  bucket: string,
+  path: string,
+  file: File,
+  options?: { cacheControl?: string; upsert?: boolean },
+): Promise<{ key: string }> {
+  if (IBM_FUNCTIONS_URL) {
+    return storageUploadViaIbm(bucket, path, file, options);
+  }
+  return storageUploadViaSupabase(bucket, path, file, options);
+}
+
+async function storageUploadViaIbm(
+  bucket: string,
+  path: string,
+  file: File,
+  options?: { cacheControl?: string; upsert?: boolean },
+): Promise<{ key: string }> {
+  const headers = await getAuthHeaders();
+  delete headers['apikey'];
+
+  const fileBase64 = await fileToBase64(file);
+
+  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/storage/upload`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      bucket,
+      path,
+      fileBase64,
+      contentType: file.type,
+      cacheControl: options?.cacheControl,
+      upsert: options?.upsert,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err?.error || `Storage upload failed (${res.status})`);
+  }
+  return res.json();
+}
+
+async function storageUploadViaSupabase(
   bucket: string,
   path: string,
   file: File,
@@ -247,6 +307,39 @@ export async function storageCreateSignedUrl(
   path: string,
   expiresIn: number,
 ): Promise<string> {
+  if (IBM_FUNCTIONS_URL) {
+    return storageCreateSignedUrlViaIbm(bucket, path, expiresIn);
+  }
+  return storageCreateSignedUrlViaSupabase(bucket, path, expiresIn);
+}
+
+async function storageCreateSignedUrlViaIbm(
+  bucket: string,
+  path: string,
+  expiresIn: number,
+): Promise<string> {
+  const headers = await getAuthHeaders();
+  delete headers['apikey'];
+
+  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/storage/signed-url`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ bucket, path, expiresIn }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err?.error || `Signed URL failed (${res.status})`);
+  }
+  const data = await res.json();
+  return data.signedURL;
+}
+
+async function storageCreateSignedUrlViaSupabase(
+  bucket: string,
+  path: string,
+  expiresIn: number,
+): Promise<string> {
   const headers = await getAuthHeaders();
   const res = await fetch(`${BASE_URL}/storage/v1/object/sign/${bucket}/${path}`, {
     method: 'POST',
@@ -262,6 +355,35 @@ export async function storageCreateSignedUrl(
 }
 
 export async function storageRemove(
+  bucket: string,
+  paths: string[],
+): Promise<void> {
+  if (IBM_FUNCTIONS_URL) {
+    return storageRemoveViaIbm(bucket, paths);
+  }
+  return storageRemoveViaSupabase(bucket, paths);
+}
+
+async function storageRemoveViaIbm(
+  bucket: string,
+  paths: string[],
+): Promise<void> {
+  const headers = await getAuthHeaders();
+  delete headers['apikey'];
+
+  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/storage/delete`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ bucket, paths }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err?.error || `Storage delete failed (${res.status})`);
+  }
+}
+
+async function storageRemoveViaSupabase(
   bucket: string,
   paths: string[],
 ): Promise<void> {
