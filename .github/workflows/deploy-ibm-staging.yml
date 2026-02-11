@@ -1,0 +1,111 @@
+name: Deploy to IBM Code Engine (Staging)
+
+on:
+  push:
+    branches:
+      - staging
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IBM_CLOUD_REGION: us-south
+  ICR_NAMESPACE: hbf-portal
+  ICR_REGISTRY: us.icr.io
+  IMAGE_NAME: hbf-portal-staging
+  CODE_ENGINE_PROJECT: Halo Business Finance
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install IBM Cloud CLI
+        run: |
+          set -euo pipefail
+
+          curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+          ibmcloud --version
+
+          # Ensure plugin repository is present
+          ibmcloud plugin repo-add ibmcloud https://plugins.cloud.ibm.com || true
+
+          # Install required plugins
+          ibmcloud plugin install container-registry -f
+          ibmcloud plugin install code-engine -f
+
+          # Update plugins (non-fatal if already latest)
+          ibmcloud plugin update container-registry -f || true
+          ibmcloud plugin update code-engine -f || true
+
+          echo "=== Installed plugins ==="
+          ibmcloud plugin list
+
+      - name: Authenticate with IBM Cloud
+        run: |
+          ibmcloud login --apikey "${{ secrets.IBM_CLOUD_API_KEY }}" -r ${{ env.IBM_CLOUD_REGION }}
+          ibmcloud target -g "${{ secrets.IBM_RESOURCE_GROUP }}"
+
+      - name: Select Code Engine project
+        run: |
+          ibmcloud ce project select --name "${{ env.CODE_ENGINE_PROJECT }}"
+
+      - name: Build & Deploy from source (Code Engine managed build)
+        timeout-minutes: 45
+        env:
+          DB_URL: ${{ secrets.IBM_DATABASE_URL_STAGING }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          echo "Building staging from source using Code Engine managed build..."
+          
+          # Create .env file for Vite build (these are public/publishable keys)
+          echo "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" > .env.production
+          echo "VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY" >> .env.production
+          echo "--- .env.production ---"
+          cat .env.production
+          
+          ibmcloud ce application update \
+            --name ${{ env.IMAGE_NAME }} \
+            --src . \
+            --strategy dockerfile \
+            --registry-secret icr-secret \
+            --image "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}" \
+            --env "DATABASE_URL=$DB_URL" \
+            --min-scale 0 \
+            --max-scale 3
+
+      - name: Wait for deployment to stabilize
+        run: sleep 45
+
+      - name: Health Check
+        run: |
+          APP_URL=$(ibmcloud ce application get --name ${{ env.IMAGE_NAME }} --output json | jq -r '.status.url')
+          echo "Staging URL: $APP_URL"
+          
+          MAX_ATTEMPTS=5
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Health check attempt $ATTEMPT of $MAX_ATTEMPTS..."
+            
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL" --max-time 30 || echo "000")
+            
+            if [ "$RESPONSE" = "200" ]; then
+              echo "✅ Staging health check passed!"
+              exit 0
+            fi
+            
+            echo "Response code: $RESPONSE - Waiting 15 seconds before retry..."
+            sleep 15
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+          
+          echo "❌ Staging health check failed after $MAX_ATTEMPTS attempts"
+          exit 1
