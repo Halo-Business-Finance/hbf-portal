@@ -1,8 +1,8 @@
 /**
  * Supabase implementation of the DataAPI interfaces.
- * This is the current provider — will be swapped to IBM provider later.
+ * Uses direct HTTP via supabaseHttp helpers (no SDK dependency).
  */
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import type {
   DataAPI,
   LoanApplicationsAPI,
@@ -15,103 +15,87 @@ import type {
 
 const loanApplications: LoanApplicationsAPI = {
   async list(userId: string): Promise<LoanApplication[]> {
-    const { data, error } = await supabase
-      .from('loan_applications')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return (data ?? []) as LoanApplication[];
+    const params = new URLSearchParams();
+    params.set('user_id', `eq.${userId}`);
+    params.set('order', 'created_at.desc');
+    const { data } = await restQuery<LoanApplication[]>('loan_applications', { params });
+    return data ?? [];
   },
 
   async listByStatus(userId: string, statuses: string[]): Promise<LoanApplication[]> {
-    const { data, error } = await supabase
-      .from('loan_applications')
-      .select('*')
-      .eq('user_id', userId)
-      .in('status', statuses as any)
-      .order('application_submitted_date', { ascending: false });
-    if (error) throw error;
-    return (data ?? []) as LoanApplication[];
+    const params = new URLSearchParams();
+    params.set('user_id', `eq.${userId}`);
+    params.set('status', `in.(${statuses.join(',')})`);
+    params.set('order', 'application_submitted_date.desc');
+    const { data } = await restQuery<LoanApplication[]>('loan_applications', { params });
+    return data ?? [];
   },
 
   async getById(id: string): Promise<LoanApplication | null> {
-    const { data, error } = await supabase
-      .from('loan_applications')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data as LoanApplication | null;
+    const params = new URLSearchParams();
+    params.set('id', `eq.${id}`);
+    const { data } = await restQuery<LoanApplication[]>('loan_applications', { params });
+    return data?.[0] ?? null;
   },
 
   async hasAny(userId: string): Promise<boolean> {
-    const { data } = await supabase
-      .from('loan_applications')
-      .select('id')
-      .eq('user_id', userId)
-      .limit(1);
+    const params = new URLSearchParams();
+    params.set('user_id', `eq.${userId}`);
+    params.set('select', 'id');
+    params.set('limit', '1');
+    const { data } = await restQuery<{ id: string }[]>('loan_applications', { params });
     return (data?.length ?? 0) > 0;
   },
 
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('loan_applications')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    const params = new URLSearchParams();
+    params.set('id', `eq.${id}`);
+    await restQuery('loan_applications', { method: 'DELETE', params });
   },
 
   async updateStatus(id: string, status: string): Promise<void> {
-    const { error } = await supabase
-      .from('loan_applications')
-      .update({ status } as any)
-      .eq('id', id);
-    if (error) throw error;
+    const params = new URLSearchParams();
+    params.set('id', `eq.${id}`);
+    await restQuery('loan_applications', { method: 'PATCH', params, body: { status } });
   },
 };
 
 const bankAccounts: BankAccountsAPI = {
   async listActive(userId: string): Promise<BankAccount[]> {
-    const { data, error } = await supabase
-      .from('bank_accounts')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('status', 'active')
-      .order('balance', { ascending: false });
-    if (error) throw error;
-    return (data ?? []) as BankAccount[];
+    const params = new URLSearchParams();
+    params.set('user_id', `eq.${userId}`);
+    params.set('status', 'eq.active');
+    params.set('order', 'balance.desc');
+    const { data } = await restQuery<BankAccount[]>('bank_accounts', { params });
+    return data ?? [];
   },
 
   async listBalances(userId: string): Promise<{ balance: number }[]> {
-    const { data, error } = await supabase
-      .from('bank_accounts')
-      .select('balance')
-      .eq('user_id', userId);
-    if (error) throw error;
-    return (data ?? []) as { balance: number }[];
+    const params = new URLSearchParams();
+    params.set('user_id', `eq.${userId}`);
+    params.set('select', 'balance');
+    const { data } = await restQuery<{ balance: number }[]>('bank_accounts', { params });
+    return data ?? [];
   },
 };
 
 const creditScores: CreditScoresAPI = {
   async listScores(userId: string): Promise<{ score: number }[]> {
-    const { data, error } = await supabase
-      .from('credit_scores')
-      .select('score')
-      .eq('user_id', userId);
-    if (error) throw error;
-    return (data ?? []) as { score: number }[];
+    const params = new URLSearchParams();
+    params.set('user_id', `eq.${userId}`);
+    params.set('select', 'score');
+    const { data } = await restQuery<{ score: number }[]>('credit_scores', { params });
+    return data ?? [];
   },
 };
 
 const documents: DocumentsAPI = {
   async listCategories(userId: string): Promise<{ document_category: string }[]> {
-    const { data, error } = await supabase
-      .from('borrower_documents')
-      .select('document_category')
-      .eq('user_id', userId);
-    if (error) throw error;
-    return (data ?? []) as { document_category: string }[];
+    const params = new URLSearchParams();
+    params.set('user_id', `eq.${userId}`);
+    params.set('select', 'document_category');
+    const { data } = await restQuery<{ document_category: string }[]>('borrower_documents', { params });
+    return data ?? [];
   },
 };
 

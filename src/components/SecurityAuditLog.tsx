@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useUserRole } from '@/hooks/useUserRole';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { Shield, AlertTriangle, Info, User, FileText, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -35,33 +35,11 @@ export const SecurityAuditLog: React.FC = () => {
     setError(null);
     
     try {
-      const { data, error: queryError } = await supabase
-        .from('audit_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (queryError) {
-        console.error('Error fetching audit events:', queryError);
-        setError('Failed to load audit events');
-        setAuditEvents([]);
-      } else {
-        // Map the data to ensure correct typing
-        const mappedData: AuditEvent[] = (data || []).map(item => ({
-          id: item.id,
-          user_id: item.user_id,
-          action: item.action,
-          resource_type: item.resource_type,
-          resource_id: item.resource_id,
-          ip_address: item.ip_address,
-          user_agent: item.user_agent,
-          created_at: item.created_at,
-          details: typeof item.details === 'object' && item.details !== null && !Array.isArray(item.details) 
-            ? item.details as Record<string, unknown>
-            : null
-        }));
-        setAuditEvents(mappedData);
-      }
+      const params = new URLSearchParams();
+      params.set('order', 'created_at.desc');
+      params.set('limit', '50');
+      const { data } = await restQuery<AuditEvent[]>('audit_logs', { params });
+      setAuditEvents(data || []);
     } catch (err) {
       console.error('Error fetching audit events:', err);
       setError('Failed to load audit events');

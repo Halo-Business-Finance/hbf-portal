@@ -33,7 +33,7 @@ import { TermLoanForm } from "@/components/forms/TermLoanForm";
 import { BusinessLineOfCreditForm } from "@/components/forms/BusinessLineOfCreditForm";
 import InvoiceFactoringForm from "@/components/forms/InvoiceFactoringForm";
 import SBAExpressLoanForm from "@/components/forms/SBAExpressLoanForm";
-import { supabase } from "@/integrations/supabase/client";
+// supabase client removed — all data access uses supabaseHttp helpers
 import { authProvider } from '@/services/auth';
 import { api } from '@/services/api';
 import Layout from "@/components/Layout";
