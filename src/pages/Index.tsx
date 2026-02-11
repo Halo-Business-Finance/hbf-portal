@@ -211,6 +211,7 @@ const Index = () => {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
@@ -539,86 +540,29 @@ const Index = () => {
     // Last resort - return empty to let Supabase use configured default
     return '';
   };
-  const handleMicrosoftSignIn = async () => {
-    setAuthLoading(true);
+  const handleSocialSignIn = async (provider: string, label: string) => {
+    setSocialLoading(provider);
     setAuthError("");
     try {
       const redirectTo = getSafeRedirectUrl();
-      const {
-        error
-      } = await authProvider.signInWithOAuth('azure', redirectTo ? {
-          redirectTo
-        } : undefined
-      );
+      const { error } = await authProvider.signInWithOAuth(provider as any, redirectTo ? { redirectTo } : undefined);
       if (error) {
-        setAuthError(error.message || "Failed to sign in with Microsoft");
+        const msg = error.message || `Failed to sign in with ${label}`;
+        setAuthError(msg);
+        toast({ variant: "destructive", title: `${label} sign-in failed`, description: msg });
       }
     } catch (err) {
-      setAuthError("An unexpected error occurred. Please try again.");
+      const msg = "An unexpected error occurred. Please try again.";
+      setAuthError(msg);
+      toast({ variant: "destructive", title: `${label} sign-in failed`, description: msg });
     } finally {
-      setAuthLoading(false);
+      setSocialLoading(null);
     }
   };
-  const handleGoogleSignIn = async () => {
-    setAuthLoading(true);
-    setAuthError("");
-    try {
-      const redirectTo = getSafeRedirectUrl();
-      const {
-        error
-      } = await authProvider.signInWithOAuth('google', redirectTo ? {
-          redirectTo
-        } : undefined
-      );
-      if (error) {
-        setAuthError(error.message || "Failed to sign in with Google");
-      }
-    } catch (err) {
-      setAuthError("An unexpected error occurred. Please try again.");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-  const handleAppleSignIn = async () => {
-    setAuthLoading(true);
-    setAuthError("");
-    try {
-      const redirectTo = getSafeRedirectUrl();
-      const {
-        error
-      } = await authProvider.signInWithOAuth('apple', redirectTo ? {
-          redirectTo
-        } : undefined
-      );
-      if (error) {
-        setAuthError(error.message || "Failed to sign in with Apple");
-      }
-    } catch (err) {
-      setAuthError("An unexpected error occurred. Please try again.");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-  const handleLinkedInSignIn = async () => {
-    setAuthLoading(true);
-    setAuthError("");
-    try {
-      const redirectTo = getSafeRedirectUrl();
-      const {
-        error
-      } = await authProvider.signInWithOAuth('linkedin_oidc', redirectTo ? {
-          redirectTo
-        } : undefined
-      );
-      if (error) {
-        setAuthError(error.message || "Failed to sign in with LinkedIn");
-      }
-    } catch (err) {
-      setAuthError("An unexpected error occurred. Please try again.");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
+  const handleMicrosoftSignIn = () => handleSocialSignIn('azure', 'Microsoft');
+  const handleGoogleSignIn = () => handleSocialSignIn('google', 'Google');
+  const handleAppleSignIn = () => handleSocialSignIn('apple', 'Apple');
+  const handleLinkedInSignIn = () => handleSocialSignIn('linkedin_oidc', 'LinkedIn');
   const resetForm = () => {
     setEmail("");
     setPassword("");
@@ -820,34 +764,42 @@ const Index = () => {
 
               {/* Social Login Icon Buttons */}
               <div className="flex items-center justify-center gap-4">
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleGoogleSignIn} disabled={authLoading} aria-label="Sign in with Google">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
-                    <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
-                    <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
-                    <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
-                  </svg>
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleGoogleSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Google">
+                  {socialLoading === 'google' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
+                      <path d="M12 24c3.24 0 5.957-1.075 7.942-2.913l-3.867-2.99c-1.075.72-2.45 1.145-4.075 1.145-3.132 0-5.785-2.115-6.735-4.952H1.248v3.086C3.215 21.318 7.289 24 12 24z" fill="#34A853" />
+                      <path d="M5.265 14.29c-.242-.72-.38-1.49-.38-2.29s.138-1.57.38-2.29V6.623H1.248C.455 8.216 0 10.054 0 12s.455 3.784 1.248 5.377l4.017-3.087z" fill="#FBBC05" />
+                      <path d="M12 4.758c1.765 0 3.35.606 4.596 1.796l3.447-3.447C17.953 1.142 15.24 0 12 0 7.289 0 3.215 2.682 1.248 6.623l4.017 3.087c.95-2.837 3.603-4.952 6.735-4.952z" fill="#EA4335" />
+                    </svg>
+                  )}
                 </Button>
 
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleAppleSignIn} disabled={authLoading} aria-label="Sign in with Apple">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black" aria-hidden="true">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                  </svg>
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleAppleSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Apple">
+                  {socialLoading === 'apple' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black" aria-hidden="true">
+                      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                    </svg>
+                  )}
                 </Button>
 
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleMicrosoftSignIn} disabled={authLoading} aria-label="Sign in with Microsoft">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="#F25022" d="M1 1h10v10H1z" />
-                    <path fill="#00A4EF" d="M1 13h10v10H1z" />
-                    <path fill="#7FBA00" d="M13 1h10v10H13z" />
-                    <path fill="#FFB900" d="M13 13h10v10H13z" />
-                  </svg>
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleMicrosoftSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Microsoft">
+                  {socialLoading === 'azure' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                      <path fill="#F25022" d="M1 1h10v10H1z" />
+                      <path fill="#00A4EF" d="M1 13h10v10H1z" />
+                      <path fill="#7FBA00" d="M13 1h10v10H13z" />
+                      <path fill="#FFB900" d="M13 13h10v10H13z" />
+                    </svg>
+                  )}
                 </Button>
 
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleLinkedInSignIn} disabled={authLoading} aria-label="Sign in with LinkedIn">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2" aria-hidden="true">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                  </svg>
+                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleLinkedInSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with LinkedIn">
+                  {socialLoading === 'linkedin_oidc' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2" aria-hidden="true">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                    </svg>
+                  )}
                 </Button>
               </div>
 
