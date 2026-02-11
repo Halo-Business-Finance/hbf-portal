@@ -10,6 +10,7 @@ import { pool, testConnection } from './db.js';
 import auditRouter from './routes/audit-logger.js';
 import loanRouter from './routes/loan-application-processor.js';
 import notificationRouter from './routes/notification-service.js';
+import appIdAuthRouter from './routes/appid-auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -33,6 +34,7 @@ app.get('/health', async (_req, res) => {
 app.use('/api/audit-logger', auditRouter);
 app.use('/api/loan-application-processor', loanRouter);
 app.use('/api/notification-service', notificationRouter);
+app.use('/api/appid-auth', appIdAuthRouter);
 
 // ── 404 fallback ──
 app.use((_req, res) => {
