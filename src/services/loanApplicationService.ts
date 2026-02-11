@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdgeFunction, restQuery } from './supabaseHttp';
 
 export interface LoanApplicationValidation {
   isValid: boolean;
@@ -32,104 +32,48 @@ export interface LoanApplicationData {
 }
 
 class LoanApplicationService {
-  /**
-   * Validate loan application data
-   */
   async validateApplication(applicationData: LoanApplicationData): Promise<LoanApplicationValidation> {
     try {
-      const { data, error } = await supabase.functions.invoke('loan-application-processor', {
-        body: {
-          action: 'validate',
-          applicationData
-        }
-      });
-
-      if (error) throw error;
-
-      return data;
+      return await invokeEdgeFunction('loan-application-processor', { action: 'validate', applicationData });
     } catch (error) {
       console.error('Error validating application:', error);
       throw new Error('Failed to validate application');
     }
   }
 
-  /**
-   * Process and submit loan application
-   */
   async processApplication(applicationData: LoanApplicationData) {
     try {
-      const { data, error } = await supabase.functions.invoke('loan-application-processor', {
-        body: {
-          action: 'process',
-          applicationData
-        }
-      });
-
-      if (error) throw error;
-
-      return data;
+      return await invokeEdgeFunction('loan-application-processor', { action: 'process', applicationData });
     } catch (error) {
       console.error('Error processing application:', error);
       throw new Error('Failed to process application');
     }
   }
 
-  /**
-   * Update application status (admin function)
-   */
   async updateApplicationStatus(applicationId: string, status: string, notes?: string) {
     try {
-      const { data, error } = await supabase.functions.invoke('loan-application-processor', {
-        body: {
-          action: 'updateStatus',
-          applicationId,
-          applicationData: { status, notes }
-        }
-      });
-
-      if (error) throw error;
-
-      return data;
+      return await invokeEdgeFunction('loan-application-processor', { action: 'updateStatus', applicationId, applicationData: { status, notes } });
     } catch (error) {
       console.error('Error updating application status:', error);
       throw new Error('Failed to update application status');
     }
   }
 
-  /**
-   * Calculate loan eligibility
-   */
   async calculateEligibility(applicationData: LoanApplicationData): Promise<LoanEligibility> {
     try {
-      const { data, error } = await supabase.functions.invoke('loan-application-processor', {
-        body: {
-          action: 'calculate-eligibility',
-          applicationData
-        }
-      });
-
-      if (error) throw error;
-
-      return data;
+      return await invokeEdgeFunction('loan-application-processor', { action: 'calculate-eligibility', applicationData });
     } catch (error) {
       console.error('Error calculating eligibility:', error);
       throw new Error('Failed to calculate eligibility');
     }
   }
 
-  /**
-   * Get user's loan applications
-   */
   async getUserApplications(userId: string) {
     try {
-      const { data, error } = await supabase
-        .from('loan_applications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
+      const p = new URLSearchParams();
+      p.set('user_id', `eq.${userId}`);
+      p.set('order', 'created_at.desc');
+      const { data } = await restQuery('loan_applications', { params: p });
       return data;
     } catch (error) {
       console.error('Error fetching user applications:', error);
@@ -137,19 +81,11 @@ class LoanApplicationService {
     }
   }
 
-  /**
-   * Get application by ID
-   */
   async getApplicationById(applicationId: string) {
     try {
-      const { data, error } = await supabase
-        .from('loan_applications')
-        .select('*')
-        .eq('id', applicationId)
-        .single();
-
-      if (error) throw error;
-
+      const p = new URLSearchParams();
+      p.set('id', `eq.${applicationId}`);
+      const { data } = await restQuery('loan_applications', { params: p, single: true });
       return data;
     } catch (error) {
       console.error('Error fetching application:', error);
@@ -157,16 +93,13 @@ class LoanApplicationService {
     }
   }
 
-  /**
-   * Save application as draft
-   */
   async saveAsDraft(userId: string, applicationData: Partial<LoanApplicationData>) {
     try {
-      const { data, error } = await supabase
-        .from('loan_applications')
-        .insert({
+      const { data } = await restQuery('loan_applications', {
+        method: 'POST',
+        body: {
           user_id: userId,
-          loan_type: applicationData.loan_type as any,
+          loan_type: applicationData.loan_type,
           amount_requested: applicationData.amount_requested,
           first_name: applicationData.first_name,
           last_name: applicationData.last_name,
@@ -179,13 +112,11 @@ class LoanApplicationService {
           years_in_business: applicationData.years_in_business,
           loan_details: applicationData.loan_details || {},
           status: 'draft',
-          application_started_date: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
+          application_started_date: new Date().toISOString(),
+        },
+        returnData: true,
+        single: true,
+      });
       return data;
     } catch (error) {
       console.error('Error saving draft:', error);
@@ -193,27 +124,19 @@ class LoanApplicationService {
     }
   }
 
-  /**
-   * Delete application (draft only)
-   */
   async deleteApplication(applicationId: string, userId: string) {
     try {
-      const { error } = await supabase
-        .from('loan_applications')
-        .delete()
-        .eq('id', applicationId)
-        .eq('user_id', userId)
-        .eq('status', 'draft');
-
-      if (error) throw error;
-
+      const p = new URLSearchParams();
+      p.set('id', `eq.${applicationId}`);
+      p.set('user_id', `eq.${userId}`);
+      p.set('status', `eq.draft`);
+      await restQuery('loan_applications', { method: 'DELETE', params: p });
       return { success: true };
     } catch (error) {
       console.error('Error deleting application:', error);
       throw new Error('Failed to delete application');
     }
   }
-
 }
 
 export const loanApplicationService = new LoanApplicationService();
