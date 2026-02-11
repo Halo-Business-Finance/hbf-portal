@@ -7,7 +7,12 @@
  */
 
 import { authProvider } from '@/services/auth';
-import { SUPABASE_URL as BASE_URL, SUPABASE_ANON_KEY as ANON_KEY } from '@/config/supabase';
+import {
+  SUPABASE_URL as BASE_URL,
+  SUPABASE_ANON_KEY as ANON_KEY,
+  functionUrl,
+  isIbmRouted,
+} from '@/config/supabase';
 
 // ── Helpers ──
 
@@ -27,15 +32,23 @@ export async function invokeEdgeFunction<T = any>(
   functionName: string,
   body: unknown,
 ): Promise<T> {
+  const ibm = isIbmRouted(functionName);
   const headers = await getAuthHeaders();
-  const res = await fetch(`${BASE_URL}/functions/v1/${functionName}`, {
+
+  // IBM Code Engine doesn't use the Supabase apikey header
+  if (ibm) {
+    delete headers['apikey'];
+  }
+
+  const url = functionUrl(functionName);
+  const res = await fetch(url, {
     method: 'POST',
     headers,
     body: JSON.stringify(body),
   });
   const data = await res.json();
   if (!res.ok || data?.error) {
-    throw new Error(data?.error || `Edge function ${functionName} error (${res.status})`);
+    throw new Error(data?.error || `${ibm ? 'IBM' : 'Edge'} function ${functionName} error (${res.status})`);
   }
   return data as T;
 }
