@@ -114,27 +114,30 @@ async function getUserInfo(cfg: AppIdConfig, accessToken: string) {
   return { data: await res.json() };
 }
 
-// ── Cloud Directory: Sign up ──
+// ── Cloud Directory: Sign up (SCIM Users endpoint) ──
 async function signUp(cfg: AppIdConfig, email: string, password: string) {
-  const mgmtUrl = `https://${cfg.oauthServerUrl.includes('us-south') ? 'us-south' : 'eu-gb'}.appid.cloud.ibm.com/management/v4/${cfg.tenantId}`;
-  
-  // Use the App ID management API for Cloud Directory sign-up
+  const mgmtUrl = getMgmtUrl(cfg);
   const iamToken = await getIAMToken();
   
-  const res = await fetch(`${mgmtUrl}/cloud_directory/sign_up`, {
+  // Try SCIM Users endpoint first
+  const res = await fetch(`${mgmtUrl}/cloud_directory/Users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${iamToken}`,
     },
     body: JSON.stringify({
-      emails: [{ value: email, primary: true }],
+      displayName: email.split('@')[0],
+      userName: email,
       password,
       active: true,
+      emails: [{ value: email, primary: true }],
+      schemas: ['urn:ietf:params:scim:schemas:core:2.0:User'],
     }),
   });
   if (!res.ok) {
     const err = await res.text();
+    console.error('Sign up error:', err);
     return { error: `Sign up failed: ${err}`, status: res.status };
   }
   return { data: await res.json() };
