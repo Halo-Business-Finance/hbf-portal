@@ -32,6 +32,12 @@ export const IBM_PORTED_FUNCTIONS: ReadonlySet<string> = new Set([
   'notification-service',
   'loan-application-processor',
   'appid-auth',
+  'update-profile',
+  'update_profile',
+  'health-check',
+  'security-telemetry',
+  'send-document-email',
+  'admin-dashboard',
 ]);
 
 /**

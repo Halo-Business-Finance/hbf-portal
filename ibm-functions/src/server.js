@@ -11,6 +11,11 @@ import auditRouter from './routes/audit-logger.js';
 import loanRouter from './routes/loan-application-processor.js';
 import notificationRouter from './routes/notification-service.js';
 import appIdAuthRouter from './routes/appid-auth.js';
+import updateProfileRouter from './routes/update-profile.js';
+import healthCheckRouter from './routes/health-check.js';
+import securityTelemetryRouter from './routes/security-telemetry.js';
+import sendDocumentEmailRouter from './routes/send-document-email.js';
+import adminDashboardRouter from './routes/admin-dashboard.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -35,6 +40,12 @@ app.use('/api/audit-logger', auditRouter);
 app.use('/api/loan-application-processor', loanRouter);
 app.use('/api/notification-service', notificationRouter);
 app.use('/api/appid-auth', appIdAuthRouter);
+app.use('/api/update-profile', updateProfileRouter);
+app.use('/api/update_profile', updateProfileRouter); // alias for underscore variant
+app.use('/api/health-check', healthCheckRouter);
+app.use('/api/security-telemetry', securityTelemetryRouter);
+app.use('/api/send-document-email', sendDocumentEmailRouter);
+app.use('/api/admin-dashboard', adminDashboardRouter);
 
 // ── 404 fallback ──
 app.use((_req, res) => {
