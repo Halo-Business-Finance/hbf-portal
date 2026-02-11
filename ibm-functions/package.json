@@ -1,0 +1,20 @@
+{
+  "name": "hbf-ibm-functions",
+  "version": "1.0.0",
+  "description": "Heritage Business Funding — IBM Cloud Functions (Node.js 20)",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "pg": "^8.13.0",
+    "zod": "^3.23.0",
+    "cors": "^2.8.5",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
