@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import { TrendingUp, Building2, User, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { restQuery } from "@/services/supabaseHttp";
 import { PremiumCard, PremiumCardHeader, PremiumCardTitle, PremiumCardContent } from "@/components/ui/premium-card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -65,20 +65,17 @@ export const EnhancedDashboardCharts = ({
       
       try {
         // Fetch bank accounts
-        const { data: accounts, error: accountsError } = await supabase
-          .from('bank_accounts')
-          .select('id, account_name, account_type, institution, balance, is_business')
-          .eq('user_id', userId);
-        
-        if (accountsError) throw accountsError;
+        const acctParams = new URLSearchParams();
+        acctParams.set('user_id', `eq.${userId}`);
+        acctParams.set('select', 'id,account_name,account_type,institution,balance,is_business');
+        const { data: accounts } = await restQuery<BankAccount[]>('bank_accounts', { params: acctParams });
         setBankAccounts(accounts || []);
 
         // Fetch applications for monthly trend
-        const { data: apps } = await supabase
-          .from('loan_applications')
-          .select('created_at, amount_requested')
-          .eq('user_id', userId);
-
+        const appParams = new URLSearchParams();
+        appParams.set('user_id', `eq.${userId}`);
+        appParams.set('select', 'created_at,amount_requested');
+        const { data: apps } = await restQuery<Application[]>('loan_applications', { params: appParams });
         setApplications(apps || []);
       } catch (error) {
         console.error('Error fetching chart data:', error);

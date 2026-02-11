@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/PageHeader';
 import { Bell, Mail, Database, Shield } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { restQuery } from '@/services/supabaseHttp';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,13 +19,9 @@ const SystemSettings = () => {
 
   const loadSettings = async () => {
     try {
-      const { data, error } = await supabase
-        .from('system_settings')
-        .select('*');
+      const { data } = await restQuery<any[]>('system_settings');
       
-      if (error) throw error;
-      
-      const settingsMap = data.reduce((acc, setting) => {
+      const settingsMap = (data || []).reduce((acc: Record<string, any>, setting: any) => {
         acc[setting.setting_key] = setting.setting_value;
         return acc;
       }, {} as Record<string, any>);
@@ -41,12 +37,13 @@ const SystemSettings = () => {
 
   const updateSetting = async (key: string, value: any) => {
     try {
-      const { error } = await supabase
-        .from('system_settings')
-        .update({ setting_value: value })
-        .eq('setting_key', key);
-      
-      if (error) throw error;
+      const params = new URLSearchParams();
+      params.set('setting_key', `eq.${key}`);
+      await restQuery('system_settings', {
+        method: 'PATCH',
+        params,
+        body: { setting_value: value },
+      });
       
       setSettings(prev => ({ ...prev, [key]: value }));
       toast.success('Setting updated successfully');

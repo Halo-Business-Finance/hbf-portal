@@ -1,29 +1,44 @@
 /**
  * Supabase implementation of AuthProviderAPI.
- * Wraps @supabase/supabase-js auth calls into the provider interface.
+ * Uses direct HTTP calls via supabaseHttp helpers (no SDK dependency).
+ * This is a fallback provider — primary auth uses IBM App ID.
  */
-import { supabase } from '@/integrations/supabase/client';
 import type {
   AuthProviderAPI,
   AuthUser,
   AuthSession,
   AuthEvent,
-  AuthResult,
   MFAFactor,
   MFAEnrollResult,
   MFAAssuranceLevel,
-  OAuthProvider,
 } from './types';
-import type { AuthChangeEvent } from '@supabase/supabase-js';
 
-// --- Mappers ---
+const BASE_URL = 'https://zosgzkpfgaaadadezpxo.supabase.co';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY';
 
-function mapUser(u: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null): AuthUser | null {
+function getStoredSession(): { access_token: string; refresh_token: string } | null {
+  try {
+    const raw = localStorage.getItem('sb-zosgzkpfgaaadadezpxo-auth-token');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed;
+  } catch { return null; }
+}
+
+function storeSession(session: any) {
+  localStorage.setItem('sb-zosgzkpfgaaadadezpxo-auth-token', JSON.stringify(session));
+}
+
+function clearSession() {
+  localStorage.removeItem('sb-zosgzkpfgaaadadezpxo-auth-token');
+}
+
+function mapUser(u: any): AuthUser | null {
   if (!u) return null;
   return { id: u.id, email: u.email, user_metadata: u.user_metadata };
 }
 
-function mapSession(s: { access_token: string; refresh_token?: string; expires_at?: number; user: any } | null): AuthSession | null {
+function mapSession(s: any): AuthSession | null {
   if (!s) return null;
   return {
     access_token: s.access_token,
@@ -33,152 +48,107 @@ function mapSession(s: { access_token: string; refresh_token?: string; expires_a
   };
 }
 
-const EVENT_MAP: Record<string, AuthEvent> = {
-  SIGNED_IN: 'SIGNED_IN',
-  SIGNED_OUT: 'SIGNED_OUT',
-  TOKEN_REFRESHED: 'TOKEN_REFRESHED',
-  USER_UPDATED: 'USER_UPDATED',
-  PASSWORD_RECOVERY: 'PASSWORD_RECOVERY',
-  MFA_CHALLENGE_VERIFIED: 'MFA_CHALLENGE_VERIFIED',
-  INITIAL_SESSION: 'INITIAL_SESSION',
-};
-
-function mapEvent(e: AuthChangeEvent): AuthEvent {
-  return EVENT_MAP[e] ?? 'SIGNED_IN';
+async function authFetch(path: string, body?: any): Promise<any> {
+  const stored = getStoredSession();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    apikey: ANON_KEY,
+    Authorization: `Bearer ${stored?.access_token || ANON_KEY}`,
+  };
+  const res = await fetch(`${BASE_URL}/auth/v1${path}`, {
+    method: body ? 'POST' : 'GET',
+    headers,
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+  return res.json();
 }
-
-// --- Provider ---
 
 export const supabaseAuthProvider: AuthProviderAPI = {
   async getSession() {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) return { error: { message: error.message } };
-    return { data: { session: mapSession(data.session) } };
+    const stored = getStoredSession();
+    if (!stored?.access_token) return { data: { session: null } };
+    // Validate with /auth/v1/user
+    const user = await authFetch('/user');
+    if (user?.id) {
+      return { data: { session: mapSession({ ...stored, user }) } };
+    }
+    return { data: { session: null } };
   },
 
   onAuthStateChange(callback) {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      callback(mapEvent(event), mapSession(session));
-    });
-    return { unsubscribe: () => subscription.unsubscribe() };
+    // Minimal implementation — no realtime, just fire initial
+    setTimeout(async () => {
+      const result = await supabaseAuthProvider.getSession();
+      const session = result.data?.session;
+      callback(session ? 'SIGNED_IN' : 'SIGNED_OUT', session ?? null);
+    }, 0);
+    return { unsubscribe: () => {} };
   },
 
   async signInWithPassword(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: { message: error.message, status: error.status } };
-    return { data: { session: mapSession(data.session)! } };
+    const data = await authFetch('/token?grant_type=password', { email, password });
+    if (data.error) return { error: { message: data.error_description || data.msg || data.error, status: 400 } };
+    storeSession(data);
+    return { data: { session: mapSession(data)! } };
   },
 
   async signUp(email, password, options) {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: options?.emailRedirectTo ? { emailRedirectTo: options.emailRedirectTo } : undefined,
-    });
-    if (error) return { error: { message: error.message } };
+    const body: any = { email, password };
+    if (options?.emailRedirectTo) body.options = { emailRedirectTo: options.emailRedirectTo };
+    const data = await authFetch('/signup', body);
+    if (data.error) return { error: { message: data.error_description || data.msg || data.error } };
     return {};
   },
 
   async signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) return { error: { message: error.message } };
+    await authFetch('/logout', {});
+    clearSession();
     return {};
   },
 
   async resetPasswordForEmail(email, options) {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, options);
-    if (error) return { error: { message: error.message } };
+    const body: any = { email };
+    if (options?.redirectTo) body.redirectTo = options.redirectTo;
+    const data = await authFetch('/recover', body);
+    if (data.error) return { error: { message: data.error } };
     return {};
   },
 
   async updateUser(attributes) {
-    const { error } = await supabase.auth.updateUser(attributes);
-    if (error) return { error: { message: error.message } };
+    const stored = getStoredSession();
+    const res = await fetch(`${BASE_URL}/auth/v1/user`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: ANON_KEY,
+        Authorization: `Bearer ${stored?.access_token || ANON_KEY}`,
+      },
+      body: JSON.stringify(attributes),
+    });
+    const data = await res.json();
+    if (data.error) return { error: { message: data.error } };
     return {};
   },
 
-  async signInWithOAuth(provider, options) {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: options?.redirectTo ? { redirectTo: options.redirectTo } : undefined,
-    });
-    if (error) return { error: { message: error.message } };
-    return {};
+  async signInWithOAuth(_provider, _options) {
+    return { error: { message: 'OAuth not supported in fallback provider' } };
   },
 
   async getUser() {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) return { error: { message: error.message } };
-    return { data: { user: mapUser(data.user) } };
+    const user = await authFetch('/user');
+    if (user?.id) return { data: { user: mapUser(user) } };
+    return { error: { message: 'Not authenticated' } };
   },
 
   mfa: {
-    async listFactors() {
-      const { data, error } = await supabase.auth.mfa.listFactors();
-      if (error) return { error: { message: error.message } };
-      const totp: MFAFactor[] = (data?.totp ?? []).map((f) => ({
-        id: f.id,
-        friendly_name: f.friendly_name ?? undefined,
-        factor_type: 'totp' as const,
-        status: f.status as 'verified' | 'unverified',
-      }));
-      return { data: { totp } };
-    },
-
-    async enroll(options) {
-      const { data, error } = await supabase.auth.mfa.enroll({
-        factorType: options.factorType,
-        friendlyName: options.friendlyName,
-      });
-      if (error) return { error: { message: error.message } };
-      return {
-        data: {
-          id: data.id,
-          totp: { qr_code: data.totp.qr_code, secret: data.totp.secret, uri: data.totp.uri },
-        } as MFAEnrollResult,
-      };
-    },
-
-    async challengeAndVerify(options) {
-      const { error } = await supabase.auth.mfa.challengeAndVerify({
-        factorId: options.factorId,
-        code: options.code,
-      });
-      if (error) return { error: { message: error.message } };
-      return {};
-    },
-
-    async challenge(options) {
-      const { data, error } = await supabase.auth.mfa.challenge({ factorId: options.factorId });
-      if (error) return { error: { message: error.message } };
-      return { data: { id: data.id } };
-    },
-
-    async verify(options) {
-      const { error } = await supabase.auth.mfa.verify({
-        factorId: options.factorId,
-        challengeId: options.challengeId,
-        code: options.code,
-      });
-      if (error) return { error: { message: error.message } };
-      return {};
-    },
-
-    async unenroll(options) {
-      const { error } = await supabase.auth.mfa.unenroll({ factorId: options.factorId });
-      if (error) return { error: { message: error.message } };
-      return {};
-    },
-
+    async listFactors() { return { data: { totp: [] } }; },
+    async enroll(_options) { return { error: { message: 'MFA not supported in fallback' } }; },
+    async challengeAndVerify(_options) { return { error: { message: 'MFA not supported in fallback' } }; },
+    async challenge(_options) { return { error: { message: 'MFA not supported in fallback' } }; },
+    async verify(_options) { return { error: { message: 'MFA not supported in fallback' } }; },
+    async unenroll(_options) { return { error: { message: 'MFA not supported in fallback' } }; },
     async getAuthenticatorAssuranceLevel() {
-      const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (error) return { error: { message: error.message } };
-      return {
-        data: {
-          currentLevel: data.currentLevel as 'aal1' | 'aal2',
-          nextLevel: data.nextLevel as 'aal1' | 'aal2',
-        } as MFAAssuranceLevel,
-      };
+      return { data: { currentLevel: 'aal1' as const, nextLevel: 'aal1' as const } as MFAAssuranceLevel };
     },
   },
 };
