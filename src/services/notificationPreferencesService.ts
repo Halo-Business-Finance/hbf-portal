@@ -1,5 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
 import { authProvider } from '@/services/auth';
+import { callRpc, restQuery } from './supabaseHttp';
 
 export interface NotificationPreference {
   email: boolean;
@@ -44,56 +44,34 @@ export const notificationEventDescriptions: Record<keyof NotificationPreferences
 };
 
 class NotificationPreferencesService {
-  /**
-   * Get user notification preferences
-   */
   async getPreferences(): Promise<NotificationPreferences | null> {
     try {
       const { data: authData, error: authError } = await authProvider.getUser();
       const user = authData?.user;
-      if (authError || !user) {
-        throw new Error('User not authenticated');
-      }
-
-      // Use RPC to get or create preferences
-      const { data, error } = await supabase.rpc('get_user_notification_preferences', {
-        _user_id: user.id
-      });
-
-      if (error) throw error;
-
-      return data as unknown as NotificationPreferences;
+      if (authError || !user) throw new Error('User not authenticated');
+      const data = await callRpc<NotificationPreferences>('get_user_notification_preferences', { _user_id: user.id });
+      return data;
     } catch (error) {
       console.error('Error fetching notification preferences:', error);
       throw new Error('Failed to fetch notification preferences');
     }
   }
 
-  /**
-   * Update user notification preferences
-   */
   async updatePreferences(preferences: NotificationPreferences) {
     try {
       const { data: authData, error: authError } = await authProvider.getUser();
       const user = authData?.user;
-      if (authError || !user) {
-        throw new Error('User not authenticated');
-      }
+      if (authError || !user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
-        .from('notification_preferences')
-        .upsert({
-          user_id: user.id,
-          preferences: preferences as any,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id'
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
+      const p = new URLSearchParams();
+      p.set('on_conflict', 'user_id');
+      const { data } = await restQuery('notification_preferences', {
+        method: 'POST',
+        params: p,
+        body: { user_id: user.id, preferences, updated_at: new Date().toISOString() },
+        returnData: true,
+        single: true,
+      });
       return data;
     } catch (error) {
       console.error('Error updating notification preferences:', error);
@@ -101,24 +79,11 @@ class NotificationPreferencesService {
     }
   }
 
-  /**
-   * Update a single event preference
-   */
-  async updateEventPreference(
-    eventType: keyof NotificationPreferences,
-    channel: 'email' | 'in_app' | 'sms',
-    enabled: boolean
-  ) {
+  async updateEventPreference(eventType: keyof NotificationPreferences, channel: 'email' | 'in_app' | 'sms', enabled: boolean) {
     try {
       const preferences = await this.getPreferences();
-      
-      if (!preferences) {
-        throw new Error('Failed to load preferences');
-      }
-
-      // Update the specific preference
+      if (!preferences) throw new Error('Failed to load preferences');
       preferences[eventType][channel] = enabled;
-
       return await this.updatePreferences(preferences);
     } catch (error) {
       console.error('Error updating event preference:', error);
@@ -126,22 +91,11 @@ class NotificationPreferencesService {
     }
   }
 
-  /**
-   * Enable/disable all notifications for a channel
-   */
   async toggleChannel(channel: 'email' | 'in_app' | 'sms', enabled: boolean) {
     try {
       const preferences = await this.getPreferences();
-      
-      if (!preferences) {
-        throw new Error('Failed to load preferences');
-      }
-
-      // Update all events for this channel
-      Object.keys(preferences).forEach((key) => {
-        preferences[key as keyof NotificationPreferences][channel] = enabled;
-      });
-
+      if (!preferences) throw new Error('Failed to load preferences');
+      Object.keys(preferences).forEach((key) => { preferences[key as keyof NotificationPreferences][channel] = enabled; });
       return await this.updatePreferences(preferences);
     } catch (error) {
       console.error('Error toggling channel:', error);
