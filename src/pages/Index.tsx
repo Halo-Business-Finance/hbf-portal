@@ -631,7 +631,7 @@ const Index = () => {
 
               {/* Email/User ID Input */}
               <div className="relative">
-                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white border-2 border-black rounded-xl px-5 pr-12 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
+                <Input id="email" type="email" placeholder="User ID" value={email} onChange={e => setEmail(e.target.value)} required disabled={authLoading || isLockedOut} aria-label="Email address or User ID" aria-required="true" autoComplete="email" className="h-14 bg-white !border-2 !border-black rounded-xl px-5 pr-12 focus:!border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700" />
                 {email && <button type="button" onClick={() => setEmail("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full" tabIndex={-1} aria-label="Clear email field">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
@@ -655,7 +655,7 @@ const Index = () => {
                   aria-label="Password"
                   aria-required="true"
                   autoComplete={isLogin ? "current-password" : "new-password"}
-                  className="h-14 bg-white border-2 border-black rounded-xl px-5 pr-16 focus:border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
+                  className="h-14 bg-white !border-2 !border-black rounded-xl px-5 pr-16 focus:!border-black focus:ring-0 transition-colors placeholder:text-gray-400 text-gray-700"
                 />
                 <button
                   type="button"
@@ -747,7 +747,7 @@ const Index = () => {
                 </Alert>}
 
               {/* Sign On Button */}
-              <Button type="submit" variant="outline" className="w-full h-12 border-2 border-black rounded-full font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed" disabled={authLoading || isLockedOut || !email || !password}>
+              <Button type="submit" variant="outline" className="w-full h-12 !border-2 !border-black rounded-full font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed" disabled={authLoading || isLockedOut || !email || !password}>
                 {authLoading ? <span className="flex items-center gap-2 justify-center text-black font-bold">
                     <Loader2 className="h-5 w-5 animate-spin text-black" />
                     Signing in...
@@ -764,7 +764,7 @@ const Index = () => {
 
               {/* Social Login Icon Buttons */}
               <div className="flex items-center justify-center gap-4">
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleGoogleSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Google">
+                <Button type="button" variant="outline" className="h-12 w-12 !border-2 !border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleGoogleSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Google">
                   {socialLoading === 'google' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M23.498 12.275c0-.813-.073-1.594-.21-2.347H12v4.437h6.437c-.278 1.49-1.121 2.752-2.39 3.598v2.989h3.867c2.265-2.083 3.571-5.15 3.571-8.677z" fill="#4285F4" />
@@ -775,7 +775,7 @@ const Index = () => {
                   )}
                 </Button>
 
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleAppleSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Apple">
+                <Button type="button" variant="outline" className="h-12 w-12 !border-2 !border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleAppleSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Apple">
                   {socialLoading === 'apple' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black" aria-hidden="true">
                       <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
@@ -783,7 +783,7 @@ const Index = () => {
                   )}
                 </Button>
 
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleMicrosoftSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Microsoft">
+                <Button type="button" variant="outline" className="h-12 w-12 !border-2 !border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleMicrosoftSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with Microsoft">
                   {socialLoading === 'azure' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                       <path fill="#F25022" d="M1 1h10v10H1z" />
@@ -794,7 +794,7 @@ const Index = () => {
                   )}
                 </Button>
 
-                <Button type="button" variant="outline" className="h-12 w-12 border-2 border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleLinkedInSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with LinkedIn">
+                <Button type="button" variant="outline" className="h-12 w-12 !border-2 !border-black rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleLinkedInSignIn} disabled={authLoading || !!socialLoading} aria-label="Sign in with LinkedIn">
                   {socialLoading === 'linkedin_oidc' ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#0A66C2" aria-hidden="true">
                       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
