@@ -19,7 +19,7 @@ export const SUPABASE_ANON_KEY =
  *
  * Leave empty / undefined to keep using Supabase Edge Functions.
  */
-export const IBM_FUNCTIONS_URL: string | undefined = undefined;
+export const IBM_FUNCTIONS_URL: string | undefined = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud';
 
 /**
  * Functions that have been ported to the IBM Code Engine API.
