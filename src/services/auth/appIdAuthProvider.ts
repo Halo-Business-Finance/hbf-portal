@@ -14,10 +14,10 @@ import type {
   OAuthProvider,
 } from './types';
 
-import { edgeFunctionUrl, SUPABASE_ANON_KEY as ANON_KEY } from '@/config/supabase';
+import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, isIbmRouted } from '@/config/supabase';
 
 // ── Edge function endpoint ──
-const EDGE_FUNCTION_URL = edgeFunctionUrl('appid-auth');
+const EDGE_FUNCTION_URL = functionUrl('appid-auth');
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';
@@ -71,17 +71,19 @@ function mapOIDCUser(info: Record<string, unknown>): AuthUser {
 }
 
 async function callEdge(action: string, params: Record<string, unknown> = {}) {
+  const ibm = isIbmRouted('appid-auth');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(ibm ? {} : { 'apikey': ANON_KEY }),
+    'Authorization': `Bearer ${ANON_KEY}`,
+  };
   const res = await fetch(EDGE_FUNCTION_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': ANON_KEY,
-      'Authorization': `Bearer ${ANON_KEY}`,
-    },
+    headers,
     body: JSON.stringify({ action, ...params }),
   });
   const data = await res.json();
-  if (!res.ok || data?.error) throw new Error(data?.error || `Edge function error (${res.status})`);
+  if (!res.ok || data?.error) throw new Error(data?.error || `Auth function error (${res.status})`);
   return data;
 }
 

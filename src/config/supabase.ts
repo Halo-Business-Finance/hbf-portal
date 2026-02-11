@@ -31,6 +31,7 @@ export const IBM_PORTED_FUNCTIONS: ReadonlySet<string> = new Set([
   'audit-logger',
   'notification-service',
   'loan-application-processor',
+  'appid-auth',
 ]);
 
 /**
