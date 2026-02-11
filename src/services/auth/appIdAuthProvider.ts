@@ -2,7 +2,6 @@
  * IBM App ID implementation of AuthProviderAPI.
  * Communicates with the appid-auth edge function — secrets never touch the browser.
  */
-import { supabase } from '@/integrations/supabase/client';
 import type {
   AuthProviderAPI,
   AuthUser,
@@ -14,6 +13,10 @@ import type {
   MFAAssuranceLevel,
   OAuthProvider,
 } from './types';
+
+// ── Edge function endpoint (direct HTTP — no Supabase client needed) ──
+const EDGE_FUNCTION_URL = 'https://zosgzkpfgaaadadezpxo.supabase.co/functions/v1/appid-auth';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY';
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';
@@ -67,11 +70,17 @@ function mapOIDCUser(info: Record<string, unknown>): AuthUser {
 }
 
 async function callEdge(action: string, params: Record<string, unknown> = {}) {
-  const { data, error } = await supabase.functions.invoke('appid-auth', {
-    body: { action, ...params },
+  const res = await fetch(EDGE_FUNCTION_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': ANON_KEY,
+      'Authorization': `Bearer ${ANON_KEY}`,
+    },
+    body: JSON.stringify({ action, ...params }),
   });
-  if (error) throw new Error(error.message || 'Edge function error');
-  if (data?.error) throw new Error(data.error);
+  const data = await res.json();
+  if (!res.ok || data?.error) throw new Error(data?.error || `Edge function error (${res.status})`);
   return data;
 }
 
