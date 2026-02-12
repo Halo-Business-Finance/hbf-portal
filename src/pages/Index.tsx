@@ -603,7 +603,7 @@ const Index = () => {
           <div className="absolute inset-0 bg-black/10 hidden md:block" />
           
           {/* Login Card - no shadow on mobile for cleaner look */}
-          <div className="relative z-10 w-full max-w-lg bg-white md:rounded-2xl md:shadow-2xl p-6 sm:p-8 md:p-10">
+          <div className="relative z-10 w-full max-w-md bg-white md:rounded-2xl md:shadow-2xl p-6 sm:p-7 md:p-8">
 
 
             {/* Lockout warning */}
