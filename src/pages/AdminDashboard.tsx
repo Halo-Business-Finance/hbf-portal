@@ -21,6 +21,9 @@ import {
 } from 'lucide-react';
 import { SecurityOverview } from '@/components/SecurityOverview';
 import { PageHeader } from '@/components/PageHeader';
+import { lazy } from 'react';
+
+const HealthCheckPanel = lazy(() => import('@/components/dashboard/HealthCheckPanel'));
 
 
 const AdminDashboard = () => {
@@ -146,6 +149,9 @@ const AdminDashboard = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8">
+        {/* Runtime Health Check */}
+        <HealthCheckPanel />
+
         {/* Security Overview Widget */}
         <SecurityOverview />
 
