@@ -61,6 +61,30 @@ function getCosConfig() {
   return { endpoint, bucket, instanceId };
 }
 
+// Basic validation to prevent path traversal and unsafe characters in object keys
+function validateObjectKey(objectKey) {
+  if (typeof objectKey !== 'string') {
+    return 'Invalid path type';
+  }
+  // Disallow directory traversal and backslashes
+  if (objectKey.includes('..') || objectKey.includes('\\')) {
+    return 'Path contains invalid sequences';
+  }
+  // Disallow leading slash to avoid changing the base path semantics
+  if (objectKey.startsWith('/')) {
+    return 'Path must not start with a slash';
+  }
+  // Very long keys are likely abusive
+  if (objectKey.length > 1024) {
+    return 'Path is too long';
+  }
+  // Basic control character check
+  if (/[^\x20-\x7E]/.test(objectKey)) {
+    return 'Path contains invalid characters';
+  }
+  return null;
+}
+
 // ── Upload (accepts raw body with headers set by frontend) ──
 
 router.post('/upload', requireAuth, async (req, res) => {
@@ -69,6 +93,11 @@ router.post('/upload', requireAuth, async (req, res) => {
 
     if (!objectKey) {
       return res.status(400).json({ error: 'Missing path' });
+    }
+
+    const validationError = validateObjectKey(objectKey);
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
     }
 
     // Ensure user can only upload to their own prefix
