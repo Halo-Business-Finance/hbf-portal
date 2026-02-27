@@ -178,7 +178,14 @@ router.post('/', requireAuth, async (req, res) => {
 
         // Handle upsert (on_conflict)
         if (params.on_conflict) {
-          sql += ` ON CONFLICT (${params.on_conflict}) DO UPDATE SET ${columns.filter(c => c !== params.on_conflict).map(c => `"${c}" = EXCLUDED."${c}"`).join(', ')}`;
+          const conflict = params.on_conflict;
+          // Basic identifier validation to prevent SQL injection via on_conflict
+          const identifierRegex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+          if (typeof conflict !== 'string' || !identifierRegex.test(conflict) || !columns.includes(conflict)) {
+            return res.status(400).json({ error: 'Invalid on_conflict column' });
+          }
+          const conflictColumn = `"${conflict}"`;
+          sql += ` ON CONFLICT (${conflictColumn}) DO UPDATE SET ${columns.filter(c => c !== conflict).map(c => `"${c}" = EXCLUDED."${c}"`).join(', ')}`;
         }
 
         if (returnData) sql += ' RETURNING *';
