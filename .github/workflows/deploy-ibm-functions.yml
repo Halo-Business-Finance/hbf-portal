@@ -10,7 +10,7 @@ on:
 env:
   IBM_REGION: us-south
   CE_PROJECT: hbf-functions
-  APP_NAME: hbf-functions-api
+  APP_NAME: hbf-api
   REGISTRY: us.icr.io
   NAMESPACE: hbf-registry
   IMAGE_NAME: hbf-functions
