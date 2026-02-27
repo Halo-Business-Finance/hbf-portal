@@ -206,6 +206,24 @@ router.get('/download/:token', async (req, res) => {
 
 // ── Delete ──
 
+function isValidObjectKeyForUser(objectKey, userId) {
+  if (typeof objectKey !== 'string') return false;
+  // Ensure the object key is within the user's namespace
+  if (!objectKey.startsWith(`${userId}/`)) {
+    return false;
+  }
+  // Disallow path traversal and backslashes
+  if (objectKey.includes('..') || objectKey.includes('\\')) {
+    return false;
+  }
+  // Allow only safe characters in the key
+  const safeKeyPattern = /^[A-Za-z0-9._\-\/]+$/;
+  if (!safeKeyPattern.test(objectKey)) {
+    return false;
+  }
+  return true;
+}
+
 router.post('/delete', requireAuth, async (req, res) => {
   try {
     const { bucket: bucketName, paths } = req.body;
@@ -214,10 +232,10 @@ router.post('/delete', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Missing paths array' });
     }
 
-    // Ensure user can only delete their own files
+    // Ensure user can only delete their own files and object keys are well-formed
     for (const p of paths) {
-      if (!p.startsWith(`${req.userId}/`)) {
-        return res.status(403).json({ error: 'Cannot delete another user\'s files' });
+      if (!isValidObjectKeyForUser(p, req.userId)) {
+        return res.status(400).json({ error: 'Invalid object key in paths' });
       }
     }
 
