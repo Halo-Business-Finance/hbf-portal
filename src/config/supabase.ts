@@ -14,12 +14,19 @@ export const SUPABASE_ANON_KEY =
 
 /**
  * IBM Code Engine Functions API base URL.
- * Set this to enable routing ported functions to IBM.
- * Example: 'https://ibm-functions-api.1a2b3c.us-south.codeengine.appdomain.cloud'
  *
- * Leave empty / undefined to keep using Supabase Edge Functions.
+ * Resolution order:
+ * 1) VITE_IBM_FUNCTIONS_URL (recommended)
+ * 2) Current origin when app is served from *.codeengine.appdomain.cloud
+ * 3) undefined (falls back to Supabase routes)
  */
-export const IBM_FUNCTIONS_URL: string | undefined = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud';
+const ENV_IBM_FUNCTIONS_URL = import.meta.env.VITE_IBM_FUNCTIONS_URL?.trim();
+const RUNTIME_IBM_FUNCTIONS_URL =
+  typeof window !== 'undefined' && window.location.hostname.endsWith('codeengine.appdomain.cloud')
+    ? window.location.origin
+    : undefined;
+
+export const IBM_FUNCTIONS_URL: string | undefined = ENV_IBM_FUNCTIONS_URL || RUNTIME_IBM_FUNCTIONS_URL;
 
 /**
  * Functions that have been ported to the IBM Code Engine API.
