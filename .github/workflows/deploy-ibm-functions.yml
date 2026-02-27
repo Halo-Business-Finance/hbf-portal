@@ -54,6 +54,15 @@ jobs:
               --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}" \
               --env IBM_DB_CA_CERT="${{ secrets.IBM_DB_CA_CERT }}" \
               --env JWT_SECRET="${{ secrets.SUPABASE_JWT_SECRET }}" \
+              --env IBM_CLOUD_API_KEY="${{ secrets.IBM_CLOUD_API_KEY }}" \
+              --env IBM_APPID_TENANT_ID="${{ secrets.IBM_APPID_TENANT_ID }}" \
+              --env IBM_APPID_CLIENT_ID="${{ secrets.IBM_APPID_CLIENT_ID }}" \
+              --env IBM_APPID_SECRET="${{ secrets.IBM_APPID_SECRET }}" \
+              --env IBM_APPID_OAUTH_SERVER_URL="${{ secrets.IBM_APPID_OAUTH_SERVER_URL }}" \
+              --env IBM_COS_API_KEY="${{ secrets.IBM_COS_API_KEY }}" \
+              --env IBM_COS_ENDPOINT="${{ secrets.IBM_COS_ENDPOINT }}" \
+              --env IBM_COS_BUCKET="${{ secrets.IBM_COS_BUCKET }}" \
+              --env IBM_COS_INSTANCE_ID="${{ secrets.IBM_COS_INSTANCE_ID }}" \
               --min-scale 1 \
               --max-scale 5 \
               --cpu 0.5 \
@@ -66,6 +75,15 @@ jobs:
               --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}" \
               --env IBM_DB_CA_CERT="${{ secrets.IBM_DB_CA_CERT }}" \
               --env JWT_SECRET="${{ secrets.SUPABASE_JWT_SECRET }}" \
+              --env IBM_CLOUD_API_KEY="${{ secrets.IBM_CLOUD_API_KEY }}" \
+              --env IBM_APPID_TENANT_ID="${{ secrets.IBM_APPID_TENANT_ID }}" \
+              --env IBM_APPID_CLIENT_ID="${{ secrets.IBM_APPID_CLIENT_ID }}" \
+              --env IBM_APPID_SECRET="${{ secrets.IBM_APPID_SECRET }}" \
+              --env IBM_APPID_OAUTH_SERVER_URL="${{ secrets.IBM_APPID_OAUTH_SERVER_URL }}" \
+              --env IBM_COS_API_KEY="${{ secrets.IBM_COS_API_KEY }}" \
+              --env IBM_COS_ENDPOINT="${{ secrets.IBM_COS_ENDPOINT }}" \
+              --env IBM_COS_BUCKET="${{ secrets.IBM_COS_BUCKET }}" \
+              --env IBM_COS_INSTANCE_ID="${{ secrets.IBM_COS_INSTANCE_ID }}" \
               --min-scale 1 \
               --max-scale 5 \
               --cpu 0.5 \
