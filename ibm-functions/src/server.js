@@ -23,9 +23,31 @@ import cosStorageRouter from './routes/cos-storage.js';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Configure CORS allowed origins from environment (comma-separated)
+const allowedOriginsEnv = process.env.CORS_ALLOWED_ORIGINS || '';
+const allowedOrigins = allowedOriginsEnv
+  .split(',')
+  .map(o => o.trim())
+  .filter(o => o.length > 0);
+
 // ── Middleware ──
 app.use(helmet());
-app.use(cors({ origin: '*' }));
+app.use(
+  cors({
+    origin: allowedOrigins.length === 0
+      ? false
+      : (origin, callback) => {
+          // Allow same-origin or non-browser requests with no Origin header
+          if (!origin) {
+            return callback(null, true);
+          }
+          if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+          }
+          return callback(new Error('Not allowed by CORS'));
+        },
+  })
+);
 app.use(express.json({ limit: '15mb' })); // 15MB to handle base64-encoded 10MB files
 
 // ── Health check ──
