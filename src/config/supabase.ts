@@ -26,7 +26,10 @@ const RUNTIME_IBM_FUNCTIONS_URL =
     ? window.location.origin
     : undefined;
 
-export const IBM_FUNCTIONS_URL: string | undefined = ENV_IBM_FUNCTIONS_URL || RUNTIME_IBM_FUNCTIONS_URL;
+/** Hard-coded fallback so the app always reaches IBM even when env vars are missing (e.g. Lovable preview). */
+const DEFAULT_IBM_FUNCTIONS_URL = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud';
+
+export const IBM_FUNCTIONS_URL: string = ENV_IBM_FUNCTIONS_URL || RUNTIME_IBM_FUNCTIONS_URL || DEFAULT_IBM_FUNCTIONS_URL;
 
 /**
  * Functions that have been ported to the IBM Code Engine API.
@@ -53,7 +56,7 @@ export const IBM_PORTED_FUNCTIONS: ReadonlySet<string> = new Set([
  * returns the IBM Code Engine endpoint; otherwise falls back to Supabase.
  */
 export function functionUrl(functionName: string): string {
-  if (IBM_FUNCTIONS_URL && IBM_PORTED_FUNCTIONS.has(functionName)) {
+  if (IBM_PORTED_FUNCTIONS.has(functionName)) {
     return `${IBM_FUNCTIONS_URL}/api/${functionName}`;
   }
   return `${SUPABASE_URL}/functions/v1/${functionName}`;
