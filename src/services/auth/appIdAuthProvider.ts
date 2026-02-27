@@ -18,6 +18,8 @@ import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, isIbmRouted } from '@/confi
 
 // ── Edge function endpoint ──
 const EDGE_FUNCTION_URL = functionUrl('appid-auth');
+const FALLBACK_IBM_AUTH_URL = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth';
+const AUTH_ENDPOINTS = Array.from(new Set([EDGE_FUNCTION_URL, FALLBACK_IBM_AUTH_URL]));
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';
@@ -78,27 +80,36 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
     Authorization: `Bearer ${ANON_KEY}`,
   };
 
-  let res: Response;
-  try {
-    res = await fetch(EDGE_FUNCTION_URL, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ action, ...params }),
-    });
-  } catch {
-    throw new Error('Unable to reach IBM auth service. Please check IBM API URL/deployment.');
+  let lastNetworkError: Error | null = null;
+
+  for (const endpoint of AUTH_ENDPOINTS) {
+    let res: Response;
+    try {
+      res = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ action, ...params }),
+      });
+    } catch (err) {
+      lastNetworkError = err instanceof Error ? err : new Error('Network error');
+      continue;
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    const data = contentType.includes('application/json')
+      ? await res.json()
+      : { error: await res.text() };
+
+    if (!res.ok || data?.error) {
+      throw new Error(data?.error || `Auth function error (${res.status})`);
+    }
+
+    return data;
   }
 
-  const contentType = res.headers.get('content-type') || '';
-  const data = contentType.includes('application/json')
-    ? await res.json()
-    : { error: await res.text() };
-
-  if (!res.ok || data?.error) {
-    throw new Error(data?.error || `Auth function error (${res.status})`);
-  }
-
-  return data;
+  throw new Error(
+    `Unable to reach IBM auth service. Checked: ${AUTH_ENDPOINTS.join(', ')}${lastNetworkError ? ` (${lastNetworkError.message})` : ''}`
+  );
 }
 
 // ── Auth state listener registry ──
