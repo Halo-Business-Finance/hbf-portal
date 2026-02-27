@@ -35,9 +35,9 @@ app.use(helmet());
 app.use(
   cors({
     origin: allowedOrigins.length === 0
-      ? false
+      ? true
       : (origin, callback) => {
-          // Allow same-origin or non-browser requests with no Origin header
+          // Allow non-browser requests with no Origin header
           if (!origin) {
             return callback(null, true);
           }
