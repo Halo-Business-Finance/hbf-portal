@@ -31,21 +31,20 @@ const allowedOrigins = allowedOriginsEnv
   .filter(o => o.length > 0);
 
 // ── Middleware ──
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  crossOriginOpenerPolicy: false,
+}));
 app.use(
   cors({
     origin: allowedOrigins.length === 0
       ? true
       : (origin, callback) => {
-          // Allow non-browser requests with no Origin header
-          if (!origin) {
-            return callback(null, true);
-          }
-          if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-          }
+          if (!origin) return callback(null, true);
+          if (allowedOrigins.includes(origin)) return callback(null, true);
           return callback(new Error('Not allowed by CORS'));
         },
+    credentials: true,
   })
 );
 app.use(express.json({ limit: '15mb' })); // 15MB to handle base64-encoded 10MB files
