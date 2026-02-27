@@ -74,16 +74,30 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
   const ibm = isIbmRouted('appid-auth');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(ibm ? {} : { 'apikey': ANON_KEY }),
-    'Authorization': `Bearer ${ANON_KEY}`,
+    ...(ibm ? {} : { apikey: ANON_KEY }),
+    Authorization: `Bearer ${ANON_KEY}`,
   };
-  const res = await fetch(EDGE_FUNCTION_URL, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ action, ...params }),
-  });
-  const data = await res.json();
-  if (!res.ok || data?.error) throw new Error(data?.error || `Auth function error (${res.status})`);
+
+  let res: Response;
+  try {
+    res = await fetch(EDGE_FUNCTION_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ action, ...params }),
+    });
+  } catch {
+    throw new Error('Unable to reach IBM auth service. Please check IBM API URL/deployment.');
+  }
+
+  const contentType = res.headers.get('content-type') || '';
+  const data = contentType.includes('application/json')
+    ? await res.json()
+    : { error: await res.text() };
+
+  if (!res.ok || data?.error) {
+    throw new Error(data?.error || `Auth function error (${res.status})`);
+  }
+
   return data;
 }
 
