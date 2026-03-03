@@ -14,12 +14,13 @@ import type {
   OAuthProvider,
 } from './types';
 
-import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, isIbmRouted } from '@/config/supabase';
+import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, SUPABASE_URL, isIbmRouted } from '@/config/supabase';
 
 // ── Edge function endpoint ──
 const EDGE_FUNCTION_URL = functionUrl('appid-auth');
+const SUPABASE_APPID_AUTH_URL = `${SUPABASE_URL}/functions/v1/appid-auth`;
 const FALLBACK_IBM_AUTH_URL = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth';
-const AUTH_ENDPOINTS = Array.from(new Set([EDGE_FUNCTION_URL, FALLBACK_IBM_AUTH_URL]));
+const AUTH_ENDPOINTS = Array.from(new Set([EDGE_FUNCTION_URL, FALLBACK_IBM_AUTH_URL, SUPABASE_APPID_AUTH_URL]));
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';
@@ -74,20 +75,25 @@ function mapOIDCUser(info: Record<string, unknown>): AuthUser {
 
 async function callEdge(action: string, params: Record<string, unknown> = {}) {
   const ibm = isIbmRouted('appid-auth');
-  const headers: Record<string, string> = {
+  const baseHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(ibm ? {} : { apikey: ANON_KEY }),
     Authorization: `Bearer ${ANON_KEY}`,
   };
 
   let lastNetworkError: Error | null = null;
 
   for (const endpoint of AUTH_ENDPOINTS) {
+    const endpointHeaders: Record<string, string> = {
+      ...baseHeaders,
+      ...(endpoint.includes('/functions/v1/') ? { apikey: ANON_KEY } : {}),
+      ...(!ibm ? { apikey: ANON_KEY } : {}),
+    };
+
     let res: Response;
     try {
       res = await fetch(endpoint, {
         method: 'POST',
-        headers,
+        headers: endpointHeaders,
         body: JSON.stringify({ action, ...params }),
       });
     } catch (err) {
