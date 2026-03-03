@@ -34,6 +34,38 @@ interface StoredSession {
   user: AuthUser;
 }
 
+// ── Auth diagnostics (exported for admin widget) ──
+export interface AuthDiagnostics {
+  activeEndpoint: string | null;
+  configuredEndpoints: string[];
+  lastAction: string | null;
+  lastActionTime: string | null;
+  lastError: string | null;
+  lastErrorTime: string | null;
+  failoverAttempts: number;
+  totalCalls: number;
+  totalFailures: number;
+  endpointStats: Record<string, { attempts: number; successes: number; failures: number }>;
+}
+
+const _diag: AuthDiagnostics = {
+  activeEndpoint: null,
+  configuredEndpoints: [...AUTH_ENDPOINTS],
+  lastAction: null,
+  lastActionTime: null,
+  lastError: null,
+  lastErrorTime: null,
+  failoverAttempts: 0,
+  totalCalls: 0,
+  totalFailures: 0,
+  endpointStats: Object.fromEntries(AUTH_ENDPOINTS.map(ep => [ep, { attempts: 0, successes: 0, failures: 0 }])),
+};
+
+/** Read-only snapshot of auth diagnostics for admin UI. */
+export function getAuthDiagnostics(): AuthDiagnostics {
+  return { ..._diag, endpointStats: JSON.parse(JSON.stringify(_diag.endpointStats)) };
+}
+
 // ── Helpers ──
 
 function storeSession(s: StoredSession) {
@@ -74,6 +106,10 @@ function mapOIDCUser(info: Record<string, unknown>): AuthUser {
 }
 
 async function callEdge(action: string, params: Record<string, unknown> = {}) {
+  _diag.totalCalls++;
+  _diag.lastAction = action;
+  _diag.lastActionTime = new Date().toISOString();
+
   const ibm = isIbmRouted('appid-auth');
   const baseHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -81,8 +117,13 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
   };
 
   let lastNetworkError: Error | null = null;
+  let attemptIndex = 0;
 
   for (const endpoint of AUTH_ENDPOINTS) {
+    attemptIndex++;
+    const epStats = _diag.endpointStats[endpoint] || { attempts: 0, successes: 0, failures: 0 };
+    epStats.attempts++;
+
     const endpointHeaders: Record<string, string> = {
       ...baseHeaders,
       ...(endpoint.includes('/functions/v1/') ? { apikey: ANON_KEY } : {}),
@@ -98,6 +139,9 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
       });
     } catch (err) {
       lastNetworkError = err instanceof Error ? err : new Error('Network error');
+      epStats.failures++;
+      _diag.endpointStats[endpoint] = epStats;
+      if (attemptIndex > 1) _diag.failoverAttempts++;
       continue;
     }
 
@@ -107,15 +151,26 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
       : { error: await res.text() };
 
     if (!res.ok || data?.error) {
-      throw new Error(data?.error || `Auth function error (${res.status})`);
+      epStats.failures++;
+      _diag.endpointStats[endpoint] = epStats;
+      _diag.totalFailures++;
+      const errMsg = data?.error || `Auth function error (${res.status})`;
+      _diag.lastError = errMsg;
+      _diag.lastErrorTime = new Date().toISOString();
+      throw new Error(errMsg);
     }
 
+    epStats.successes++;
+    _diag.endpointStats[endpoint] = epStats;
+    _diag.activeEndpoint = endpoint;
     return data;
   }
 
-  throw new Error(
-    `Unable to reach IBM auth service. Checked: ${AUTH_ENDPOINTS.join(', ')}${lastNetworkError ? ` (${lastNetworkError.message})` : ''}`
-  );
+  _diag.totalFailures++;
+  const errMsg = `Unable to reach IBM auth service. Checked: ${AUTH_ENDPOINTS.join(', ')}${lastNetworkError ? ` (${lastNetworkError.message})` : ''}`;
+  _diag.lastError = errMsg;
+  _diag.lastErrorTime = new Date().toISOString();
+  throw new Error(errMsg);
 }
 
 // ── Auth state listener registry ──
