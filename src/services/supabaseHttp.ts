@@ -1,8 +1,8 @@
 /**
- * Direct HTTP helpers for calling backend REST API and Edge Functions.
+ * Direct HTTP helpers for calling the HBF API (IBM Code Engine).
  *
- * When IBM_FUNCTIONS_URL is configured, restQuery and callRpc are routed
- * through the IBM Cloud Functions Express server instead of Supabase PostgREST.
+ * The deployed HBF API uses /api/v1/ as its route prefix and requires
+ * authentication via x-api-key, Authorization header, or x-session-token.
  */
 
 import { authProvider } from '@/services/auth';
@@ -12,11 +12,23 @@ import {
   functionUrl,
   isIbmRouted,
   IBM_FUNCTIONS_URL,
+  IBM_API_PREFIX,
 } from '@/config/supabase';
 
 // ── Helpers ──
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
+  const { data } = await authProvider.getSession();
+  const token = data?.session?.access_token;
+  return {
+    'Content-Type': 'application/json',
+    'x-api-key': ANON_KEY,
+    Authorization: `Bearer ${token || ANON_KEY}`,
+  };
+}
+
+/** Headers for Supabase-direct calls (fallback) */
+async function getSupabaseHeaders(): Promise<Record<string, string>> {
   const { data } = await authProvider.getSession();
   const token = data?.session?.access_token;
   return {
@@ -33,12 +45,7 @@ export async function invokeEdgeFunction<T = any>(
   body: unknown,
 ): Promise<T> {
   const ibm = isIbmRouted(functionName);
-  const headers = await getAuthHeaders();
-
-  // IBM Code Engine doesn't use the Supabase apikey header
-  if (ibm) {
-    delete headers['apikey'];
-  }
+  const headers = ibm ? await getAuthHeaders() : await getSupabaseHeaders();
 
   const url = functionUrl(functionName);
   const res = await fetch(url, {
@@ -53,18 +60,14 @@ export async function invokeEdgeFunction<T = any>(
   return data as T;
 }
 
-// ── REST API (PostgREST-compatible) caller ──
+// ── REST API caller ──
 
 interface RestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
-  /** Extra query params appended to the URL */
   params?: URLSearchParams;
-  /** If true, adds Prefer: return=representation */
   returnData?: boolean;
-  /** Adds Prefer: count=exact and returns { data, count } */
   countOnly?: boolean;
-  /** Single-row mode (adds Accept: application/vnd.pgrst.object+json) */
   single?: boolean;
 }
 
@@ -72,29 +75,26 @@ export async function restQuery<T = any>(
   table: string,
   options: RestOptions = {},
 ): Promise<{ data: T; count?: number }> {
-  // Route through IBM if configured
   if (IBM_FUNCTIONS_URL) {
     return restQueryViaIbm<T>(table, options);
   }
   return restQueryViaSupabase<T>(table, options);
 }
 
-/** Route through IBM Cloud Functions rest-query proxy */
+/** Route through HBF API /api/v1/query */
 async function restQueryViaIbm<T>(
   table: string,
   options: RestOptions,
 ): Promise<{ data: T; count?: number }> {
   const { method = 'GET', body, params, returnData, countOnly, single } = options;
   const headers = await getAuthHeaders();
-  delete headers['apikey']; // IBM doesn't use Supabase apikey
 
-  // Convert URLSearchParams to plain object for JSON body
   const paramsObj: Record<string, string> = {};
   if (params) {
     params.forEach((v, k) => { paramsObj[k] = v; });
   }
 
-  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/rest-query`, {
+  const res = await fetch(`${IBM_FUNCTIONS_URL}${IBM_API_PREFIX}/query`, {
     method: 'POST',
     headers,
     body: JSON.stringify({ table, method, params: paramsObj, body, returnData, countOnly, single }),
@@ -102,7 +102,7 @@ async function restQueryViaIbm<T>(
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err?.error || `REST ${method} ${table} failed (${res.status})`);
+    throw new Error(err?.error?.message || err?.error || `REST ${method} ${table} failed (${res.status})`);
   }
 
   const result = await res.json();
@@ -115,7 +115,7 @@ async function restQueryViaSupabase<T>(
   options: RestOptions,
 ): Promise<{ data: T; count?: number }> {
   const { method = 'GET', body, params, returnData, countOnly, single } = options;
-  const headers = await getAuthHeaders();
+  const headers = await getSupabaseHeaders();
 
   const preferParts: string[] = [];
   if (returnData) preferParts.push('return=representation');
@@ -159,22 +159,20 @@ export async function callRpc<T = any>(
   functionName: string,
   params: Record<string, unknown> = {},
 ): Promise<T> {
-  // Route through IBM if configured
   if (IBM_FUNCTIONS_URL) {
     return callRpcViaIbm<T>(functionName, params);
   }
   return callRpcViaSupabase<T>(functionName, params);
 }
 
-/** Route RPC through IBM Cloud Functions */
+/** Route RPC through HBF API /api/v1/rpc/{functionName} */
 async function callRpcViaIbm<T>(
   functionName: string,
   params: Record<string, unknown>,
 ): Promise<T> {
   const headers = await getAuthHeaders();
-  delete headers['apikey'];
 
-  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/rpc/${functionName}`, {
+  const res = await fetch(`${IBM_FUNCTIONS_URL}${IBM_API_PREFIX}/rpc/${functionName}`, {
     method: 'POST',
     headers,
     body: JSON.stringify(params),
@@ -191,7 +189,7 @@ async function callRpcViaSupabase<T>(
   functionName: string,
   params: Record<string, unknown>,
 ): Promise<T> {
-  const headers = await getAuthHeaders();
+  const headers = await getSupabaseHeaders();
   const res = await fetch(`${BASE_URL}/rest/v1/rpc/${functionName}`, {
     method: 'POST',
     headers,
@@ -205,19 +203,7 @@ async function callRpcViaSupabase<T>(
 }
 
 // ── Storage helpers ──
-// Routes through IBM COS when IBM_FUNCTIONS_URL is configured,
-// otherwise falls back to Supabase Storage.
-
-async function getStorageHeaders(contentType?: string): Promise<Record<string, string>> {
-  const { data } = await authProvider.getSession();
-  const token = data?.session?.access_token;
-  const headers: Record<string, string> = {
-    apikey: ANON_KEY,
-    Authorization: `Bearer ${token || ANON_KEY}`,
-  };
-  if (contentType) headers['Content-Type'] = contentType;
-  return headers;
-}
+// Routes through HBF API /api/v1/storage when IBM_FUNCTIONS_URL is configured
 
 /** Convert a File to base64 string */
 async function fileToBase64(file: File): Promise<string> {
@@ -225,7 +211,6 @@ async function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Remove data URL prefix (data:...;base64,)
       const base64 = result.split(',')[1];
       resolve(base64);
     };
@@ -253,11 +238,10 @@ async function storageUploadViaIbm(
   options?: { cacheControl?: string; upsert?: boolean },
 ): Promise<{ key: string }> {
   const headers = await getAuthHeaders();
-  delete headers['apikey'];
 
   const fileBase64 = await fileToBase64(file);
 
-  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/storage/upload`, {
+  const res = await fetch(`${IBM_FUNCTIONS_URL}${IBM_API_PREFIX}/storage/upload`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
@@ -283,7 +267,7 @@ async function storageUploadViaSupabase(
   file: File,
   options?: { cacheControl?: string; upsert?: boolean },
 ): Promise<{ key: string }> {
-  const headers = await getStorageHeaders();
+  const headers = await getSupabaseHeaders();
   if (options?.cacheControl) headers['cache-control'] = options.cacheControl;
   if (options?.upsert) headers['x-upsert'] = 'true';
 
@@ -319,9 +303,8 @@ async function storageCreateSignedUrlViaIbm(
   expiresIn: number,
 ): Promise<string> {
   const headers = await getAuthHeaders();
-  delete headers['apikey'];
 
-  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/storage/signed-url`, {
+  const res = await fetch(`${IBM_FUNCTIONS_URL}${IBM_API_PREFIX}/storage/signed-url`, {
     method: 'POST',
     headers,
     body: JSON.stringify({ bucket, path, expiresIn }),
@@ -340,7 +323,7 @@ async function storageCreateSignedUrlViaSupabase(
   path: string,
   expiresIn: number,
 ): Promise<string> {
-  const headers = await getAuthHeaders();
+  const headers = await getSupabaseHeaders();
   const res = await fetch(`${BASE_URL}/storage/v1/object/sign/${bucket}/${path}`, {
     method: 'POST',
     headers,
@@ -369,9 +352,8 @@ async function storageRemoveViaIbm(
   paths: string[],
 ): Promise<void> {
   const headers = await getAuthHeaders();
-  delete headers['apikey'];
 
-  const res = await fetch(`${IBM_FUNCTIONS_URL}/api/storage/delete`, {
+  const res = await fetch(`${IBM_FUNCTIONS_URL}${IBM_API_PREFIX}/storage/delete`, {
     method: 'POST',
     headers,
     body: JSON.stringify({ bucket, paths }),
@@ -387,7 +369,7 @@ async function storageRemoveViaSupabase(
   bucket: string,
   paths: string[],
 ): Promise<void> {
-  const headers = await getAuthHeaders();
+  const headers = await getSupabaseHeaders();
   const res = await fetch(`${BASE_URL}/storage/v1/object/${bucket}`, {
     method: 'DELETE',
     headers,
