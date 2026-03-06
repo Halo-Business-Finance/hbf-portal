@@ -1,6 +1,6 @@
 /**
  * IBM App ID implementation of AuthProviderAPI.
- * Communicates with the appid-auth edge function — secrets never touch the browser.
+ * Communicates with the HBF API auth endpoints — secrets never touch the browser.
  */
 import type {
   AuthProviderAPI,
@@ -14,34 +14,10 @@ import type {
   OAuthProvider,
 } from './types';
 
-import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, SUPABASE_URL, isIbmRouted, IBM_FUNCTIONS_URL } from '@/config/supabase';
+import { SUPABASE_ANON_KEY as ANON_KEY, IBM_FUNCTIONS_URL, IBM_API_PREFIX } from '@/config/supabase';
 
-// ── Edge function endpoint ──
-const EDGE_FUNCTION_URL = functionUrl('appid-auth');
-const SUPABASE_APPID_AUTH_URL = `${SUPABASE_URL}/functions/v1/appid-auth`;
-const NORMALIZED_IBM_BASE_URL = IBM_FUNCTIONS_URL.replace(/\/+$/, '');
-const API_DOMAIN_BASE_URL = 'https://api.halobusinessfinance.com';
-
-// Build all candidate endpoints — the failover loop tries each in order
-const AUTH_ENDPOINTS = Array.from(
-  new Set([
-    // Primary: configured IBM endpoint
-    EDGE_FUNCTION_URL,
-    // v1 API routes on IBM domain (deployed version uses /api/v1/)
-    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/sign-in`,
-    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid`,
-    `${NORMALIZED_IBM_BASE_URL}/api/v1/appid-auth`,
-    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid-auth`,
-    // Production custom domain
-    `${API_DOMAIN_BASE_URL}/api/v1/auth/sign-in`,
-    `${API_DOMAIN_BASE_URL}/api/v1/auth/appid`,
-    `${API_DOMAIN_BASE_URL}/api/appid-auth`,
-    `${API_DOMAIN_BASE_URL}/api/v1/appid-auth`,
-    // Legacy/fallback
-    'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth',
-    SUPABASE_APPID_AUTH_URL,
-  ])
-);
+// ── Auth endpoint — the deployed HBF API uses /api/v1/auth/sign-in ──
+const AUTH_ENDPOINT = `${IBM_FUNCTIONS_URL}${IBM_API_PREFIX}/auth/sign-in`;
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';
@@ -71,7 +47,7 @@ export interface AuthDiagnostics {
 
 const _diag: AuthDiagnostics = {
   activeEndpoint: null,
-  configuredEndpoints: [...AUTH_ENDPOINTS],
+  configuredEndpoints: [AUTH_ENDPOINT],
   lastAction: null,
   lastActionTime: null,
   lastError: null,
@@ -79,7 +55,7 @@ const _diag: AuthDiagnostics = {
   failoverAttempts: 0,
   totalCalls: 0,
   totalFailures: 0,
-  endpointStats: Object.fromEntries(AUTH_ENDPOINTS.map(ep => [ep, { attempts: 0, successes: 0, failures: 0 }])),
+  endpointStats: { [AUTH_ENDPOINT]: { attempts: 0, successes: 0, failures: 0 } },
 };
 
 /** Read-only snapshot of auth diagnostics for admin UI. */
@@ -126,94 +102,69 @@ function mapOIDCUser(info: Record<string, unknown>): AuthUser {
   };
 }
 
+/**
+ * Call the HBF API auth endpoint.
+ * The deployed API requires one of: Authorization header, x-session-token, or x-api-key.
+ */
 async function callEdge(action: string, params: Record<string, unknown> = {}) {
   _diag.totalCalls++;
   _diag.lastAction = action;
   _diag.lastActionTime = new Date().toISOString();
 
-  const ibm = isIbmRouted('appid-auth');
-  const baseHeaders: Record<string, string> = {
+  const epStats = _diag.endpointStats[AUTH_ENDPOINT] || { attempts: 0, successes: 0, failures: 0 };
+  epStats.attempts++;
+
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${ANON_KEY}`,
+    'x-api-key': ANON_KEY,
   };
 
-  let lastNetworkError: Error | null = null;
-  let attemptIndex = 0;
-
-  for (const endpoint of AUTH_ENDPOINTS) {
-    attemptIndex++;
-    const epStats = _diag.endpointStats[endpoint] || { attempts: 0, successes: 0, failures: 0 };
-    epStats.attempts++;
-
-    const isSupabaseEndpoint = endpoint.includes('/functions/v1/');
-    const isIbmApiEndpoint = endpoint.includes('codeengine.appdomain.cloud') || endpoint.includes('api.halobusinessfinance.com');
-
-    const endpointHeaders: Record<string, string> = {
-      ...baseHeaders,
-      ...(isSupabaseEndpoint || !ibm ? { apikey: ANON_KEY } : {}),
-      ...(isIbmApiEndpoint ? { 'x-api-key': ANON_KEY } : {}),
-    };
-
-    let res: Response;
-    try {
-      res = await fetch(endpoint, {
-        method: 'POST',
-        headers: endpointHeaders,
-        body: JSON.stringify({ action, ...params }),
-      });
-    } catch (err) {
-      lastNetworkError = err instanceof Error ? err : new Error('Network error');
-      epStats.failures++;
-      _diag.endpointStats[endpoint] = epStats;
-      if (attemptIndex > 1) _diag.failoverAttempts++;
-      continue;
-    }
-
-    const contentType = res.headers.get('content-type') || '';
-    const data = contentType.includes('application/json')
-      ? await res.json()
-      : { error: await res.text() };
-
-    if (!res.ok || data?.error) {
-      epStats.failures++;
-      _diag.endpointStats[endpoint] = epStats;
-      _diag.totalFailures++;
-      const rawError = data?.error;
-      const errMsg =
-        typeof rawError === 'string'
-          ? rawError
-          : (rawError as { message?: string })?.message || `Auth function error (${res.status})`;
-      _diag.lastError = errMsg;
-      _diag.lastErrorTime = new Date().toISOString();
-
-      const lowerErr = String(errMsg).toLowerCase();
-      const shouldFailover =
-        res.status === 404 ||
-        res.status === 405 ||
-        res.status >= 500 ||
-        lowerErr.includes('endpoint not found') ||
-        lowerErr.includes('not found');
-
-      if (shouldFailover) {
-        lastNetworkError = new Error(errMsg);
-        if (attemptIndex < AUTH_ENDPOINTS.length) _diag.failoverAttempts++;
-        continue;
-      }
-
-      throw new Error(errMsg);
-    }
-
-    epStats.successes++;
-    _diag.endpointStats[endpoint] = epStats;
-    _diag.activeEndpoint = endpoint;
-    return data;
+  // If we have a stored session, also send the bearer token
+  const stored = loadSession();
+  if (stored?.access_token) {
+    headers['Authorization'] = `Bearer ${stored.access_token}`;
   }
 
-  _diag.totalFailures++;
-  const errMsg = `Unable to reach IBM auth service. Checked: ${AUTH_ENDPOINTS.join(', ')}${lastNetworkError ? ` (${lastNetworkError.message})` : ''}`;
-  _diag.lastError = errMsg;
-  _diag.lastErrorTime = new Date().toISOString();
-  throw new Error(errMsg);
+  let res: Response;
+  try {
+    res = await fetch(AUTH_ENDPOINT, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ action, ...params }),
+    });
+  } catch (err) {
+    const networkErr = err instanceof Error ? err : new Error('Network error');
+    epStats.failures++;
+    _diag.endpointStats[AUTH_ENDPOINT] = epStats;
+    _diag.totalFailures++;
+    _diag.lastError = networkErr.message;
+    _diag.lastErrorTime = new Date().toISOString();
+    throw new Error(`Unable to reach IBM auth service at ${AUTH_ENDPOINT}: ${networkErr.message}`);
+  }
+
+  const contentType = res.headers.get('content-type') || '';
+  const data = contentType.includes('application/json')
+    ? await res.json()
+    : { error: await res.text() };
+
+  if (!res.ok || data?.error) {
+    epStats.failures++;
+    _diag.endpointStats[AUTH_ENDPOINT] = epStats;
+    _diag.totalFailures++;
+    const rawError = data?.error;
+    const errMsg =
+      typeof rawError === 'string'
+        ? rawError
+        : (rawError as { message?: string })?.message || `Auth function error (${res.status})`;
+    _diag.lastError = errMsg;
+    _diag.lastErrorTime = new Date().toISOString();
+    throw new Error(errMsg);
+  }
+
+  epStats.successes++;
+  _diag.endpointStats[AUTH_ENDPOINT] = epStats;
+  _diag.activeEndpoint = AUTH_ENDPOINT;
+  return data;
 }
 
 // ── Auth state listener registry ──
@@ -262,7 +213,6 @@ export const appIdAuthProvider: AuthProviderAPI = {
   onAuthStateChange(callback) {
     listeners.add(callback);
 
-    // Fire initial session
     const stored = loadSession();
     if (stored) {
       queueMicrotask(() => callback('INITIAL_SESSION', toAuthSession(stored)));
@@ -329,7 +279,6 @@ export const appIdAuthProvider: AuthProviderAPI = {
         return { error: { message: err.message } };
       }
     }
-    // Email change not supported via App ID Cloud Directory in this flow
     if (attributes.email) {
       return { error: { message: 'Email change not supported via App ID' } };
     }
@@ -340,7 +289,6 @@ export const appIdAuthProvider: AuthProviderAPI = {
     try {
       const redirectUri = options?.redirectTo || `${window.location.origin}/auth/callback`;
       const state = crypto.randomUUID();
-      // Store state for CSRF verification
       sessionStorage.setItem(CALLBACK_KEY, JSON.stringify({ state, redirectUri }));
 
       const res = await callEdge('get_authorization_url', {
@@ -367,8 +315,7 @@ export const appIdAuthProvider: AuthProviderAPI = {
     }
   },
 
-  // MFA is not natively supported by App ID Cloud Directory.
-  // These stubs allow the UI to function without errors.
+  // MFA stubs — not supported by App ID Cloud Directory
   mfa: {
     async listFactors(): Promise<AuthResult<{ totp: MFAFactor[] }>> {
       return { data: { totp: [] } };
@@ -394,7 +341,7 @@ export const appIdAuthProvider: AuthProviderAPI = {
   },
 };
 
-// ── OAuth callback handler (call from /auth/callback route) ──
+// ── OAuth callback handler ──
 export async function handleAppIdOAuthCallback(): Promise<AuthResult<{ session: AuthSession }>> {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
@@ -402,7 +349,6 @@ export async function handleAppIdOAuthCallback(): Promise<AuthResult<{ session: 
 
   if (!code) return { error: { message: 'No authorization code in callback' } };
 
-  // Verify CSRF state
   const stored = sessionStorage.getItem(CALLBACK_KEY);
   if (stored) {
     const { state: expectedState, redirectUri } = JSON.parse(stored);

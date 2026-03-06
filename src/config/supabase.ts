@@ -1,10 +1,8 @@
 /**
- * Centralised Supabase / backend configuration.
- * Every service file imports from here instead of duplicating constants.
+ * Centralised backend configuration.
  *
- * When IBM_FUNCTIONS_URL is set, the three ported edge functions
- * (audit-logger, notification-service, loan-application-processor)
- * are routed to the IBM Code Engine API instead of Supabase Edge Functions.
+ * The HBF API (Code Engine) uses /api/v1/ as its route prefix.
+ * All frontend services import from here for consistent routing.
  */
 
 export const SUPABASE_URL = 'https://zosgzkpfgaaadadezpxo.supabase.co';
@@ -13,12 +11,12 @@ export const SUPABASE_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvc2d6a3BmZ2FhYWRhZGV6cHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NzAxMjgsImV4cCI6MjA2OTE0NjEyOH0.r2puMuMTlbLkXqceD7MfC630q_W0K-9GbI632BtFJOY';
 
 /**
- * IBM Code Engine Functions API base URL.
+ * IBM Code Engine API base URL.
  *
  * Resolution order:
- * 1) VITE_IBM_FUNCTIONS_URL (recommended)
- * 2) Current origin when app is served from *.codeengine.appdomain.cloud
- * 3) undefined (falls back to Supabase routes)
+ * 1) VITE_IBM_FUNCTIONS_URL (recommended for overrides)
+ * 2) Current origin when app is served from Code Engine
+ * 3) Hard-coded production URL
  */
 const ENV_IBM_FUNCTIONS_URL = import.meta.env.VITE_IBM_FUNCTIONS_URL?.trim();
 const RUNTIME_IBM_FUNCTIONS_URL =
@@ -26,16 +24,15 @@ const RUNTIME_IBM_FUNCTIONS_URL =
     ? window.location.origin
     : undefined;
 
-/** Hard-coded fallback so the app always reaches IBM even when env vars are missing (e.g. Lovable preview). */
 const DEFAULT_IBM_FUNCTIONS_URL = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud';
 
 export const IBM_FUNCTIONS_URL: string = ENV_IBM_FUNCTIONS_URL || RUNTIME_IBM_FUNCTIONS_URL || DEFAULT_IBM_FUNCTIONS_URL;
 
+/** The deployed HBF API uses /api/v1 as the base path */
+export const IBM_API_PREFIX = '/api/v1';
+
 /**
- * Functions that have been ported to the IBM Code Engine API.
- * When IBM_FUNCTIONS_URL is configured, calls to these functions
- * are routed to `${IBM_FUNCTIONS_URL}/api/${functionName}` instead
- * of the Supabase edge function URL.
+ * Functions that are handled by the IBM Code Engine API.
  */
 export const IBM_PORTED_FUNCTIONS: ReadonlySet<string> = new Set([
   'audit-logger',
@@ -52,12 +49,11 @@ export const IBM_PORTED_FUNCTIONS: ReadonlySet<string> = new Set([
 
 /**
  * Resolve the URL for a given function name.
- * If the function has been ported and IBM_FUNCTIONS_URL is configured,
- * returns the IBM Code Engine endpoint; otherwise falls back to Supabase.
+ * IBM-ported functions use /api/v1/{functionName}.
  */
 export function functionUrl(functionName: string): string {
   if (IBM_PORTED_FUNCTIONS.has(functionName)) {
-    return `${IBM_FUNCTIONS_URL}/api/${functionName}`;
+    return `${IBM_FUNCTIONS_URL}${IBM_API_PREFIX}/${functionName}`;
   }
   return `${SUPABASE_URL}/functions/v1/${functionName}`;
 }
