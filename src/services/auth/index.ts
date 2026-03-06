@@ -17,7 +17,8 @@ export type {
 } from './types';
 
 import { supabaseAuthProvider } from './supabaseAuthProvider';
-import { appIdAuthProvider, handleAppIdOAuthCallback } from './appIdAuthProvider';
+import { appIdAuthProvider, handleAppIdOAuthCallback, getAuthDiagnostics } from './appIdAuthProvider';
+export type { AuthDiagnostics } from './appIdAuthProvider';
 
 /**
  * Switch auth backend by changing this line.
@@ -26,4 +27,4 @@ import { appIdAuthProvider, handleAppIdOAuthCallback } from './appIdAuthProvider
  */
 export const authProvider = appIdAuthProvider;
 
-export { appIdAuthProvider, handleAppIdOAuthCallback };
+export { appIdAuthProvider, handleAppIdOAuthCallback, getAuthDiagnostics };
