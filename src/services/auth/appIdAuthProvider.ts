@@ -14,12 +14,34 @@ import type {
   OAuthProvider,
 } from './types';
 
-import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, isIbmRouted } from '@/config/supabase';
+import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, SUPABASE_URL, isIbmRouted, IBM_FUNCTIONS_URL } from '@/config/supabase';
 
 // ── Edge function endpoint ──
 const EDGE_FUNCTION_URL = functionUrl('appid-auth');
-const FALLBACK_IBM_AUTH_URL = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth';
-const AUTH_ENDPOINTS = Array.from(new Set([EDGE_FUNCTION_URL, FALLBACK_IBM_AUTH_URL]));
+const SUPABASE_APPID_AUTH_URL = `${SUPABASE_URL}/functions/v1/appid-auth`;
+const NORMALIZED_IBM_BASE_URL = IBM_FUNCTIONS_URL.replace(/\/+$/, '');
+const API_DOMAIN_BASE_URL = 'https://api.halobusinessfinance.com';
+
+// Build all candidate endpoints — the failover loop tries each in order
+const AUTH_ENDPOINTS = Array.from(
+  new Set([
+    // Primary: configured IBM endpoint
+    EDGE_FUNCTION_URL,
+    // v1 API routes on IBM domain (deployed version uses /api/v1/)
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/sign-in`,
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid`,
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/appid-auth`,
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid-auth`,
+    // Production custom domain
+    `${API_DOMAIN_BASE_URL}/api/v1/auth/sign-in`,
+    `${API_DOMAIN_BASE_URL}/api/v1/auth/appid`,
+    `${API_DOMAIN_BASE_URL}/api/appid-auth`,
+    `${API_DOMAIN_BASE_URL}/api/v1/appid-auth`,
+    // Legacy/fallback
+    'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth',
+    SUPABASE_APPID_AUTH_URL,
+  ])
+);
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';
@@ -31,6 +53,38 @@ interface StoredSession {
   id_token?: string;
   expires_at?: number;
   user: AuthUser;
+}
+
+// ── Auth diagnostics (exported for admin widget) ──
+export interface AuthDiagnostics {
+  activeEndpoint: string | null;
+  configuredEndpoints: string[];
+  lastAction: string | null;
+  lastActionTime: string | null;
+  lastError: string | null;
+  lastErrorTime: string | null;
+  failoverAttempts: number;
+  totalCalls: number;
+  totalFailures: number;
+  endpointStats: Record<string, { attempts: number; successes: number; failures: number }>;
+}
+
+const _diag: AuthDiagnostics = {
+  activeEndpoint: null,
+  configuredEndpoints: [...AUTH_ENDPOINTS],
+  lastAction: null,
+  lastActionTime: null,
+  lastError: null,
+  lastErrorTime: null,
+  failoverAttempts: 0,
+  totalCalls: 0,
+  totalFailures: 0,
+  endpointStats: Object.fromEntries(AUTH_ENDPOINTS.map(ep => [ep, { attempts: 0, successes: 0, failures: 0 }])),
+};
+
+/** Read-only snapshot of auth diagnostics for admin UI. */
+export function getAuthDiagnostics(): AuthDiagnostics {
+  return { ..._diag, endpointStats: JSON.parse(JSON.stringify(_diag.endpointStats)) };
 }
 
 // ── Helpers ──
@@ -73,25 +127,45 @@ function mapOIDCUser(info: Record<string, unknown>): AuthUser {
 }
 
 async function callEdge(action: string, params: Record<string, unknown> = {}) {
+  _diag.totalCalls++;
+  _diag.lastAction = action;
+  _diag.lastActionTime = new Date().toISOString();
+
   const ibm = isIbmRouted('appid-auth');
-  const headers: Record<string, string> = {
+  const baseHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(ibm ? {} : { apikey: ANON_KEY }),
     Authorization: `Bearer ${ANON_KEY}`,
   };
 
   let lastNetworkError: Error | null = null;
+  let attemptIndex = 0;
 
   for (const endpoint of AUTH_ENDPOINTS) {
+    attemptIndex++;
+    const epStats = _diag.endpointStats[endpoint] || { attempts: 0, successes: 0, failures: 0 };
+    epStats.attempts++;
+
+    const isSupabaseEndpoint = endpoint.includes('/functions/v1/');
+    const isIbmApiEndpoint = endpoint.includes('codeengine.appdomain.cloud') || endpoint.includes('api.halobusinessfinance.com');
+
+    const endpointHeaders: Record<string, string> = {
+      ...baseHeaders,
+      ...(isSupabaseEndpoint || !ibm ? { apikey: ANON_KEY } : {}),
+      ...(isIbmApiEndpoint ? { 'x-api-key': ANON_KEY } : {}),
+    };
+
     let res: Response;
     try {
       res = await fetch(endpoint, {
         method: 'POST',
-        headers,
+        headers: endpointHeaders,
         body: JSON.stringify({ action, ...params }),
       });
     } catch (err) {
       lastNetworkError = err instanceof Error ? err : new Error('Network error');
+      epStats.failures++;
+      _diag.endpointStats[endpoint] = epStats;
+      if (attemptIndex > 1) _diag.failoverAttempts++;
       continue;
     }
 
@@ -101,15 +175,45 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
       : { error: await res.text() };
 
     if (!res.ok || data?.error) {
-      throw new Error(data?.error || `Auth function error (${res.status})`);
+      epStats.failures++;
+      _diag.endpointStats[endpoint] = epStats;
+      _diag.totalFailures++;
+      const rawError = data?.error;
+      const errMsg =
+        typeof rawError === 'string'
+          ? rawError
+          : (rawError as { message?: string })?.message || `Auth function error (${res.status})`;
+      _diag.lastError = errMsg;
+      _diag.lastErrorTime = new Date().toISOString();
+
+      const lowerErr = String(errMsg).toLowerCase();
+      const shouldFailover =
+        res.status === 404 ||
+        res.status === 405 ||
+        res.status >= 500 ||
+        lowerErr.includes('endpoint not found') ||
+        lowerErr.includes('not found');
+
+      if (shouldFailover) {
+        lastNetworkError = new Error(errMsg);
+        if (attemptIndex < AUTH_ENDPOINTS.length) _diag.failoverAttempts++;
+        continue;
+      }
+
+      throw new Error(errMsg);
     }
 
+    epStats.successes++;
+    _diag.endpointStats[endpoint] = epStats;
+    _diag.activeEndpoint = endpoint;
     return data;
   }
 
-  throw new Error(
-    `Unable to reach IBM auth service. Checked: ${AUTH_ENDPOINTS.join(', ')}${lastNetworkError ? ` (${lastNetworkError.message})` : ''}`
-  );
+  _diag.totalFailures++;
+  const errMsg = `Unable to reach IBM auth service. Checked: ${AUTH_ENDPOINTS.join(', ')}${lastNetworkError ? ` (${lastNetworkError.message})` : ''}`;
+  _diag.lastError = errMsg;
+  _diag.lastErrorTime = new Date().toISOString();
+  throw new Error(errMsg);
 }
 
 // ── Auth state listener registry ──
