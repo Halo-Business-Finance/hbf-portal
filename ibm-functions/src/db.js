@@ -14,14 +14,32 @@ if (!DATABASE_URL) {
 
 // Reconstruct CA cert from single-line env var if needed
 function buildCaCert() {
-  const raw = process.env.IBM_DB_CA_CERT;
+  let raw = process.env.IBM_DB_CA_CERT;
   if (!raw) return undefined;
-  // If it already has newlines it's fine; otherwise reformat
-  if (raw.includes('\n')) return raw;
-  return raw
-    .replace('-----BEGIN CERTIFICATE-----', '-----BEGIN CERTIFICATE-----\n')
-    .replace('-----END CERTIFICATE-----', '\n-----END CERTIFICATE-----\n')
-    .replace(/(.{64})(?!-)/g, '$1\n');
+
+  // Handle base64-encoded certs (no PEM header)
+  if (!raw.includes('-----BEGIN')) {
+    try {
+      raw = Buffer.from(raw, 'base64').toString('utf-8');
+    } catch {
+      // not base64, use as-is
+    }
+  }
+
+  // If it already has proper newlines, return as-is
+  if (raw.includes('-----BEGIN CERTIFICATE-----\n')) return raw;
+
+  // Fix single-line PEM: extract base64 body and reformat with 64-char lines
+  if (raw.includes('-----BEGIN CERTIFICATE-----')) {
+    const body = raw
+      .replace('-----BEGIN CERTIFICATE-----', '')
+      .replace('-----END CERTIFICATE-----', '')
+      .replace(/\s+/g, '');
+    const lines = body.match(/.{1,64}/g) || [];
+    return '-----BEGIN CERTIFICATE-----\n' + lines.join('\n') + '\n-----END CERTIFICATE-----\n';
+  }
+
+  return raw;
 }
 
 const caCert = buildCaCert();
