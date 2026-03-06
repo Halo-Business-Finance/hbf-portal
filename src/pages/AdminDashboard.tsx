@@ -24,7 +24,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { lazy } from 'react';
 
 const HealthCheckPanel = lazy(() => import('@/components/dashboard/HealthCheckPanel'));
-
+const AuthDiagnosticsPanel = lazy(() => import('@/components/dashboard/AuthDiagnosticsPanel'));
 
 const AdminDashboard = () => {
   const { authenticated, loading } = useAuth();
@@ -150,7 +150,10 @@ const AdminDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8">
         {/* Runtime Health Check */}
-        <HealthCheckPanel />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <HealthCheckPanel />
+          <AuthDiagnosticsPanel />
+        </div>
 
         {/* Security Overview Widget */}
         <SecurityOverview />
