@@ -168,6 +168,21 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
       const errMsg = data?.error || `Auth function error (${res.status})`;
       _diag.lastError = errMsg;
       _diag.lastErrorTime = new Date().toISOString();
+
+      const lowerErr = String(errMsg).toLowerCase();
+      const shouldFailover =
+        res.status === 404 ||
+        res.status === 405 ||
+        res.status >= 500 ||
+        lowerErr.includes('endpoint not found') ||
+        lowerErr.includes('not found');
+
+      if (shouldFailover) {
+        lastNetworkError = new Error(errMsg);
+        if (attemptIndex < AUTH_ENDPOINTS.length) _diag.failoverAttempts++;
+        continue;
+      }
+
       throw new Error(errMsg);
     }
 
