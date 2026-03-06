@@ -21,19 +21,24 @@ const EDGE_FUNCTION_URL = functionUrl('appid-auth');
 const SUPABASE_APPID_AUTH_URL = `${SUPABASE_URL}/functions/v1/appid-auth`;
 const NORMALIZED_IBM_BASE_URL = IBM_FUNCTIONS_URL.replace(/\/+$/, '');
 const API_DOMAIN_BASE_URL = 'https://api.halobusinessfinance.com';
-const IBM_V1_APPID_AUTH_URL = `${NORMALIZED_IBM_BASE_URL}/api/v1/appid-auth`;
-const IBM_V1_AUTH_APPID_AUTH_URL = `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid-auth`;
-const API_DOMAIN_APPID_AUTH_URL = `${API_DOMAIN_BASE_URL}/api/appid-auth`;
-const API_DOMAIN_V1_APPID_AUTH_URL = `${API_DOMAIN_BASE_URL}/api/v1/appid-auth`;
-const FALLBACK_IBM_AUTH_URL = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth';
+
+// Build all candidate endpoints — the failover loop tries each in order
 const AUTH_ENDPOINTS = Array.from(
   new Set([
+    // Primary: configured IBM endpoint
     EDGE_FUNCTION_URL,
-    IBM_V1_APPID_AUTH_URL,
-    IBM_V1_AUTH_APPID_AUTH_URL,
-    API_DOMAIN_APPID_AUTH_URL,
-    API_DOMAIN_V1_APPID_AUTH_URL,
-    FALLBACK_IBM_AUTH_URL,
+    // v1 API routes on IBM domain (deployed version uses /api/v1/)
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/sign-in`,
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid`,
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/appid-auth`,
+    `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid-auth`,
+    // Production custom domain
+    `${API_DOMAIN_BASE_URL}/api/v1/auth/sign-in`,
+    `${API_DOMAIN_BASE_URL}/api/v1/auth/appid`,
+    `${API_DOMAIN_BASE_URL}/api/appid-auth`,
+    `${API_DOMAIN_BASE_URL}/api/v1/appid-auth`,
+    // Legacy/fallback
+    'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth',
     SUPABASE_APPID_AUTH_URL,
   ])
 );
