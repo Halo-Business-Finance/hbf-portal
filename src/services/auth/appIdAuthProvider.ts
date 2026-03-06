@@ -140,10 +140,13 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
     const epStats = _diag.endpointStats[endpoint] || { attempts: 0, successes: 0, failures: 0 };
     epStats.attempts++;
 
+    const isSupabaseEndpoint = endpoint.includes('/functions/v1/');
+    const isIbmApiEndpoint = endpoint.includes('codeengine.appdomain.cloud') || endpoint.includes('api.halobusinessfinance.com');
+
     const endpointHeaders: Record<string, string> = {
       ...baseHeaders,
-      ...(endpoint.includes('/functions/v1/') ? { apikey: ANON_KEY } : {}),
-      ...(!ibm ? { apikey: ANON_KEY } : {}),
+      ...(isSupabaseEndpoint || !ibm ? { apikey: ANON_KEY } : {}),
+      ...(isIbmApiEndpoint ? { 'x-api-key': ANON_KEY } : {}),
     };
 
     let res: Response;
