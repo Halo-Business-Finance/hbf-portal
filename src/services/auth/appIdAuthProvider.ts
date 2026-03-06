@@ -173,7 +173,11 @@ async function callEdge(action: string, params: Record<string, unknown> = {}) {
       epStats.failures++;
       _diag.endpointStats[endpoint] = epStats;
       _diag.totalFailures++;
-      const errMsg = data?.error || `Auth function error (${res.status})`;
+      const rawError = data?.error;
+      const errMsg =
+        typeof rawError === 'string'
+          ? rawError
+          : (rawError as { message?: string })?.message || `Auth function error (${res.status})`;
       _diag.lastError = errMsg;
       _diag.lastErrorTime = new Date().toISOString();
 
