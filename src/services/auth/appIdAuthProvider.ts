@@ -14,13 +14,24 @@ import type {
   OAuthProvider,
 } from './types';
 
-import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, SUPABASE_URL, isIbmRouted } from '@/config/supabase';
+import { functionUrl, SUPABASE_ANON_KEY as ANON_KEY, SUPABASE_URL, isIbmRouted, IBM_FUNCTIONS_URL } from '@/config/supabase';
 
 // ── Edge function endpoint ──
 const EDGE_FUNCTION_URL = functionUrl('appid-auth');
 const SUPABASE_APPID_AUTH_URL = `${SUPABASE_URL}/functions/v1/appid-auth`;
+const NORMALIZED_IBM_BASE_URL = IBM_FUNCTIONS_URL.replace(/\/+$/, '');
+const IBM_V1_APPID_AUTH_URL = `${NORMALIZED_IBM_BASE_URL}/api/v1/appid-auth`;
+const IBM_V1_AUTH_APPID_AUTH_URL = `${NORMALIZED_IBM_BASE_URL}/api/v1/auth/appid-auth`;
 const FALLBACK_IBM_AUTH_URL = 'https://hbf-api.23oqh4gja5d5.us-south.codeengine.appdomain.cloud/api/appid-auth';
-const AUTH_ENDPOINTS = Array.from(new Set([EDGE_FUNCTION_URL, FALLBACK_IBM_AUTH_URL, SUPABASE_APPID_AUTH_URL]));
+const AUTH_ENDPOINTS = Array.from(
+  new Set([
+    EDGE_FUNCTION_URL,
+    IBM_V1_APPID_AUTH_URL,
+    IBM_V1_AUTH_APPID_AUTH_URL,
+    FALLBACK_IBM_AUTH_URL,
+    SUPABASE_APPID_AUTH_URL,
+  ])
+);
 
 // ── Storage keys ──
 const TOKEN_KEY = 'appid_session';
