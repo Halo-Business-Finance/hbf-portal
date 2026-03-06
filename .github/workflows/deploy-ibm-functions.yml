@@ -31,7 +31,8 @@ jobs:
 
       - name: Login to IBM Cloud
         run: |
-          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} -r ${{ env.IBM_REGION }} -g ${{ secrets.IBM_RESOURCE_GROUP }}
+          ibmcloud login --apikey "${{ secrets.IBM_CLOUD_API_KEY }}" -r ${{ env.IBM_REGION }}
+          ibmcloud target -g "${{ secrets.IBM_RESOURCE_GROUP }}"
 
       - name: Login to Container Registry
         run: ibmcloud cr login
