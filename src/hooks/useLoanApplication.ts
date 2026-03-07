@@ -3,8 +3,8 @@ import { useToast } from '@/hooks/use-toast';
 import { loanApplicationService, type LoanApplicationData } from '@/services/loanApplicationService';
 import { notificationService } from '@/services/notificationService';
 import { useAuth } from '@/contexts/AuthContext';
-import { invokeEdgeFunction } from '@/services/supabaseHttp';
 import { sanitizeFormData } from '@/lib/utils';
+import { crmSyncService } from '@/services/crmSyncService';
 
 export const useLoanApplication = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -77,18 +77,18 @@ export const useLoanApplication = () => {
       const result = await loanApplicationService.processApplication(sanitizedData);
 
       if (result.success) {
-        // Auto-sync to CRM (non-critical)
-        try {
-          await invokeEdgeFunction('crm-integration', { 
-            action: 'sync_loan_application', 
-            data: { 
-              applicationId: result.application.id,
-              ...result.application 
-            } 
-          });
-        } catch (crmError) {
-          // CRM sync failure is non-critical
-        }
+        // Sync to CRM (non-blocking)
+        crmSyncService.syncLoanApplication({
+          application_id: result.application.id,
+          user_id: user.id,
+          loan_type: sanitizedData.loan_type,
+          amount_requested: sanitizedData.amount_requested,
+          status: 'submitted',
+          business_name: sanitizedData.business_name,
+          first_name: sanitizedData.first_name,
+          last_name: sanitizedData.last_name,
+          phone: sanitizedData.phone,
+        }).catch(err => console.warn('[CRM Sync] Non-critical sync error:', err));
 
         await notificationService.sendApplicationSubmittedNotification(
           user.email || `${applicationData.first_name}@example.com`,
@@ -137,7 +137,22 @@ export const useLoanApplication = () => {
     try {
       setIsLoading(true);
       const result = await loanApplicationService.saveAsDraft(user.id, applicationData);
-      
+
+      // Sync draft to CRM (non-blocking)
+      if (result?.id) {
+        crmSyncService.syncLoanApplication({
+          application_id: result.id,
+          user_id: user.id,
+          loan_type: applicationData.loan_type || 'unknown',
+          amount_requested: applicationData.amount_requested || 0,
+          status: 'draft',
+          business_name: applicationData.business_name,
+          first_name: applicationData.first_name,
+          last_name: applicationData.last_name,
+          phone: applicationData.phone,
+        }).catch(err => console.warn('[CRM Sync] Non-critical sync error:', err));
+      }
+
       toast({
         title: "Draft Saved",
         description: "Your application has been saved as a draft.",

@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { restQuery, invokeEdgeFunction } from '@/services/supabaseHttp';
+import { crmSyncService } from '@/services/crmSyncService';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -130,6 +131,15 @@ const BorrowerPortal = () => {
         last_name: values.last_name,
         phone: values.phone || '',
       });
+
+      // Sync profile to CRM (non-blocking)
+      crmSyncService.syncProfile({
+        user_id: user.id,
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: user.email,
+        phone: values.phone,
+      }).catch(err => console.warn('[CRM Sync] Profile sync error:', err));
 
       setUserProfile({
         ...userProfile,
