@@ -44,7 +44,7 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Select Code Engine project
-        run: ibmcloud ce project select --name ${{ env.CE_PROJECT }}
+        run: ibmcloud ce project select -n "${{ env.CE_PROJECT }}"
 
       - name: Deploy or update application
         run: |
