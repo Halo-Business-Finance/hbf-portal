@@ -1,4 +1,5 @@
 import { invokeEdgeFunction, restQuery } from './supabaseHttp';
+import { crmSyncService } from './crmSyncService';
 
 export interface LoanApplicationValidation {
   isValid: boolean;
@@ -52,7 +53,20 @@ class LoanApplicationService {
 
   async updateApplicationStatus(applicationId: string, status: string, notes?: string) {
     try {
-      return await invokeEdgeFunction('loan-application-processor', { action: 'updateStatus', applicationId, applicationData: { status, notes } });
+      const result = await invokeEdgeFunction('loan-application-processor', { action: 'updateStatus', applicationId, applicationData: { status, notes } });
+
+      // Sync status change to CRM (non-blocking)
+      // We don't have full app data here, so log as activity
+      crmSyncService.syncStatusChange({
+        application_id: applicationId,
+        user_id: '',
+        loan_type: '',
+        amount_requested: 0,
+        old_status: 'unknown',
+        new_status: status,
+      }).catch(err => console.warn('[CRM Sync] Status sync error:', err));
+
+      return result;
     } catch (error) {
       console.error('Error updating application status:', error);
       throw new Error('Failed to update application status');
