@@ -38,6 +38,45 @@ jobs:
       - name: Login to Container Registry
         run: ibmcloud cr login
 
+      - name: Validate required deployment secrets
+        env:
+          IBM_DATABASE_URL: ${{ secrets.IBM_DATABASE_URL }}
+          IBM_DB_CA_CERT: ${{ secrets.IBM_DB_CA_CERT }}
+          SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
+          IBM_APPID_TENANT_ID: ${{ secrets.IBM_APPID_TENANT_ID }}
+          IBM_APPID_CLIENT_ID: ${{ secrets.IBM_APPID_CLIENT_ID }}
+          IBM_APPID_SECRET: ${{ secrets.IBM_APPID_SECRET }}
+          IBM_APPID_OAUTH_SERVER_URL: ${{ secrets.IBM_APPID_OAUTH_SERVER_URL }}
+          IBM_COS_API_KEY: ${{ secrets.IBM_COS_API_KEY }}
+          IBM_COS_ENDPOINT: ${{ secrets.IBM_COS_ENDPOINT }}
+          IBM_COS_BUCKET: ${{ secrets.IBM_COS_BUCKET }}
+          IBM_COS_INSTANCE_ID: ${{ secrets.IBM_COS_INSTANCE_ID }}
+        run: |
+          missing=0
+          for var in \
+            IBM_DATABASE_URL \
+            IBM_DB_CA_CERT \
+            SUPABASE_JWT_SECRET \
+            IBM_APPID_TENANT_ID \
+            IBM_APPID_CLIENT_ID \
+            IBM_APPID_SECRET \
+            IBM_APPID_OAUTH_SERVER_URL \
+            IBM_COS_API_KEY \
+            IBM_COS_ENDPOINT \
+            IBM_COS_BUCKET \
+            IBM_COS_INSTANCE_ID
+          do
+            if [ -z "${!var}" ]; then
+              echo "Missing required secret: $var"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            echo "Deployment aborted due to missing required secrets."
+            exit 1
+          fi
+
       - name: Build & push image
         working-directory: ibm-functions
         run: |
