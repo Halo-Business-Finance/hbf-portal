@@ -1,9 +1,12 @@
-name: Deploy to IBM Code Engine
+name: Deploy Portal to IBM Code Engine
 
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'ibm-functions/**'
+      - 'docs/hbf-api-starter/**'
   workflow_dispatch:
 
 permissions:
@@ -13,7 +16,9 @@ env:
   IBM_CLOUD_REGION: us-south
   ICR_NAMESPACE: hbf-portal
   ICR_REGISTRY: us.icr.io
-  IMAGE_NAME: hbf-portal
+  # PORTAL_APP_NAME is the ONLY Code Engine app this workflow may touch.
+  # Changing this to any other app name (e.g. hbf-api) is FORBIDDEN.
+  PORTAL_APP_NAME: hbf-portal
   CODE_ENGINE_PROJECT: Halo Business Finance
 
 jobs:
@@ -23,6 +28,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: 🚨 Collision guard – ensure we never touch hbf-api
+        run: |
+          set -euo pipefail
+          APP="hbf-portal"
+          if [ "$APP" != "hbf-portal" ]; then
+            echo "🚨 FATAL: PORTAL_APP_NAME is '$APP' — this workflow may ONLY deploy 'hbf-portal'."
+            echo "Aborting to prevent overwriting the hbf-api backend."
+            exit 1
+          fi
+          echo "✅ Collision guard passed — deploying to '$APP' only."
 
       - name: Install IBM Cloud CLI
         run: |
@@ -54,15 +70,28 @@ jobs:
         run: |
           ibmcloud ce project select --name "${{ env.CODE_ENGINE_PROJECT }}"
 
-      - name: Build & Deploy from source (Code Engine managed build)
+      - name: 🚨 Verify target app is hbf-portal (runtime check)
+        run: |
+          set -euo pipefail
+          # Double-check the live app we're about to update is the portal, not the API
+          APP_IMAGE=$(ibmcloud ce application get --name ${{ env.PORTAL_APP_NAME }} --output json 2>/dev/null | jq -r '.spec.template.spec.containers[0].image // empty' || echo "")
+          if echo "$APP_IMAGE" | grep -qi "hbf-api"; then
+            echo "🚨 COLLISION DETECTED: '${{ env.PORTAL_APP_NAME }}' is currently running an hbf-api image!"
+            echo "   Current image: $APP_IMAGE"
+            echo "   This workflow will NOT overwrite it. Aborting."
+            exit 1
+          fi
+          echo "✅ Runtime check passed — '${{ env.PORTAL_APP_NAME }}' is not running an API image."
+
+      - name: Build & Deploy portal from source
         timeout-minutes: 45
         env:
           DB_URL: ${{ secrets.IBM_DATABASE_URL }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: |
-          echo "Building from source using Code Engine managed build..."
-          echo "This builds the Dockerfile on IBM servers and pushes to the registry."
+          echo "Building portal from source using Code Engine managed build..."
+          echo "Target app: ${{ env.PORTAL_APP_NAME }} (portal ONLY)"
           
           # Create .env file for Vite build (these are public/publishable keys)
           echo "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" > .env.production
@@ -71,11 +100,11 @@ jobs:
           cat .env.production
           
           ibmcloud ce application update \
-            --name ${{ env.IMAGE_NAME }} \
+            --name ${{ env.PORTAL_APP_NAME }} \
             --src . \
             --strategy dockerfile \
             --registry-secret icr-secret \
-            --image "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.IMAGE_NAME }}" \
+            --image "${{ env.ICR_REGISTRY }}/${{ env.ICR_NAMESPACE }}/${{ env.PORTAL_APP_NAME }}" \
             --env "DATABASE_URL=$DB_URL"
 
       - name: Wait for deployment to stabilize
@@ -83,7 +112,7 @@ jobs:
 
       - name: Health Check
         run: |
-          APP_URL=$(ibmcloud ce application get --name ${{ env.IMAGE_NAME }} --output json | jq -r '.status.url')
+          APP_URL=$(ibmcloud ce application get --name ${{ env.PORTAL_APP_NAME }} --output json | jq -r '.status.url')
           echo "Application URL: $APP_URL"
           
           MAX_ATTEMPTS=5
@@ -95,7 +124,7 @@ jobs:
             RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL" --max-time 30 || echo "000")
             
             if [ "$RESPONSE" = "200" ]; then
-              echo "✅ Health check passed! Application is running correctly."
+              echo "✅ Health check passed! Portal is running correctly."
               exit 0
             fi
             
