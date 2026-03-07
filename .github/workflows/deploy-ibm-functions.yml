@@ -9,11 +9,11 @@ on:
 
 env:
   IBM_REGION: us-south
-  CE_PROJECT: hbf-functions
+  CE_PROJECT: Halo Business Finance
   APP_NAME: hbf-api
   REGISTRY: us.icr.io
-  NAMESPACE: hbf-registry
-  IMAGE_NAME: hbf-functions
+  NAMESPACE: hbf-api
+  IMAGE_NAME: hbf-api
 
 jobs:
   deploy:
