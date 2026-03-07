@@ -636,6 +636,14 @@ const MyDocuments = () => {
         }],
       });
 
+      // Sync version upload to CRM (non-blocking)
+      crmSyncService.syncDocumentUpload({
+        user_id: user.id,
+        document_id: rootDocId,
+        document_name: `${newVersionFile.name} (v${nextVersion})`,
+        document_category: documentToUpdate.document_category,
+      }).catch(err => console.warn('[CRM Sync] Doc version sync error:', err));
+
       setUploadProgress(100);
 
       toast({
