@@ -14,6 +14,7 @@ env:
   REGISTRY: us.icr.io
   NAMESPACE: hbf-api
   IMAGE_NAME: hbf-api
+  REGISTRY_SECRET: hbf-api-icr-secret
 
 jobs:
   deploy:
@@ -46,6 +47,17 @@ jobs:
       - name: Select Code Engine project
         run: ibmcloud ce project select --name "Halo Business Finance" --endpoint public
 
+      - name: Ensure Code Engine registry pull secret
+        run: |
+          if ibmcloud ce registry get --name ${{ env.REGISTRY_SECRET }} > /dev/null 2>&1; then
+            ibmcloud ce registry delete --name ${{ env.REGISTRY_SECRET }} --force
+          fi
+          ibmcloud ce registry create \
+            --name ${{ env.REGISTRY_SECRET }} \
+            --server ${{ env.REGISTRY }} \
+            --username iamapikey \
+            --password "${{ secrets.IBM_CLOUD_API_KEY }}"
+
       - name: Deploy or update application
         run: |
           if ibmcloud ce app get --name ${{ env.APP_NAME }} > /dev/null 2>&1; then
@@ -54,6 +66,7 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --build-clear \
               --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+              --registry-secret ${{ env.REGISTRY_SECRET }} \
               --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}" \
               --env IBM_DB_CA_CERT="${{ secrets.IBM_DB_CA_CERT }}" \
               --env JWT_SECRET="${{ secrets.SUPABASE_JWT_SECRET }}" \
@@ -79,6 +92,7 @@ jobs:
               ibmcloud ce app update \
                 --name ${{ env.APP_NAME }} \
                 --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+                --registry-secret ${{ env.REGISTRY_SECRET }} \
                 --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}" \
                 --env IBM_DB_CA_CERT="${{ secrets.IBM_DB_CA_CERT }}" \
                 --env JWT_SECRET="${{ secrets.SUPABASE_JWT_SECRET }}" \
@@ -106,6 +120,7 @@ jobs:
             ibmcloud ce app create \
               --name ${{ env.APP_NAME }} \
               --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+              --registry-secret ${{ env.REGISTRY_SECRET }} \
               --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}" \
               --env IBM_DB_CA_CERT="${{ secrets.IBM_DB_CA_CERT }}" \
               --env JWT_SECRET="${{ secrets.SUPABASE_JWT_SECRET }}" \
