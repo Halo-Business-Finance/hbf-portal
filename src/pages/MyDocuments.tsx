@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { restQuery, storageUpload, storageCreateSignedUrl, storageRemove, invokeEdgeFunction } from '@/services/supabaseHttp';
 import { authProvider } from '@/services/auth';
+import { crmSyncService } from '@/services/crmSyncService';
 import { PageHeader } from '@/components/PageHeader';
 import { 
   Upload, 
@@ -290,6 +291,14 @@ const MyDocuments = () => {
               description: null
             }],
           });
+
+          // Sync to CRM (non-blocking)
+          crmSyncService.syncDocumentUpload({
+            user_id: user.id,
+            document_id: `${Date.now()}`,
+            document_name: file.name,
+            document_category: selectedCategory,
+          }).catch(err => console.warn('[CRM Sync] Doc sync error:', err));
 
           uploadedCount++;
           setUploadProgress(Math.round((uploadedCount / totalFiles) * 100));
