@@ -51,6 +51,7 @@ jobs:
           if ibmcloud ce app get --name ${{ env.APP_NAME }} > /dev/null 2>&1; then
             ibmcloud ce app update \
               --name ${{ env.APP_NAME }} \
+              --build-clear \
               --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
               --env DATABASE_URL="${{ secrets.IBM_DATABASE_URL }}" \
               --env IBM_DB_CA_CERT="${{ secrets.IBM_DB_CA_CERT }}" \
